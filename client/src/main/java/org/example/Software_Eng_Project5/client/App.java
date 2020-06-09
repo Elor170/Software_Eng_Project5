@@ -51,8 +51,8 @@ public class App extends Application {
     @Subscribe
     public void onMessageEvent(org.example.Software_Eng_Project5.client.MessageEvent event) {
         Platform.runLater(() -> {
-            if(event.getMessage().getCommand().equals("#login-Y")) {
-
+            if(event.getMessage().isCheck()) {
+                System.out.println(event.getMessage().getType());
                 try {
                     setRoot("secondary");
                 } catch (IOException e) {
