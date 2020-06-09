@@ -9,6 +9,7 @@
         <module name="entities" />
         <module name="client" />
         <module name="server" />
+        <module name="usersSystem" />
       </profile>
     </annotationProcessing>
   </component>

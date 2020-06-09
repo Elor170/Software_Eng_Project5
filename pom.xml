@@ -12,6 +12,7 @@
     <module>server</module>
     <module>entities</module>
     <module>client</module>
+    <module>usersSystem</module>
   </modules>
 
   <name>Software_Eng_Project5</name>
