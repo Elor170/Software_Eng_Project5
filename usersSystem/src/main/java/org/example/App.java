@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.Software_Eng_Project5.entities.Teacher;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,7 +15,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import org.example.Software_Eng_Project5.entities.User;
+
 /**
  * JavaFX App
  */
@@ -27,7 +28,7 @@ public class App extends Application {
         Configuration configuration = new Configuration();
 
         // Add ALL of your entities here. You can also try adding a whole package.
-        configuration.addAnnotatedClass(User.class);
+        configuration.addAnnotatedClass(Teacher.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
 
@@ -57,8 +58,8 @@ public class App extends Application {
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            User user = new User(userName, password, userType);
-            session.save(user);
+            Teacher teacher = new Teacher(userName, password);
+            session.save(teacher);
 
             session.flush();
             session.getTransaction().commit();

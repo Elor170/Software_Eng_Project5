@@ -24,7 +24,7 @@
          <VBox.margin>
             <Insets bottom="5.0" right="180.0" />
          </VBox.margin></Label>
-      <TextField fx:id="userNameTF" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="250.0" promptText="Please enter user name">
+      <TextField fx:id="userNameTF" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="250.0" promptText="Please enter teacher name">
          <VBox.margin>
             <Insets bottom="10.0" />
          </VBox.margin></TextField>
