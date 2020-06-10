@@ -1,7 +1,7 @@
 package org.example.Software_Eng_Project5.server;
 
 import org.example.Software_Eng_Project5.entities.Message;
-import org.example.Software_Eng_Project5.entities.User;
+import org.example.Software_Eng_Project5.entities.Teacher;
 import org.example.Software_Eng_Project5.server.ocsf.AbstractServer;
 import org.example.Software_Eng_Project5.server.ocsf.ConnectionToClient;
 import org.hibernate.HibernateException;
@@ -16,6 +16,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +33,7 @@ public class SimpleServer extends AbstractServer {
 		Configuration configuration = new Configuration();
 
 		// Add ALL of your entities here. You can also try adding a whole package.
-		configuration.addAnnotatedClass(User.class);
+		configuration.addAnnotatedClass(Teacher.class);
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties()).build();
 
@@ -40,7 +41,6 @@ public class SimpleServer extends AbstractServer {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
 		try {
 			SessionFactory sessionFactory = getSessionFactory();
@@ -50,24 +50,10 @@ public class SimpleServer extends AbstractServer {
 			Message message = (Message) msg;
 			Message returnMessage = new Message();
 
-			if (message.getCommand().equals("#login")) {
-				String userName = ((List<String>)(message.getObjList())).get(0);
-				String password = ((List<String>)(message.getObjList())).get(1);
-				List<User> usersList = getAll(User.class);
+			if (message.getCommand().equals("getObject")) {
+				returnMessage = getObject(message);
+			}
 
-				returnMessage.setCheck(false);
-				for (User userDB: usersList){
-
-					boolean checkUserName = userDB.getUserName().equals(userName);
-					boolean checkPassword = userDB.getPassword().equals(password);
-					if (checkUserName && checkPassword){
-						returnMessage.setCheck(true);
-						returnMessage.setType(userDB.getUserType());
-						break;
-					}
-				}
-
-				message.setObjList(null);
 
 				try {
 					client.sendToClient(returnMessage);
@@ -75,7 +61,7 @@ public class SimpleServer extends AbstractServer {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
+
 
 			session.flush();
 			session.getTransaction().commit();
@@ -95,6 +81,30 @@ public class SimpleServer extends AbstractServer {
 
 	}
 
+
+	public Message getObject(Message message){
+		Message retMessage = new Message();
+		String indexString = message.getIndexString();
+		String objType = message.getType();
+
+		if (objType.equals("User")) {
+			List<Teacher> teacherList = getAll(Teacher.class);
+			for (Teacher teacher : teacherList){
+				if (teacher.getUserName().equals(indexString)){
+					retMessage.setType("Teacher");
+					List<Teacher> teacherFound = new ArrayList<>();
+					teacherFound.add(teacher);
+					retMessage.setObjList(teacherFound);
+					return retMessage;
+				}
+			}
+		}
+		return retMessage;
+	}
+
+//	public Object getObjectList(Message message){
+//
+//	}
 
 	public static <T> List<T> getAll(Class<T> object) {
 		CriteriaBuilder builder = session.getCriteriaBuilder();

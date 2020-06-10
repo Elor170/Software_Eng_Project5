@@ -6,10 +6,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.entities.Message;
+import org.example.Software_Eng_Project5.entities.Teacher;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * JavaFX App
@@ -49,14 +52,20 @@ public class App extends Application {
     }
 
     @Subscribe
+    @SuppressWarnings("unchecked")
     public void onMessageEvent(org.example.Software_Eng_Project5.client.MessageEvent event) {
         Platform.runLater(() -> {
-            if(event.getMessage().isCheck()) {
-                System.out.println(event.getMessage().getType());
-                try {
-                    setRoot("secondary");
-                } catch (IOException e) {
-                    e.printStackTrace();
+            Message message = event.getMessage();
+            String password = PrimaryController.getPassword();
+
+            if(message.getType() != null){
+                if (message.getType().equals("Teacher") &&
+                        ((List<Teacher>)message.getObjList()).get(0).getPassword().equals(password)){
+                    try {
+                        setRoot("secondary");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

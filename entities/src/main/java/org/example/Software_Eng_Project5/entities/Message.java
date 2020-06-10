@@ -4,9 +4,10 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private String command;
+    private String IndexString;
     private String type;
-    private boolean check;
     private Object objList;
+
 
     public Message() {
     }
@@ -14,6 +15,22 @@ public class Message implements Serializable {
     public Message(String command, Object objList) {
         this.command = command;
         this.objList = objList;
+    }
+
+    public String getIndexString() {
+        return IndexString;
+    }
+
+    public void setIndexString(String indexString) {
+        IndexString = indexString;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Object getObjList() {
@@ -32,19 +49,4 @@ public class Message implements Serializable {
         this.command = command;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isCheck() {
-        return check;
-    }
-
-    public void setCheck(boolean check) {
-        this.check = check;
-    }
 }

@@ -19,6 +19,7 @@ public class PrimaryController {
 
 	@FXML
 	private TextField passwordTF;
+	private static String password;
 
 	@FXML
 	private Button logInB;
@@ -26,15 +27,22 @@ public class PrimaryController {
 	@FXML
 	void logInB(ActionEvent event) {
 		List<String> stringList = new ArrayList<>();
-		stringList.add(userNameTF.getText());
-		stringList.add(passwordTF.getText());
-		Message message = new Message("#login", stringList);
+		String userName = userNameTF.getText();
+		this.password = passwordTF.getText();
+		Message message = new Message();
+		message.setCommand("getObject");
+		message.setIndexString(userName);
+		message.setType("User");
 		try {
 			org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static String getPassword() {
+		return password;
 	}
 }
 
