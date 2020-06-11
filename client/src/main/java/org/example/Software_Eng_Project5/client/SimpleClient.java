@@ -1,6 +1,7 @@
 package org.example.Software_Eng_Project5.client;
 
 import org.example.Software_Eng_Project5.client.ocsf.AbstractClient;
+import org.example.Software_Eng_Project5.client.user.UserEvent;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.greenrobot.eventbus.EventBus;
 
@@ -15,7 +16,7 @@ public class SimpleClient extends AbstractClient {
 	@Override
 	protected void handleMessageFromServer(Object msg) {
 		if (msg.getClass().equals(Message.class)) {
-			EventBus.getDefault().post(new org.example.Software_Eng_Project5.client.MessageEvent((Message) msg));
+			EventBus.getDefault().post(new UserEvent((Message) msg));
 		}
 
 	}

@@ -1,15 +1,15 @@
-package org.example.Software_Eng_Project5.client;
+package org.example.Software_Eng_Project5.client.user;
 
 import org.example.Software_Eng_Project5.entities.Message;
 
-public class MessageEvent {
+public class UserEvent {
     private Message message;
 
     public Message getMessage() {
         return message;
     }
 
-    public MessageEvent(Message message) {
+    public UserEvent(Message message) {
         this.message = message;
     }
 }
