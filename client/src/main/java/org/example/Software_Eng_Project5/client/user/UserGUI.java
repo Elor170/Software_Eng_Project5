@@ -1,6 +1,6 @@
 
 
-package org.example.Software_Eng_Project5.client;
+package org.example.Software_Eng_Project5.client.user;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrimaryController {
+public class UserGUI {
 
 	@FXML
 	private TextField userNameTF;
