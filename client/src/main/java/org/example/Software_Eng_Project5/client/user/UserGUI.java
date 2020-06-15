@@ -1,49 +1,47 @@
-
-
 package org.example.Software_Eng_Project5.client.user;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import org.example.Software_Eng_Project5.entities.Message;
+import org.greenrobot.eventbus.EventBus;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserGUI {
 
 	@FXML
+	private Label status;
+
+	@FXML
 	private TextField userNameTF;
 
 	@FXML
 	private TextField passwordTF;
-	private static String password;
 
 	@FXML
 	private Button logInB;
 
+
 	@FXML
 	void logInB(ActionEvent event) {
+		status.setText("");
 		List<String> stringList = new ArrayList<>();
-		String userName = userNameTF.getText();
-		this.password = passwordTF.getText();
+		stringList.add(userNameTF.getText());
+		stringList.add(passwordTF.getText());
 		Message message = new Message();
-		message.setCommand("getObject");
-		message.setIndexString(userName);
-		message.setType("User");
-		try {
-			org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		message.setObjList(stringList);
+		EventBus.getDefault().post(new UserEvent(message, "LogIn"));
 	}
 
-	public static String getPassword() {
-		return password;
+	public void logInFailed(){
+		status.setText("The user name or the password are wrong");
 	}
+
 }
 
 

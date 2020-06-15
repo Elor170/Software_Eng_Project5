@@ -7,14 +7,10 @@ public class Message implements Serializable {
     private String IndexString;
     private String type;
     private Object objList;
+    private Object SingleObject;
 
 
     public Message() {
-    }
-
-    public Message(String command, Object objList) {
-        this.command = command;
-        this.objList = objList;
     }
 
     public String getIndexString() {
@@ -49,4 +45,11 @@ public class Message implements Serializable {
         this.command = command;
     }
 
+    public Object getSingleObject() {
+        return SingleObject;
+    }
+
+    public void setSingleObject(Object singleObject) {
+        SingleObject = singleObject;
+    }
 }
