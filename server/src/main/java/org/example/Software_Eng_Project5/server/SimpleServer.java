@@ -26,7 +26,6 @@ public class SimpleServer extends AbstractServer {
 
 	public SimpleServer(int port) {
 		super(port);
-		
 	}
 
 	private static SessionFactory getSessionFactory() throws HibernateException {
@@ -50,8 +49,9 @@ public class SimpleServer extends AbstractServer {
 			Message message = (Message) msg;
 			Message returnMessage = new Message();
 
-			if (message.getCommand().equals("getObject")) {
-				returnMessage = getObject(message);
+			if (message.getCommand().startsWith("Bring")) {
+				if(message.getCommand().endsWith("One"))
+					returnMessage = getObject(message);
 			}
 
 
@@ -88,13 +88,13 @@ public class SimpleServer extends AbstractServer {
 		String objType = message.getType();
 
 		if (objType.equals("User")) {
+			retMessage.setCommand("User Event");
+
 			List<Teacher> teacherList = getAll(Teacher.class);
 			for (Teacher teacher : teacherList){
 				if (teacher.getUserName().equals(indexString)){
 					retMessage.setType("Teacher");
-					List<Teacher> teacherFound = new ArrayList<>();
-					teacherFound.add(teacher);
-					retMessage.setObjList(teacherFound);
+					retMessage.setSingleObject(teacher);
 					return retMessage;
 				}
 			}

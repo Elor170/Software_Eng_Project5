@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.Teacher;
 import org.greenrobot.eventbus.EventBus;
@@ -20,26 +21,32 @@ import java.util.List;
  */
 public class UserApp extends Application {
 
-    private static Scene scene;
-    private org.example.Software_Eng_Project5.client.SimpleClient client;
+    protected static Scene scene;
+    protected org.example.Software_Eng_Project5.client.SimpleClient client;
+    protected String userName;
+    private String password;
+    private UserGUI userGUI;
 
     @Override
     public void start(Stage stage) throws IOException {
         EventBus.getDefault().register(this);
         client = org.example.Software_Eng_Project5.client.SimpleClient.getClient();
         client.openConnection();
-        scene = new Scene(loadFXML("userWindow"));
+        EventBus.getDefault().register(client);
+        scene = new Scene(loadFXML("userWindow", this));
         stage.setScene(scene);
         stage.show();
     }
 
-    private static void setRoot(String fxml) throws IOException {
-        scene.setRoot(UserApp.loadFXML(fxml));
+    protected void setRoot(String fxml) throws IOException {
+        scene.setRoot(this.loadFXML(fxml, this));
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
+    protected Parent loadFXML(String fxml, UserApp userApp) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(UserApp.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+        Parent parent = fxmlLoader.load();
+        userApp.userGUI = fxmlLoader.getController();
+        return parent;
     }
 
 
@@ -48,28 +55,53 @@ public class UserApp extends Application {
     public void stop() throws Exception {
         // TODO Auto-generated method stub
         EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(client);
         super.stop();
         System.exit(0);
     }
 
+
+
     @Subscribe
     @SuppressWarnings("unchecked")
-    public void logInEvent(UserEvent event) {
-        Platform.runLater(() -> {
-            Message message = event.getMessage();
-            String password = UserGUI.getPassword();
+    public void inUserEvent (UserEvent event) {
+        Message massage = event.getMessage();
+        String eventType = event.getEventType();
+        if(eventType.equals("LogIn")){
+            List<String> stringList = (List<String>)massage.getObjList();
+            this.userName = stringList.get(0);
+            this.password = stringList.get(1);
+        }
 
-            if(message.getType() != null){
-                if (message.getType().equals("Teacher") &&
-                        ((List<Teacher>)message.getObjList()).get(0).getPassword().equals(password)){
-                    TeacherApp teacherApp = null;
+        if(eventType.equals("LogIn check")){
+            logIn(massage);
+        }
+
+    }
+
+    private void logIn(Message massage){
+        Platform.runLater(() -> {
+        boolean isLogin = false;
+        String userType = massage.getType();
+        Object user = massage.getSingleObject();
+
+        if(userType != null){
+            if(userType.equals("Teacher")){
+                Teacher teacher = (Teacher)user;
+                if (teacher.getUserName().equals(this.userName)
+                        && teacher.getPassword().equals(this.password)){
                     try {
-                        teacherApp = new TeacherApp(this.client ,this.scene);
+                        TeacherApp teacherApp = new TeacherApp(this.userName);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
+                    isLogin = true;
                 }
+            }
+
+        }
+            if (!isLogin) {
+                userGUI.logInFailed();
             }
         });
 
