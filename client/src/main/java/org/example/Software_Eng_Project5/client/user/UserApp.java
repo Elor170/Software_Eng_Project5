@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class UserApp extends Application {
 
+    protected Stage stage;
     protected static Scene scene;
     protected org.example.Software_Eng_Project5.client.SimpleClient client;
     protected String userName;
@@ -29,6 +30,7 @@ public class UserApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        this.stage = stage;
         EventBus.getDefault().register(this);
         client = org.example.Software_Eng_Project5.client.SimpleClient.getClient();
         client.openConnection();
@@ -81,7 +83,7 @@ public class UserApp extends Application {
 
     private void logIn(Message massage){
         Platform.runLater(() -> {
-        boolean isLogin = false;
+        boolean isUserNamePasswordMatch = false;
         String userType = massage.getType();
         Object user = massage.getSingleObject();
 
@@ -91,16 +93,16 @@ public class UserApp extends Application {
                 if (teacher.getUserName().equals(this.userName)
                         && teacher.getPassword().equals(this.password)){
                     try {
-                        TeacherApp teacherApp = new TeacherApp(this.userName);
+                        TeacherApp teacherApp = new TeacherApp(this.stage ,this.userName);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    isLogin = true;
+                    isUserNamePasswordMatch = true;
                 }
             }
 
         }
-            if (!isLogin) {
+            if (!isUserNamePasswordMatch) {
                 userGUI.logInFailed();
             }
         });
