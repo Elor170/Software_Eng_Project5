@@ -2,7 +2,6 @@ package org.example.Software_Eng_Project5.client.user;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -28,7 +27,7 @@ public class UserGUI {
 
 
 	@FXML
-	void logInB(ActionEvent event) {
+	private void logInB(ActionEvent event) {
 		status.setText("");
 		List<String> stringList = new ArrayList<>();
 		stringList.add(userNameTF.getText());
