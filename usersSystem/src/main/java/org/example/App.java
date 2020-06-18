@@ -1,6 +1,8 @@
 package org.example;
 
+import org.example.Software_Eng_Project5.entities.Student;
 import org.example.Software_Eng_Project5.entities.Teacher;
+import org.example.Software_Eng_Project5.entities.User;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -28,7 +30,10 @@ public class App extends Application {
         Configuration configuration = new Configuration();
 
         // Add ALL of your entities here. You can also try adding a whole package.
+        configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Teacher.class);
+        configuration.addAnnotatedClass(Student.class);
+
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
 
@@ -58,8 +63,18 @@ public class App extends Application {
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            Teacher teacher = new Teacher(userName, password);
-            session.save(teacher);
+            User user = new User(userName, password, userType);
+            session.save(user);
+
+            if (userType.equals("Teacher")){
+                Teacher teacher = new Teacher(userName);
+                session.save(teacher);
+            }
+
+            if (userType.equals("Student")){
+                Student student = new Student(userName);
+                session.save(student);
+            }
 
             session.flush();
             session.getTransaction().commit();

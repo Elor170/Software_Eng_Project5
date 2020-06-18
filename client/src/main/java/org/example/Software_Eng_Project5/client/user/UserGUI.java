@@ -29,16 +29,18 @@ public class UserGUI {
 	@FXML
 	private void logInB(ActionEvent event) {
 		status.setText("");
-		List<String> stringList = new ArrayList<>();
-		stringList.add(userNameTF.getText());
-		stringList.add(passwordTF.getText());
 		Message message = new Message();
-		message.setObjList(stringList);
+		message.setIndexString(userNameTF.getText());
+		message.setSingleObject(passwordTF.getText());
 		EventBus.getDefault().post(new UserEvent(message, "LogIn"));
 	}
 
 	public void logInFailed(){
 		status.setText("The user name or the password are wrong");
+	}
+
+	public void alreadyConnected(){
+		status.setText("The user is already connected");
 	}
 
 }

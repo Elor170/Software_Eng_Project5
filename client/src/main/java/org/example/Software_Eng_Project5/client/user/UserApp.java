@@ -5,9 +5,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.Teacher;
 import org.greenrobot.eventbus.EventBus;
@@ -24,9 +24,8 @@ public class UserApp extends Application {
     protected Stage stage;
     protected static Scene scene;
     protected org.example.Software_Eng_Project5.client.SimpleClient client;
-    protected String userName;
-    private String password;
     private UserGUI userGUI;
+    protected String userName;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -36,6 +35,9 @@ public class UserApp extends Application {
         client.openConnection();
         EventBus.getDefault().register(client);
         scene = new Scene(loadFXML("userWindow", this));
+        stage.setTitle("HSTS");
+        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
+        stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();
     }
@@ -55,7 +57,9 @@ public class UserApp extends Application {
 
     @Override
     public void stop() throws Exception {
-        // TODO Auto-generated method stub
+        Message message = new Message();
+        message.setIndexString(this.userName);
+        EventBus.getDefault().post(new UserEvent(message, "LogOut"));
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().unregister(client);
         super.stop();
@@ -69,11 +73,6 @@ public class UserApp extends Application {
     public void inUserEvent (UserEvent event) {
         Message massage = event.getMessage();
         String eventType = event.getEventType();
-        if(eventType.equals("LogIn")){
-            List<String> stringList = (List<String>)massage.getObjList();
-            this.userName = stringList.get(0);
-            this.password = stringList.get(1);
-        }
 
         if(eventType.equals("LogIn check")){
             logIn(massage);
@@ -83,28 +82,26 @@ public class UserApp extends Application {
 
     private void logIn(Message massage){
         Platform.runLater(() -> {
-        boolean isUserNamePasswordMatch = false;
-        String userType = massage.getType();
-        Object user = massage.getSingleObject();
+            String userType = massage.getType();
+            String userName = massage.getIndexString();
 
-        if(userType != null){
-            if(userType.equals("Teacher")){
-                Teacher teacher = (Teacher)user;
-                if (teacher.getUserName().equals(this.userName)
-                        && teacher.getPassword().equals(this.password)){
+            if(userType != null){
+                if(userType.equals("Teacher")){
                     try {
-                        TeacherApp teacherApp = new TeacherApp(this.stage ,this.userName);
+                        this.userName = userName;
+                        TeacherApp teacherApp = new TeacherApp(this.stage ,userName);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    isUserNamePasswordMatch = true;
+                }
+                else if(userType.equals("Already connected")){
+                    userGUI.alreadyConnected();
                 }
             }
-
-        }
-            if (!isUserNamePasswordMatch) {
+            else {
                 userGUI.logInFailed();
             }
+
         });
 
     }

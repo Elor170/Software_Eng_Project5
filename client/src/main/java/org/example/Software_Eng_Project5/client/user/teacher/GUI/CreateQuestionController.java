@@ -4,12 +4,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import org.example.Software_Eng_Project5.client.user.UserEvent;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.greenrobot.eventbus.EventBus;
 import org.example.Software_Eng_Project5.entities.Message;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +49,7 @@ public class CreateQuestionController {
 
         @FXML
         private void clickAns(ActionEvent event) {
-            String answer = ((CheckBox)event.getSource()).getText();
+            String answer = ((CheckBox)event.getSource()).getId();
             chooseAnswer1.setSelected(false);
             chooseAnswer2.setSelected(false);
             chooseAnswer3.setSelected(false);
