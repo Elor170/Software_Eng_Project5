@@ -4,6 +4,7 @@ package org.example.Software_Eng_Project5.client.user.teacher;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
 import org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController;
@@ -24,12 +25,14 @@ public class TeacherApp extends UserApp {
 
     public TeacherApp(Stage stage, String userName) throws IOException {
         this.stage = stage;
+        this.userName = userName;
         EventBus.getDefault().register(this);
-        //scene.setRoot(loadFXML("teacherWindow", this));
+
         scene = new Scene(loadFXML("teacherWindow", this));
+        stage.setTitle("HSTS");
+        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
         stage.setScene(scene);
         stage.show();
-        this.userName = userName;
         mainTeacherController.setUserName(this.userName);
     }
 

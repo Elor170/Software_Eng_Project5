@@ -44,16 +44,19 @@ public class SimpleClient extends AbstractClient {
 		org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
 	}
 
+
 	@Subscribe
 	@SuppressWarnings("unchecked")
-	public void inUserEve (UserEvent event) throws IOException {
-		Message massage = event.getMessage();
+	public void inUserEvent (UserEvent event) throws IOException {
+		Message message = event.getMessage();
 		String eventType = event.getEventType();
 		if(eventType.equals("LogIn")){
-			List<String> stringList = (List<String>)massage.getObjList();
-			massage.setIndexString(stringList.get(0));
-			massage.setType("User");
-			bringOne(massage);
+			message.setCommand("LogIn");
+			org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
+		}
+		else if(eventType.equals("LogOut")){
+			message.setCommand("LogOut");
+			org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
 		}
 	}
 }

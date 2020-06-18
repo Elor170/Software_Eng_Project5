@@ -1,7 +1,6 @@
 package org.example.Software_Eng_Project5.server;
 
-import org.example.Software_Eng_Project5.entities.Message;
-import org.example.Software_Eng_Project5.entities.Teacher;
+import org.example.Software_Eng_Project5.entities.*;
 import org.example.Software_Eng_Project5.server.ocsf.AbstractServer;
 import org.example.Software_Eng_Project5.server.ocsf.ConnectionToClient;
 import org.hibernate.HibernateException;
@@ -32,7 +31,10 @@ public class SimpleServer extends AbstractServer {
 		Configuration configuration = new Configuration();
 
 		// Add ALL of your entities here. You can also try adding a whole package.
+		configuration.addAnnotatedClass(User.class);
 		configuration.addAnnotatedClass(Teacher.class);
+		configuration.addAnnotatedClass(Student.class);
+
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties()).build();
 
@@ -49,10 +51,17 @@ public class SimpleServer extends AbstractServer {
 			Message message = (Message) msg;
 			Message returnMessage = new Message();
 
-			if (message.getCommand().startsWith("Bring")) {
-				if(message.getCommand().endsWith("One"))
-					returnMessage = getObject(message);
+			if(message.getCommand().startsWith("LogIn")){
+				returnMessage = logIn(message.getIndexString(), (String) message.getSingleObject());
 			}
+
+			else if(message.getCommand().equals("LogOut")){
+				logOut(message.getIndexString());
+			}
+//			else if (message.getCommand().startsWith("Bring")) {
+//				if(message.getCommand().endsWith("One"))
+//					returnMessage = getObject(message);
+//			}
 
 
 				try {
@@ -81,30 +90,56 @@ public class SimpleServer extends AbstractServer {
 
 	}
 
-
-	public Message getObject(Message message){
+	private Message logIn(String userName, String password) {
 		Message retMessage = new Message();
-		String indexString = message.getIndexString();
-		String objType = message.getType();
-
-		if (objType.equals("User")) {
-			retMessage.setCommand("User Event");
-
-			List<Teacher> teacherList = getAll(Teacher.class);
-			for (Teacher teacher : teacherList){
-				if (teacher.getUserName().equals(indexString)){
-					retMessage.setType("Teacher");
-					retMessage.setSingleObject(teacher);
-					return retMessage;
+		retMessage.setCommand("User Event");
+		User user = session.get(User.class, userName);
+		if(user != null){
+			if(user.getPassword().equals(password)){
+				if(!user.isConnected()) {
+					System.out.println("The " + user.getUserType() + ": " + user.getUserName() + " is connected");
+					user.setConnected(true);
+					session.update(user);
+					retMessage.setType(user.getUserType());
+					retMessage.setIndexString(user.getUserName());
+				}
+				else{
+					retMessage.setType("Already connected");
 				}
 			}
 		}
 		return retMessage;
 	}
 
-//	public Object getObjectList(Message message){
+	private void logOut(String userName){
+		User user = session.get(User.class, userName);
+		user.setConnected(false);
+		session.update(user);
+		System.out.println("The " + user.getUserType() + ": " + user.getUserName() + " disconnected");
+	}
+
+
+//	public Message getObject(Message message){
+//		Message retMessage = new Message();
+//		String indexString = message.getIndexString();
+//		String objType = message.getType();
 //
+//		if (objType.equals("User")) {
+//			retMessage.setCommand("User Event");
+//
+//			List<Teacher> teacherList = getAll(Teacher.class);
+//			for (Teacher teacher : teacherList){
+//				if (teacher.getUserName().equals(indexString)){
+//					retMessage.setType("Teacher");
+//					retMessage.setSingleObject(teacher);
+//					return retMessage;
+//				}
+//			}
+//		}
+//		return retMessage;
 //	}
+
+
 
 	public static <T> List<T> getAll(Class<T> object) {
 		CriteriaBuilder builder = session.getCriteriaBuilder();

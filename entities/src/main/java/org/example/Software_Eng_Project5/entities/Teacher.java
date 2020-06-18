@@ -1,25 +1,21 @@
 package org.example.Software_Eng_Project5.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
-@Table(name = "Teachers")
+@Table(name = "teachers")
 public class Teacher implements Serializable {
 
     @Id
     private String userName;
-    private String password;
-
 
     public Teacher() {
     }
 
-    public Teacher(String userName, String password) {
+    public Teacher(String userName) {
         this.userName = userName;
-        this.password = password;
     }
 
     public String getUserName() {
@@ -30,12 +26,5 @@ public class Teacher implements Serializable {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
 }
