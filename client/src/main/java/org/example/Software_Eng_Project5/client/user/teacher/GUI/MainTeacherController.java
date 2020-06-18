@@ -39,6 +39,7 @@ public class MainTeacherController {
     @FXML
     private void showQuestionsB(ActionEvent event){
 
+
         VBox vb = new VBox();
         Label l = new Label("Questions");
         vb.setAlignment(Pos.TOP_CENTER);
