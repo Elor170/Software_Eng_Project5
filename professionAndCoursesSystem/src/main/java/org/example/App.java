@@ -1,5 +1,10 @@
 package org.example;
 
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.entities.*;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -7,12 +12,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
-
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -33,11 +32,9 @@ public class App extends Application {
         Configuration configuration = new Configuration();
 
         // Add ALL of your entities here. You can also try adding a whole package.
-        configuration.addAnnotatedClass(User.class);
-        configuration.addAnnotatedClass(Teacher.class);
-        configuration.addAnnotatedClass(Student.class);
-        configuration.addAnnotatedClass(Profession.class);
         configuration.addAnnotatedClass(Course.class);
+        configuration.addAnnotatedClass(Profession.class);
+        configuration.addAnnotatedClass(Teacher.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
@@ -47,10 +44,9 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("mainWindow"));
+        scene = new Scene(loadFXML("mainWindow"), 640, 480);
         stage.setScene(scene);
         stage.show();
-        setProfessionList();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -62,24 +58,13 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void addUser2DB(String userName, String password, String userType, List<Profession> teacherProfessions){
+    public static void addObject2DB(Object object){
         try {
             SessionFactory sessionFactory = getSessionFactory();
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            User user = new User(userName, password, userType);
-            session.save(user);
-
-            if (userType.equals("Teacher")){
-                Teacher teacher = new Teacher(userName, teacherProfessions);
-                session.save(teacher);
-            }
-
-            if (userType.equals("Student")){
-                Student student = new Student(userName);
-                session.save(student);
-            }
+            session.save(object);
 
             session.flush();
             session.getTransaction().commit();
@@ -107,7 +92,7 @@ public class App extends Application {
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            mainWindowController.setProfessionsList(getAll(Profession.class));
+            addCourseWindowController.setProfessionsList(getAll(Profession.class));
 
             session.flush();
             session.getTransaction().commit();
