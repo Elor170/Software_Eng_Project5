@@ -7,10 +7,15 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="entities" />
-        <module name="client" />
-        <module name="server" />
         <module name="usersSystem" />
+        <module name="server" />
+        <module name="client" />
+        <module name="professionAndCoursesSystem" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="professions&amp;coursesSystem" target="11" />
+      <module name="professions_coursesSystem" target="13" />
+    </bytecodeTargetLevel>
   </component>
 </project>
