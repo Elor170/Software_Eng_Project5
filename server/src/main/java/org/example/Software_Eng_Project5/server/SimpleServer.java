@@ -63,11 +63,6 @@ public class SimpleServer extends AbstractServer {
 			else if(message.getCommand().equals("LogOut")){
 				logOut(message.getIndexString());
 			}
-//			else if (message.getCommand().startsWith("Bring")) {
-//				if(message.getCommand().endsWith("One"))
-//					returnMessage = getObject(message);
-//			}
-
 
 				try {
 					client.sendToClient(returnMessage);
@@ -129,26 +124,6 @@ public class SimpleServer extends AbstractServer {
 		System.out.println("The " + user.getUserType() + ": " + user.getUserName() + " disconnected");
 	}
 
-
-//	public Message getObject(Message message){
-//		Message retMessage = new Message();
-//		String indexString = message.getIndexString();
-//		String objType = message.getType();
-//
-//		if (objType.equals("User")) {
-//			retMessage.setCommand("User Event");
-//
-//			List<Teacher> teacherList = getAll(Teacher.class);
-//			for (Teacher teacher : teacherList){
-//				if (teacher.getUserName().equals(indexString)){
-//					retMessage.setType("Teacher");
-//					retMessage.setSingleObject(teacher);
-//					return retMessage;
-//				}
-//			}
-//		}
-//		return retMessage;
-//	}
 
 
 
