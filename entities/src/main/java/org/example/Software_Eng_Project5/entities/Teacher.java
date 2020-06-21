@@ -16,6 +16,11 @@ public class Teacher implements Serializable {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "writer")
     private List<Question> questionList;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
+    private List<Test> testList;
+
+
+
     public Teacher() {
     }
 
@@ -52,5 +57,13 @@ public class Teacher implements Serializable {
         for (Question question: questionList){
             question.setWriter(this);
         }
+    }
+
+    public List<Test> getTestList() {
+        return testList;
+    }
+
+    public void addTest(Test test){
+        this.testList.add(test);
     }
 }

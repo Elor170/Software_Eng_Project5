@@ -39,6 +39,7 @@ public class App extends Application {
         configuration.addAnnotatedClass(Course.class);
         configuration.addAnnotatedClass(Question.class);
         configuration.addAnnotatedClass(Answer.class);
+        configuration.addAnnotatedClass(Test.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();

@@ -15,6 +15,8 @@ public class Course implements Serializable {
     private Profession profession;
     @ManyToMany(mappedBy = "courseList", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Question.class)
     private List<Question> questionList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+    private List<Test> testList;
 
     public Course() {
     }
@@ -60,5 +62,9 @@ public class Course implements Serializable {
         for(Question question: questionList){
             question.getCourseList().add(this);
         }
+    }
+
+    public List<Test> getTestList() {
+        return testList;
     }
 }
