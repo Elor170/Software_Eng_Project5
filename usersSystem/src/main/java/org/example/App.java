@@ -38,6 +38,8 @@ public class App extends Application {
         configuration.addAnnotatedClass(Student.class);
         configuration.addAnnotatedClass(Profession.class);
         configuration.addAnnotatedClass(Course.class);
+        configuration.addAnnotatedClass(Question.class);
+        configuration.addAnnotatedClass(Answer.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
@@ -50,7 +52,7 @@ public class App extends Application {
         scene = new Scene(loadFXML("mainWindow"));
         stage.setScene(scene);
         stage.show();
-        setProfessionList();
+        setProfessions();
     }
 
     static void setRoot(String fxml) throws IOException {
@@ -74,6 +76,11 @@ public class App extends Application {
             if (userType.equals("Teacher")){
                 Teacher teacher = new Teacher(userName, teacherProfessions);
                 session.save(teacher);
+                for(Profession profession: teacherProfessions){
+                    profession = session.get(Profession.class, profession.getCode());
+                    profession.getTeacherList().add(teacher);
+                    session.update(profession);
+                }
             }
 
             if (userType.equals("Student")){
@@ -101,13 +108,15 @@ public class App extends Application {
 
     }
 
-    public static void setProfessionList(){
+    public static void setProfessions(){
         try {
             SessionFactory sessionFactory = getSessionFactory();
             session = sessionFactory.openSession();
             session.beginTransaction();
 
-            mainWindowController.setProfessionsList(getAll(Profession.class));
+
+            List<Profession> professionList = getAll(Profession.class);
+            mainWindowController.setProfessionsList(professionList);
 
             session.flush();
             session.getTransaction().commit();

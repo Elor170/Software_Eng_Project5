@@ -12,7 +12,7 @@
 
 <BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1000.0" style="-fx-background-color: #161719;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController">
    <top>
-      <HBox alignment="CENTER_LEFT" prefHeight="17.0" prefWidth="802.0" style="-fx-background-color: #313335;" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" prefHeight="20.0" prefWidth="802.0" style="-fx-background-color: #313335;" BorderPane.alignment="CENTER">
          <children>
             <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                <HBox.margin>
@@ -57,8 +57,25 @@
    <center>
       <HBox prefHeight="461.0" prefWidth="900.0" BorderPane.alignment="CENTER">
          <children>
-            <VBox prefHeight="200.0" prefWidth="250.0" style="-fx-background-color: #1D1D1F;" />
-            <VBox prefHeight="550.0" prefWidth="650.0" />
+            <VBox fx:id="professionVBox" maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-color: #1D1D1F;">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></VBox>
+            <VBox>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="5.0" top="5.0" />
+               </HBox.margin>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <children>
+                  <Label fx:id="contentTitle" alignment="CENTER" ellipsisString="" textFill="WHITE" underline="true">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  <VBox fx:id="contentVBox" />
+               </children></VBox>
          </children>
       </HBox>
    </center>

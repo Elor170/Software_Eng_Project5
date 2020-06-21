@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
 import org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController;
 import org.example.Software_Eng_Project5.entities.Message;
+import org.example.Software_Eng_Project5.entities.Profession;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -23,7 +24,7 @@ public class TeacherApp extends UserApp {
 
     private static MainTeacherController mainTeacherController;
 
-    public TeacherApp(Stage stage, String userName) throws IOException {
+    public TeacherApp(Stage stage, String userName, List<Profession> professionList) throws IOException {
         this.stage = stage;
         this.userName = userName;
         EventBus.getDefault().register(this);
@@ -33,7 +34,9 @@ public class TeacherApp extends UserApp {
         Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
         stage.setScene(scene);
         stage.show();
+        mainTeacherController.setProfessionList(professionList);
         mainTeacherController.setUserName(this.userName);
+        mainTeacherController.showProfessions();
     }
 
     @Override

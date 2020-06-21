@@ -10,18 +10,18 @@ public class Teacher implements Serializable {
 
     @Id
     private String userName;
-//    @ManyToMany(mappedBy = "teacherList", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Profession.class)
-//    private List<Profession> professionList;
+    @ManyToMany(mappedBy = "teacherList", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Profession.class)
+    private List<Profession> professionList;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "writer")
+    private List<Question> questionList;
 
     public Teacher() {
     }
 
     public Teacher(String userName,  List<Profession> professions) {
         this.userName = userName;
-//        for(Profession profession: professions){
-//            profession.getTeacherList().add(this);
-//        }
-//        setProfessionList(professions);
+        setProfessionList(professions);
     }
 
     public String getUserName() {
@@ -32,11 +32,25 @@ public class Teacher implements Serializable {
         this.userName = userName;
     }
 
-//    public List<Profession> getProfessionList() {
-//        return professionList;
-//    }
-//
-//    public void setProfessionList(List<Profession> professionList) {
-//        this.professionList = professionList;
-//    }
+    public List<Profession> getProfessionList() {
+        return professionList;
+    }
+
+    public void setProfessionList(List<Profession> professionList) {
+        this.professionList = professionList;
+//        for (Profession profession: professionList){
+//            profession.getTeacherList().add(this);
+//        }
+    }
+
+    public List<Question> getQuestionList() {
+        return questionList;
+    }
+
+    public void setQuestionList(List<Question> questionList) {
+        this.questionList = questionList;
+        for (Question question: questionList){
+            question.setWriter(this);
+        }
+    }
 }

@@ -34,6 +34,10 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(User.class);
 		configuration.addAnnotatedClass(Teacher.class);
 		configuration.addAnnotatedClass(Student.class);
+		configuration.addAnnotatedClass(Profession.class);
+		configuration.addAnnotatedClass(Course.class);
+		configuration.addAnnotatedClass(Question.class);
+		configuration.addAnnotatedClass(Answer.class);
 
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties()).build();
@@ -102,6 +106,12 @@ public class SimpleServer extends AbstractServer {
 					session.update(user);
 					retMessage.setType(user.getUserType());
 					retMessage.setIndexString(user.getUserName());
+					if (user.getUserType().equals("Teacher")){
+						Teacher teacher = session.get(Teacher.class, userName);
+						List<Profession> professionList = teacher.getProfessionList();
+						retMessage.setObjList(professionList);
+						System.out.println(professionList.get(0).getName());
+					}
 				}
 				else{
 					retMessage.setType("Already connected");

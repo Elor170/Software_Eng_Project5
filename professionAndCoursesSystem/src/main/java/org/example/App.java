@@ -32,9 +32,13 @@ public class App extends Application {
         Configuration configuration = new Configuration();
 
         // Add ALL of your entities here. You can also try adding a whole package.
-        configuration.addAnnotatedClass(Course.class);
-        configuration.addAnnotatedClass(Profession.class);
+        configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Teacher.class);
+        configuration.addAnnotatedClass(Student.class);
+        configuration.addAnnotatedClass(Profession.class);
+        configuration.addAnnotatedClass(Course.class);
+        configuration.addAnnotatedClass(Question.class);
+        configuration.addAnnotatedClass(Answer.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();

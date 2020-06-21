@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.entities.Message;
+import org.example.Software_Eng_Project5.entities.Profession;
 import org.example.Software_Eng_Project5.entities.Teacher;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -80,6 +81,7 @@ public class UserApp extends Application {
 
     }
 
+    @SuppressWarnings("unchecked")
     private void logIn(Message massage){
         Platform.runLater(() -> {
             String userType = massage.getType();
@@ -89,7 +91,7 @@ public class UserApp extends Application {
                 if(userType.equals("Teacher")){
                     try {
                         this.userName = userName;
-                        TeacherApp teacherApp = new TeacherApp(this.stage ,userName);
+                        TeacherApp teacherApp = new TeacherApp(this.stage ,userName, (List<Profession>) massage.getObjList());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
