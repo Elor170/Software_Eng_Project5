@@ -23,6 +23,9 @@ public class Profession implements Serializable {
     @OneToMany(mappedBy = "profession", targetEntity = Question.class)
     private List<Question> questionList;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "profession")
+    private List<Test> testList;
+
     public Profession() {
     }
 
@@ -79,4 +82,6 @@ public class Profession implements Serializable {
             question.setProfession(this);
         }
     }
+
+    public List<Test> getTestList() { return testList; }
 }
