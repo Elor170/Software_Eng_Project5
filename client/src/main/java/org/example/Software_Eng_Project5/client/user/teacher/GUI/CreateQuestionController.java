@@ -1,5 +1,6 @@
 package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -181,7 +182,10 @@ public class CreateQuestionController {
         if(event.getEventType().equals("Created")){
             if (event.getMessage().getItemsType().equals("Question"))
                 System.out.println("Save");
-            stage.close();
+            Platform.runLater(() -> {
+                stage.close();
+                System.out.println("------SAVED-----");
+            });
         }
     }
 }

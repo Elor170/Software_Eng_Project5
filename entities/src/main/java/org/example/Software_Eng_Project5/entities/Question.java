@@ -48,6 +48,8 @@ public class Question implements Serializable {
     public Question(String questionText, String ans1Text, String ans2Text, String ans3Text, String ans4Text
             , int correctAns, Profession profession, List<Course> courses) {
         this.questionText = questionText;
+        //TODO change the constructor
+
         List<Answer> answerList = new ArrayList<>();
         Answer answer1 = new Answer(ans1Text);
         answerList.add(answer1);
@@ -60,7 +62,6 @@ public class Question implements Serializable {
         this.setAnswers(answerList);
         this.setProfession(profession);
         this.setCourseList(courses);
-
 
     }
 

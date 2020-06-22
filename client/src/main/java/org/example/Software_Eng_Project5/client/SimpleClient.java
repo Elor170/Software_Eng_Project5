@@ -35,7 +35,6 @@ public class SimpleClient extends AbstractClient {
 					EventBus.getDefault().post(new UserEvent(message, "LogIn check"));
 					break;
 				case "Teacher Event":
-					System.out.println(eventType);
 					if (eventType.equals("Received")) {
 						EventBus.getDefault().post(new TeacherEvent(message, "Received"));
 					}
