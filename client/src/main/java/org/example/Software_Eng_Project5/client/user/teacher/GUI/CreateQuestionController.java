@@ -184,7 +184,7 @@ public class CreateQuestionController {
                 System.out.println("Save");
             Platform.runLater(() -> {
                 stage.close();
-                System.out.println("------SAVED-----");
+                System.out.println("------SAVED----");
             });
         }
     }
