@@ -2,12 +2,11 @@ package org.example.Software_Eng_Project5.client;
 
 import org.example.Software_Eng_Project5.client.ocsf.AbstractClient;
 import org.example.Software_Eng_Project5.client.user.UserEvent;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
 import java.io.IOException;
-import java.util.List;
 
 public class SimpleClient extends AbstractClient {
 	
@@ -17,16 +16,6 @@ public class SimpleClient extends AbstractClient {
 		super(host, port);
 	}
 
-	@Override
-	protected void handleMessageFromServer(Object msg) {
-		if (msg.getClass().equals(Message.class)) {
-			if (((Message) msg).getCommand().equals("User Event"))
-				EventBus.getDefault().post(new UserEvent((Message) msg, "LogIn check"));
-		}
-
-	}
-
-
 	public static org.example.Software_Eng_Project5.client.SimpleClient getClient() {
 		if (client == null) {
 			client = new org.example.Software_Eng_Project5.client.SimpleClient("localhost", 3000);
@@ -34,29 +23,50 @@ public class SimpleClient extends AbstractClient {
 		return client;
 	}
 
-	private void bringOne(Message message) throws IOException {
-		message.setCommand("Bring One");
-		org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
-	}
+	@Override
+	protected void handleMessageFromServer(Object msg) {
+		if (msg.getClass().equals(Message.class)) {
+			Message message = (Message) msg;
+			String command = message.getCommand();
+			String eventType = message.getType();
 
-	private void bringList(Message message) throws IOException {
-		message.setCommand("Bring List");
-		org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
+			switch (command) {
+				case "User Event":
+					EventBus.getDefault().post(new UserEvent(message, "LogIn check"));
+					break;
+				case "Teacher Event":
+					System.out.println(eventType);
+					if (eventType.equals("Received")) {
+						EventBus.getDefault().post(new TeacherEvent(message, "Received"));
+					}
+					else if(eventType.equals("Created"))
+						EventBus.getDefault().post(new TeacherEvent(message, "Created"));
+					break;
+				case "Student Event":
+					//TODO
+					break;
+			}
+		}
+
 	}
 
 
 	@Subscribe
-	@SuppressWarnings("unchecked")
 	public void inUserEvent (UserEvent event) throws IOException {
 		Message message = event.getMessage();
 		String eventType = event.getEventType();
-		if(eventType.equals("LogIn")){
-			message.setCommand("LogIn");
+		if(eventType.startsWith("Log")){
+			if (eventType.endsWith("In"))
+				message.setCommand("LogIn");
+			else if(eventType.endsWith("Out")){
+				message.setCommand("LogOut");
+			}
 			org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
 		}
-		else if(eventType.equals("LogOut")){
-			message.setCommand("LogOut");
-			org.example.Software_Eng_Project5.client.SimpleClient.getClient().sendToServer(message);
-		}
+	}
+
+	@Subscribe
+	public void inTeacherEvent (TeacherEvent event) throws IOException {
+
 	}
 }

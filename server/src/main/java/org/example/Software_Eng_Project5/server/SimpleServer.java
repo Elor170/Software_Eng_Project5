@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,18 +55,33 @@ public class SimpleServer extends AbstractServer {
 			session.beginTransaction();
 
 			Message message = (Message) msg;
-			Message returnMessage = new Message();
+			String command = message.getCommand();
+			Message returnMessage = null;
 
-			if(message.getCommand().startsWith("LogIn")){
-				returnMessage = logIn(message.getIndexString(), (String) message.getSingleObject());
+			switch (command){
+				case "LogIn":
+					returnMessage = logIn(message.getIndexString(), (String) message.getSingleObject());
+					break;
+
+				case "LogOut":
+					logOut(message.getIndexString());
+					break;
+
+				case "Bring":
+					if (message.isList()) {
+						returnMessage = bringList(message);
+					}
+					break;
+				case "Insert":
+					returnMessage = insertObject(message);
+					break;
+
 			}
 
-			else if(message.getCommand().equals("LogOut")){
-				logOut(message.getIndexString());
-			}
 
 				try {
-					client.sendToClient(returnMessage);
+					if (returnMessage != null)
+						client.sendToClient(returnMessage);
 					System.out.format("Sent message to client %s\n", Objects.requireNonNull(client.getInetAddress()).getHostAddress());
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -90,29 +106,74 @@ public class SimpleServer extends AbstractServer {
 
 	}
 
+	private Message insertObject(Message message) {
+		Message retMessage = new Message();
+		Class classType = message.getClassType();
+		Object object = message.getSingleObject();
+
+		if (classType.equals(Question.class)){
+			session.save(object);
+		}
+
+		retMessage.setCommand("Teacher Event");
+		retMessage.setType("Created");
+		retMessage.setItemsType("Question");
+		return retMessage;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Message bringList(Message message) {
+		Message retMessage = new Message();
+		Class classType = message.getClassType();
+		String indexString = message.getIndexString();
+		List<Question> questionList = null;
+
+		Object object = session.get(classType, indexString);
+		if (classType.equals(Course.class))
+			questionList = new ArrayList<>(((Course)object).getQuestionList());
+		else if(classType.equals(Profession.class))
+			questionList = new ArrayList<>(((Profession)object).getQuestionList());
+		else if(classType.equals(Teacher.class))
+			questionList = new ArrayList<>(((Teacher)object).getQuestionList());
+
+		if (message.getItemsType().equals("Question")) {
+			retMessage.setObjList(questionList);
+			retMessage.setCommand("Teacher Event");
+			retMessage.setItemsType("Question");
+			retMessage.setList(true);
+			retMessage.setType("Received");
+		}
+
+
+
+		return retMessage;
+	}
+
 	private Message logIn(String userName, String password) {
 		Message retMessage = new Message();
 		retMessage.setCommand("User Event");
 		User user = session.get(User.class, userName);
-		if(user != null){
-			if(user.getPassword().equals(password)){
+
+		if(user != null && user.getPassword().equals(password)){
 				if(!user.isConnected()) {
 					System.out.println("The " + user.getUserType() + ": " + user.getUserName() + " is connected");
 					user.setConnected(true);
 					session.update(user);
 					retMessage.setType(user.getUserType());
 					retMessage.setIndexString(user.getUserName());
+
 					if (user.getUserType().equals("Teacher")){
 						Teacher teacher = session.get(Teacher.class, userName);
-						List<Profession> professionList = teacher.getProfessionList();
+						List<Profession> professionList = new ArrayList<>(teacher.getProfessionList());
 						retMessage.setObjList(professionList);
-						System.out.println(professionList.get(0).getName());
 					}
 				}
 				else{
 					retMessage.setType("Already connected");
 				}
-			}
+		}
+		else {
+			retMessage.setType("No match found");
 		}
 		return retMessage;
 	}

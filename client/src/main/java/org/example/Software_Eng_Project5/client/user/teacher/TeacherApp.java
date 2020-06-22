@@ -8,32 +8,39 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
 import org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController;
+import org.example.Software_Eng_Project5.entities.Course;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.Profession;
+import org.example.Software_Eng_Project5.entities.Question;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * JavaFX App
  */
 public class TeacherApp extends UserApp {
 
-    private static MainTeacherController mainTeacherController;
+    private  MainTeacherController mainTeacherController;
 
-    public TeacherApp(Stage stage, String userName, List<Profession> professionList) throws IOException {
+    public TeacherApp(Stage stage, String userName, List<Profession> professionList,
+                      org.example.Software_Eng_Project5.client.SimpleClient client) throws IOException {
         this.stage = stage;
         this.userName = userName;
+        this.client = client;
         EventBus.getDefault().register(this);
+
 
         scene = new Scene(loadFXML("teacherWindow", this));
         stage.setTitle("HSTS");
         Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
         stage.setScene(scene);
         stage.show();
+
+        EventBus.getDefault().register(mainTeacherController);
         mainTeacherController.setProfessionList(professionList);
         mainTeacherController.setUserName(this.userName);
         mainTeacherController.showProfessions();
@@ -48,88 +55,75 @@ public class TeacherApp extends UserApp {
     protected Parent loadFXML(String fxml, UserApp userApp) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource(fxml + ".fxml"));
         Parent parent = fxmlLoader.load();
-        TeacherApp.mainTeacherController = fxmlLoader.getController();
+        if (mainTeacherController == null)
+            mainTeacherController = fxmlLoader.getController();
         return parent;
     }
 
-//    private void createQuestion(String newQuestion, String ans1, String ans2, String ans3, String ans4, int correctAns)
-//    {
-//        Object question = new Question(newQuestion, ans1, ans2, ans3, ans4, correctAns);
-//        Message message = new Message();
-//        message.setCommand("Insert Question");
-//        message.setSingleObject(question);
+
+    private void bring(Message message) throws IOException
+    {
+        message.setCommand("Bring");
+        client.sendToServer(message);
+    }
+
+    private void createQuestion(String questionText, String ans1, String ans2, String ans3, String ans4, int correctAns,
+                                Profession profession, List<Course> courses)
+    {
+
+        Message msg = new Message();
+        Question question = new Question(questionText, ans1, ans2, ans3, ans4, correctAns, profession, courses);
+        msg.setClassType(Question.class);
+        msg.setCommand("Insert");
+        msg.setSingleObject(question);
+        try {
+            client.sendToServer(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //int professionCode;
+//        msg.setCommand("Get Profession Code");
+//        msg.setSingleObject(profession);
 //        try {
-//            client.sendToServer(message);
+//            client.sendToServer(msg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-//    }
+        //professionCode = (Integer)message.getSingleObject();
+    }
 
-//    private void bringQuestionsList(List<Integer> questionsNumbers) throws IOException
-//    {
-//        Message message = new Message("Get Questions List", questionsNumbers);
-//        client.sendToServer(message);
-//    }
-//
-//    private Exam createExam(String type, String teacher, int time, List<String> notes, int code) throws IOException
-//    {
-//        Object exam = new Exam(questions, type, teacher, time, notes, code);
-//        Message message;
-//        message = new Message("Insert Exam", exam);
-//        client.sendToServer(message);
-//        return (Exam)exam;
-//    }
-//
-//    private Exam retrieveExam(int examCode) throws IOException
-//    {
-//        Message msg = new Message("Retrieve Exam", examCode);
-//        client.sendToServer(msg);
-//        Exam exam = (Exam)message.getObjList();
-//        return exam;
-//    }
-//
-//    private boolean checkPermissions(String userName, String professionToCheck) throws IOException
-//    {
-//        Message msg = new Message("GetObject", null);
-//        client.sendToServer(msg);
-//        List<String> professions = ((Teacher)message.getObjList()).getProfessions();
-//        for (String profession : professions)
-//        {
-//            if(profession.equals(professionToCheck))
-//                return true;
-//        }
-//        return false;
-//    }
-//
-//    private void confirmGrade()
-//    {
-//
-//    }
-//
-//    private void requestExamTimeChange(Exam exam, int time)
-//    {
-//
-//    }
-//
-//    @Subscribe
-//    public void onUserEvent(UserEvent userEvent)
-//    {
-//        message = userEvent.getMessage();
-//    }
+    @Override
+    public void stop() throws Exception {
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(mainTeacherController);
+        super.stop();
+    }
 
     @Subscribe
     @SuppressWarnings("unchecked")
     public void inTeacherEvent(TeacherEvent event){
-        if (event.getEventType().equals("Create Question")){
-            Message message = event.getMessage();
-            int correctAns = message.getIndexInt();
-            List<String> textList = (List<String>) message.getObjList();
-            String newQuestion = textList.get(0);
-            String ans1 = textList.get(1);
-            String ans2 = textList.get(2);
-            String ans3 = textList.get(3);
-            String ans4 = textList.get(4);
-            //createQuestion(newQuestion, ans1, ans2, ans3, ans4, correctAns);
+        Message message = event.getMessage();
+        String eventType = event.getEventType();
+
+        switch (eventType){
+            case "Bring":
+                try {
+                    bring(message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case "Update":
+                //TODO
+                break;
+
+            case "Create Question":
+                List<String> textList = (List<String>) message.getObjList();
+                createQuestion(textList.get(0), textList.get(1), textList.get(2), textList.get(3), textList.get(4),
+                        message.getIndexInt(), (Profession) message.getSingleObject(), (List<Course>) message.getObjList2());
+                break;
         }
     }
 }

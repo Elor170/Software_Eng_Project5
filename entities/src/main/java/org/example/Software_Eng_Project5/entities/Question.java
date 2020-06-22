@@ -2,6 +2,7 @@ package org.example.Software_Eng_Project5.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,7 +40,27 @@ public class Question implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "test_id"))
     private List<Test> testList;
 
+
     public Question() {
+
+    }
+
+    public Question(String questionText, String ans1Text, String ans2Text, String ans3Text, String ans4Text
+            , int correctAns, Profession profession, List<Course> courses) {
+        this.questionText = questionText;
+        List<Answer> answerList = new ArrayList<>();
+        Answer answer1 = new Answer(ans1Text);
+        answerList.add(answer1);
+        Answer answer2 = new Answer(ans2Text);
+        answerList.add(answer2);
+        Answer answer3 = new Answer(ans3Text);
+        answerList.add(answer3);
+        Answer answer4 = new Answer(ans4Text);
+        answerList.add(answer4);
+        this.setAnswers(answerList);
+        this.setProfession(profession);
+        this.setCourseList(courses);
+
 
     }
 
@@ -92,7 +113,6 @@ public class Question implements Serializable {
 
     public void setProfession(Profession profession) {
         this.profession = profession;
-        profession.getQuestionList().add(this);
     }
 
     public Teacher getWriter() {
@@ -110,8 +130,5 @@ public class Question implements Serializable {
 
     public void setCourseList(List<Course> courseList) {
         this.courseList = courseList;
-        for (Course course: courseList){
-            course.getQuestionList().add(this);
-        }
     }
 }

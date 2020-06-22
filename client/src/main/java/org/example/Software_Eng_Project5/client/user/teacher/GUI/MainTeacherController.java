@@ -1,5 +1,6 @@
 package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,13 +10,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
-import org.example.Software_Eng_Project5.entities.Course;
-import org.example.Software_Eng_Project5.entities.Profession;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
+import org.example.Software_Eng_Project5.entities.*;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,28 +26,25 @@ import java.util.List;
 
 public class MainTeacherController {
 
+    private boolean isShowQuestions;
     private String professionCode;
     private String courseCode;
     private Profession profession;
     private Course course;
     private List<Profession> professionList;
-
+    private  List<Question> questionList;
+    private  CreateQuestionController createQuestionController;
 
     @FXML
     private BorderPane borderPane;
-
     @FXML
     private Label userNameLabel;
-
     @FXML
     private Button showQuestionsB;
-
     @FXML
     private VBox professionVBox;
-
     @FXML
     private VBox contentVBox;
-
     @FXML
     private Label contentTitle;
 
@@ -57,6 +57,7 @@ public class MainTeacherController {
     }
 
     public void showProfessions(){
+        isShowQuestions = false;
         Image professionImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\profession.png");
         Image courseImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\course.png");
         ImageView professionIcon;
@@ -67,29 +68,37 @@ public class MainTeacherController {
         Profession professionObj;
         List<Course> courseList;
         Course courseObj;
+
         for (Profession profession : professionList) {
             professionObj = profession;
             professionIcon = new ImageView(professionImg);
-            professionTreeItem = new TreeItem<String>("P-" + professionObj.getCode() + " " + professionObj.getName(), professionIcon);
+            professionTreeItem = new TreeItem<String>(professionObj.getCode() + " " + professionObj.getName(), professionIcon);
             courseList = professionObj.getCourseList();
+
             for (Course course : courseList) {
                 courseObj = course;
                 courseIcon = new ImageView(courseImg);
-                courseTreeItem = new TreeItem<String>("C-" + courseObj.getCode() + " " + courseObj.getName(), courseIcon);
+                courseTreeItem = new TreeItem<String>(courseObj.getCode() + " " + courseObj.getName(), courseIcon);
                 professionTreeItem.getChildren().add(courseTreeItem);
             }
 
             professionNode = new TreeView<>(professionTreeItem);
             professionNode.setStyle("-fx-background-color:  #1D1D1F");
             professionNode.setStyle("-fx-control-inner-background:  #313335");
+
             TreeView<String> finalProfessionNode = professionNode;
             professionNode.addEventFilter(MouseEvent.MOUSE_CLICKED, (mouseEvent) -> {
                 TreeItem<String> item = finalProfessionNode.getSelectionModel().getSelectedItem();
                 if (item != null) {
                     String name = item.getValue();
-                    setProfessionCode(name.substring(2, 4));
-                    if (item.getParent() != null)
-                        setCourseCode(name.substring(2, 4));
+                    if (item.getParent() != null) {
+                        setProfessionCode(item.getParent().getValue().substring(0, 2));
+                        setCourseCode(name.substring(0, 2));
+                    }
+                    else
+                        setProfessionCode(name.substring(0, 2));
+                    if (this.isShowQuestions)
+                        showQuestionsB(null);
                 }
 
             });
@@ -99,52 +108,66 @@ public class MainTeacherController {
         TreeView<String> teacherQuestionsNode = new TreeView<>(teacherQuestions);
         teacherQuestionsNode.setStyle("-fx-background-color:  #1D1D1F");
         teacherQuestionsNode.setStyle("-fx-control-inner-background:  #313335");
+
         teacherQuestionsNode.addEventFilter(MouseEvent.MOUSE_CLICKED, (mouseEvent) -> {
             setCourseCode(null);
             setProfessionCode(null);
+            if (this.isShowQuestions)
+                showQuestionsB(null);
         });
         professionVBox.getChildren().add(teacherQuestionsNode);
     }
 
-
-
-
     @FXML
     private void showQuestionsB(ActionEvent event){
+        this.isShowQuestions = true;
         this.contentVBox.getChildren().clear();
+        Message msg = new Message();
+        msg.setList(true);
+        msg.setItemsType("Question");
 
-        this.contentTitle.setText("My Questions");
         if (this.courseCode != null) {
             this.contentTitle.setText("The questions of course " + this.course.getCode() + " " + this.course.getName()
                     + " in profession " + this.profession.getCode() + " " + this.profession.getName());
-
-            //if(this.course.getQuestionList().size() != 0)
-            if(false)
-                System.out.println("Showing the Questions");
-            else {
-                Label label = new Label("There no questions in this course yet.");
-                this.contentVBox.getChildren().add(label);
-            }
-
-            Button addQuestion = new Button("Create Question");
-            addQuestion.setOnAction((this::onCreateQuestion));
-            this.contentVBox.getChildren().add(addQuestion);
+            msg.setClassType(Course.class);
+            msg.setIndexString(this.courseCode);
         }
 
         else if(this.professionCode != null) {
             this.contentTitle.setText("The questions of profession " + this.profession.getCode() + " " + this.profession.getName());
-            //if(this.profession.getQuestionList().size() != 0)
-            if(false)
-                System.out.println("Showing the Questions");
-            else {
-                Label label = new Label("There no questions in this profession yet.");
-                this.contentVBox.getChildren().add(label);
-                Button addQuestion = new Button("Create Question");
-                addQuestion.setOnAction((this::onCreateQuestion));
-                this.contentVBox.getChildren().add(addQuestion);
-            }
+            msg.setClassType(Profession.class);
+            msg.setIndexString(this.professionCode);
         }
 
+        else{
+            this.contentTitle.setText("My Questions");
+            msg.setClassType(Teacher.class);
+            msg.setIndexString(this.userNameLabel.getText());
+        }
+
+        EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+        questionList = null;
+        do {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (questionList == null);
+
+        if(!questionList.isEmpty())
+            System.out.println("Showing the Questions");
+        else {
+            Label label = new Label("There are no questions yet.");
+            label.setTextFill(Color.WHITE);
+            this.contentVBox.getChildren().add(label);
+        }
+
+        if (this.professionCode != null){
+            Button addQuestion = new Button("Create Question");
+            addQuestion.setOnAction((this::onCreateQuestion));
+            this.contentVBox.getChildren().add(addQuestion);
+        }
     }
 
     @FXML
@@ -162,7 +185,10 @@ public class MainTeacherController {
         stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();
-        CreateQuestionController.stage = stage;
+        this.createQuestionController = fxmlLoader.getController();
+        EventBus.getDefault().register(this.createQuestionController);
+        CreateQuestionController.setStage(stage);
+        this.createQuestionController.showCourses(this.profession);
     }
 
     public String getProfessionCode() {
@@ -198,40 +224,22 @@ public class MainTeacherController {
     public void setProfessionList(List<Profession> professionList) {
         this.professionList = professionList;
     }
+
+    @Subscribe
+    @SuppressWarnings("unchecked")
+    public void inTeacherEvent(TeacherEvent event){
+        Message message = event.getMessage();
+        String eventType = event.getEventType();
+
+        if (eventType.equals("Received")){
+            if(message.getItemsType().equals("Question") && message.isList()) {
+                questionList = (List<Question>) message.getObjList();
+                System.out.println("---------2");
+            }
+        }
+
+
+
+    }
 }
 
-
-//        HBox questionHBox = new HBox();
-//        Label questionCode = new Label("123");
-//        questionCode.setTextFill(Color.WHITE);
-//        Label questionText = new Label("??????????");
-//        questionText.setTextFill(Color.WHITE);
-//        questionHBox.getChildren().addAll(questionCode, questionText);
-//        contentVBox.getChildren().add(questionHBox);
-//      this.contentTitle.setTextFill(Paint.valueOf("#ffffff"));
-//        this.contentTitle.setTextAlignment(TextAlignment.CENTER);
-//this.contentTitle.setText
-//        contentVBox.getChildren().clear();
-//        Label questionLabel = new Label(labelStr);
-//        questionLabel.setTextFill(Paint.valueOf("#ffffff"));
-//        contentVBox.getChildren().add(questionLabel);
-
-//        VBox vb = new VBox();
-//        Label l = new Label("Questions");
-//        vb.setAlignment(Pos.TOP_CENTER);
-//        l.setTextFill(Color.WHITE);
-//        vb.getChildren().add(l);
-//        l = new Label("Q1");
-//        l.setTextFill(Color.WHITE);
-//        vb.getChildren().add(l);
-//        l = new Label("Q2");
-//        l.setTextFill(Color.WHITE);
-//        vb.getChildren().add(l);
-//        l = new Label("Q3");
-//        l.setTextFill(Color.WHITE);
-//        vb.getChildren().add(l);
-//        Button addQuestion = new Button("Create Question");
-//        addQuestion.setOnAction((this::onCreateQuestion));
-//        vb.getChildren().add(addQuestion);
-//
-//        borderPane.setCenter(vb);

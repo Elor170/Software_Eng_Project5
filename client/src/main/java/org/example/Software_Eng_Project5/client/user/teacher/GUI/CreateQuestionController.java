@@ -3,49 +3,52 @@ package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
+import org.example.Software_Eng_Project5.entities.Course;
+import org.example.Software_Eng_Project5.entities.Profession;
+import org.example.Software_Eng_Project5.entities.Question;
 import org.greenrobot.eventbus.EventBus;
 import org.example.Software_Eng_Project5.entities.Message;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateQuestionController {
-
-        static public Stage stage;
+        static private Stage stage;
+        private Profession profession;
+        private String courseCode;
+        private List<Course> courseList;
 
         @FXML
         private TextArea questionTextArea;
-
         @FXML
         private CheckBox chooseAnswer1;
-
         @FXML
         private TextField answer1Text;
-
         @FXML
         private CheckBox chooseAnswer2;
-
         @FXML
         private TextField answer2Text;
-
         @FXML
         private CheckBox chooseAnswer3;
-
         @FXML
         private TextField answer3Text;
-
         @FXML
         private CheckBox chooseAnswer4;
-
         @FXML
         private TextField answer4Text;
-
         @FXML
         private Button saveQuestionB;
-
         @FXML
         private Label errorLabel;
+        @FXML
+        private VBox coursesVBox;
 
         @FXML
         private void clickAns(ActionEvent event) {
@@ -80,11 +83,10 @@ public class CreateQuestionController {
             textList.add(answer3Text.getText());
             textList.add(answer4Text.getText());
             message.setObjList(textList);
+            message.setSingleObject(this.profession);
+            message.setObjList2(this.courseList);
 
             EventBus.getDefault().post(new TeacherEvent(message, "Create Question"));
-
-            System.out.println("Save");
-            stage.close();
         }
 
         private boolean fieldsCheck(){
@@ -95,7 +97,9 @@ public class CreateQuestionController {
                     answer4Text.getText().trim().isEmpty())
                 check = false;
             else if(getCorrectAnswerNumber() == 0)
-            check = false;
+                check = false;
+            else if (this.courseList.isEmpty())
+                check = false;
 
             return check;
         }
@@ -114,5 +118,71 @@ public class CreateQuestionController {
             return answerNum;
         }
 
+    public void showCourses(Profession professionObj) {
+        this.profession = professionObj;
+        this.courseList = new ArrayList<>();
+
+        Image professionImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\profession.png");
+        ImageView professionIcon = new ImageView(professionImg);
+        TreeItem<HBox> professionTreeItem = new TreeItem<HBox>( new HBox(
+                new Label(professionObj.getCode() + " " + professionObj.getName())), professionIcon);
+        TreeView<HBox> professionNode = new TreeView<>(professionTreeItem);
+        professionNode.setStyle("-fx-background-color:  #1D1D1F");
+        professionNode.setStyle("-fx-control-inner-background:  #313335");
+
+        Image courseImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\course.png");
+        ImageView courseIcon;
+        TreeItem<HBox> courseTreeItem;
+        CheckBox courseCheckBox;
+        Course courseObj;
+
+        List<Course> courseList = professionObj.getCourseList();
+        for (Course course : courseList) {
+            courseObj = course;
+            courseIcon = new ImageView(courseImg);
+            courseCheckBox = new CheckBox(courseObj.getCode() + " " + courseObj.getName());
+            courseCheckBox.setOnAction(this::selectCourses);
+            courseTreeItem = new TreeItem<HBox>(new HBox(courseCheckBox), courseIcon);
+            professionTreeItem.getChildren().add(courseTreeItem);
+        }
+
+        coursesVBox.getChildren().add(professionNode);
     }
+
+    public static void setStage(Stage stage) {
+        CreateQuestionController.stage = stage;
+    }
+
+    private void selectCourses(ActionEvent event){
+        CheckBox checkBox = (CheckBox)event.getSource();
+        String selectedCourseCode = checkBox.getText().substring(0, 2);
+        List<Course> courseList = this.profession.getCourseList();
+        Course selectedCourse = null;
+
+        for (Course course: courseList){
+            if (selectedCourseCode.equals(course.getCode()))
+                selectedCourse = course;
+        }
+
+        if(checkBox.isSelected()){
+            this.courseList.add(selectedCourse);
+        }
+        else
+            this.courseList.remove(selectedCourse);
+
+
+        for (Course course: this.courseList){
+            System.out.println(course.getCode() + " " + course.getName());
+        }
+    }
+
+    @Subscribe
+    public void inTeacherEvent(TeacherEvent event){
+        if(event.getEventType().equals("Created")){
+            if (event.getMessage().getItemsType().equals("Question"))
+                System.out.println("Save");
+            stage.close();
+        }
+    }
+}
 
