@@ -10,7 +10,6 @@ import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.Profession;
-import org.example.Software_Eng_Project5.entities.Teacher;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -31,10 +30,12 @@ public class UserApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
-        EventBus.getDefault().register(this);
         client = org.example.Software_Eng_Project5.client.SimpleClient.getClient();
         client.openConnection();
+
+        EventBus.getDefault().register(this);
         EventBus.getDefault().register(client);
+
         scene = new Scene(loadFXML("userWindow", this));
         stage.setTitle("HSTS");
         Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
@@ -70,7 +71,6 @@ public class UserApp extends Application {
 
 
     @Subscribe
-    @SuppressWarnings("unchecked")
     public void inUserEvent (UserEvent event) {
         Message massage = event.getMessage();
         String eventType = event.getEventType();
@@ -78,7 +78,6 @@ public class UserApp extends Application {
         if(eventType.equals("LogIn check")){
             logIn(massage);
         }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -87,23 +86,33 @@ public class UserApp extends Application {
             String userType = massage.getType();
             String userName = massage.getIndexString();
 
-            if(userType != null){
-                if(userType.equals("Teacher")){
+            switch (userType) {
+                case "Headmaster":
+                    //TODO
+                    break;
+
+                case "Teacher":
                     try {
                         this.userName = userName;
-                        TeacherApp teacherApp = new TeacherApp(this.stage ,userName, (List<Profession>) massage.getObjList());
+                        TeacherApp teacherApp = new TeacherApp(this.stage, userName,
+                                (List<Profession>) massage.getObjList(), this.client);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else if(userType.equals("Already connected")){
-                    userGUI.alreadyConnected();
-                }
-            }
-            else {
-                userGUI.logInFailed();
-            }
+                    break;
 
+                case "Student":
+                    //TODO
+                    break;
+
+                case "Already connected":
+                    userGUI.alreadyConnected();
+                    break;
+
+                case "No match found":
+                    userGUI.logInFailed();
+                    break;
+            }
         });
 
     }

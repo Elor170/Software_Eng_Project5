@@ -33,6 +33,9 @@ public class Test implements Serializable {
     @JoinColumn(name = "test_profession_id")
     private Profession profession;
 
+    public Test() {
+    }
+
     public Test(String code, int testTime, boolean isManual, Teacher author,
                 Course course, Profession profession) {
         this.code = code;
@@ -75,5 +78,21 @@ public class Test implements Serializable {
 
     public void setQuestionList(List<Question> questionList) {
         this.questionList = questionList;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isManual() {
+        return isManual;
+    }
+
+    public void setManual(boolean manual) {
+        isManual = manual;
     }
 }

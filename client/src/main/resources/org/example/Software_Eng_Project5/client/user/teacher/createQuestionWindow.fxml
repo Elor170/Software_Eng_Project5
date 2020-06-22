@@ -13,9 +13,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="551.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.CreateQuestionController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="780.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.CreateQuestionController">
    <center>
-      <VBox alignment="CENTER" prefHeight="341.0" prefWidth="662.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="376.0" prefWidth="551.0" BorderPane.alignment="CENTER">
          <children>
             <VBox alignment="BOTTOM_CENTER" prefHeight="67.0" prefWidth="558.0">
                <children>
@@ -169,4 +169,7 @@
          </BorderPane.margin>
       </VBox>
    </center>
+   <left>
+      <VBox fx:id="coursesVBox" prefHeight="386.0" prefWidth="204.0" style="-fx-background-color: #292A2D;" BorderPane.alignment="CENTER" />
+   </left>
 </BorderPane>
