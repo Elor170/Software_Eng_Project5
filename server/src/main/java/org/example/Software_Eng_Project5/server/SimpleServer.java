@@ -112,12 +112,13 @@ public class SimpleServer extends AbstractServer {
 		Object object = message.getSingleObject();
 
 		if (classType.equals(Question.class)){
-			session.save(object);
+			//TODO create and save the Question
+			//session.save(object);
+			retMessage.setItemsType("Question");
 		}
 
 		retMessage.setCommand("Teacher Event");
 		retMessage.setType("Created");
-		retMessage.setItemsType("Question");
 		return retMessage;
 	}
 

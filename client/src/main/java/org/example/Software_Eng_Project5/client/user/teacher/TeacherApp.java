@@ -67,31 +67,33 @@ public class TeacherApp extends UserApp {
         client.sendToServer(message);
     }
 
-    private void createQuestion(String questionText, String ans1, String ans2, String ans3, String ans4, int correctAns,
-                                Profession profession, List<Course> courses)
-    {
 
-        Message msg = new Message();
-        Question question = new Question(questionText, ans1, ans2, ans3, ans4, correctAns, profession, courses);
+    private void createQuestion(Message msg)
+    {
         msg.setClassType(Question.class);
         msg.setCommand("Insert");
-        msg.setSingleObject(question);
         try {
             client.sendToServer(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        //int professionCode;
-//        msg.setCommand("Get Profession Code");
-//        msg.setSingleObject(profession);
+//    private void createQuestion(String questionText, String ans1, String ans2, String ans3, String ans4, int correctAns,
+//                                Profession profession, List<Course> courses)
+//    {
+//
+//        Message msg = new Message();
+//        Question question = new Question(questionText, ans1, ans2, ans3, ans4, correctAns, profession, courses);
+//        msg.setClassType(Question.class);
+//        msg.setCommand("Insert");
+//        msg.setSingleObject(question);
 //        try {
 //            client.sendToServer(msg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        //professionCode = (Integer)message.getSingleObject();
-    }
+//    }
 
     @Override
     public void stop() throws Exception {
@@ -120,9 +122,10 @@ public class TeacherApp extends UserApp {
                 break;
 
             case "Create Question":
-                List<String> textList = (List<String>) message.getObjList();
-                createQuestion(textList.get(0), textList.get(1), textList.get(2), textList.get(3), textList.get(4),
-                        message.getIndexInt(), (Profession) message.getSingleObject(), (List<Course>) message.getObjList2());
+//                List<String> textList = (List<String>) message.getObjList();
+//                createQuestion(textList.get(0), textList.get(1), textList.get(2), textList.get(3), textList.get(4),
+//                        message.getIndexInt(), (Profession) message.getSingleObject(), (List<Course>) message.getObjList2());
+                createQuestion(message);
                 break;
         }
     }

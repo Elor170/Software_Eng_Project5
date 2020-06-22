@@ -234,7 +234,6 @@ public class MainTeacherController {
         if (eventType.equals("Received")){
             if(message.getItemsType().equals("Question") && message.isList()) {
                 questionList = (List<Question>) message.getObjList();
-                System.out.println("---------2");
             }
         }
 
