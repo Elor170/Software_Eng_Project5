@@ -4,12 +4,14 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -47,10 +49,9 @@ public class MainTeacherController {
     private VBox contentVBox;
     @FXML
     private Label contentTitle;
-
-
     @FXML
-    private javafx.scene.layout.VBox VBox;
+    private VBox VBox;
+
 
     public void setUserName(String userName){
         userNameLabel.setText(userName);
@@ -110,8 +111,10 @@ public class MainTeacherController {
         teacherQuestionsNode.setStyle("-fx-control-inner-background:  #313335");
 
         teacherQuestionsNode.addEventFilter(MouseEvent.MOUSE_CLICKED, (mouseEvent) -> {
-            setCourseCode(null);
-            setProfessionCode(null);
+            if(this.profession != null) {
+                setCourseCode(null);
+                setProfessionCode(null);
+            }
             if (this.isShowQuestions)
                 showQuestionsB(null);
         });
@@ -149,24 +152,50 @@ public class MainTeacherController {
         questionList = null;
         do {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }while (questionList == null);
 
-        if(!questionList.isEmpty())
-            System.out.println("Showing the Questions");
+        //Case: There are questions in the selected course/profession
+        if(!questionList.isEmpty()){
+            VBox questionVBox;
+            Label questionLabel;
+            for(Question question: questionList) {
+                Label answerLabel;
+                int correctAnswerNum = question.getCorrectAnsNum();
+
+                List<Answer> answerList = question.getAnswers();
+                questionLabel = new Label("     " + question.getCode() + "  " + question.getQuestionText());
+                questionLabel.setTextFill(Color.WHITE);
+                questionVBox = new VBox(questionLabel);
+
+                for(Answer answer: answerList){
+                    answerLabel = new Label("           " + answer.getAnsText());
+                    if(--correctAnswerNum == 0)
+                        answerLabel.setTextFill(Color.GREEN);
+                    else
+                        answerLabel.setTextFill(Color.RED);
+                    questionVBox.getChildren().add(answerLabel);
+                }
+                contentVBox.getChildren().add(questionVBox);
+            }
+        }
+        // Case: No questions in the selected course/profession
         else {
             Label label = new Label("There are no questions yet.");
             label.setTextFill(Color.WHITE);
             this.contentVBox.getChildren().add(label);
         }
 
+        // Add create question button
         if (this.professionCode != null){
             Button addQuestion = new Button("Create Question");
             addQuestion.setOnAction((this::onCreateQuestion));
-            this.contentVBox.getChildren().add(addQuestion);
+            HBox hBox = new HBox(addQuestion);
+            hBox.setAlignment(Pos.CENTER);
+            this.contentVBox.getChildren().add(hBox);
         }
     }
 
@@ -230,13 +259,17 @@ public class MainTeacherController {
     public void inTeacherEvent(TeacherEvent event){
         Message message = event.getMessage();
         String eventType = event.getEventType();
-
+        System.out.println("Received");
         if (eventType.equals("Received")){
             if(message.getItemsType().equals("Question") && message.isList()) {
                 questionList = (List<Question>) message.getObjList();
             }
         }
-
+        else if (eventType.equals("Created")){
+            Platform.runLater(() -> {
+                this.showQuestionsB(null);
+            });
+        }
 
 
     }

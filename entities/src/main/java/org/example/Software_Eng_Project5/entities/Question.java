@@ -9,10 +9,9 @@ import java.util.List;
 @Table(name = "questions")
 public class Question implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private int correctAnsNum;
     private String code; // 5 digits
+    private int correctAnsNum;
+
     private String questionText;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "question")
@@ -45,32 +44,12 @@ public class Question implements Serializable {
 
     }
 
-    public Question(String questionText, String ans1Text, String ans2Text, String ans3Text, String ans4Text
-            , int correctAns, Profession profession, List<Course> courses) {
+    public Question(String questionText, List<Answer> answerList, int correctAns, Teacher writer, String code) {
         this.questionText = questionText;
-        //TODO change the constructor
-
-        List<Answer> answerList = new ArrayList<>();
-        Answer answer1 = new Answer(ans1Text);
-        answerList.add(answer1);
-        Answer answer2 = new Answer(ans2Text);
-        answerList.add(answer2);
-        Answer answer3 = new Answer(ans3Text);
-        answerList.add(answer3);
-        Answer answer4 = new Answer(ans4Text);
-        answerList.add(answer4);
+        this.code = code;
+        this.correctAnsNum = correctAns;
+        this.setWriter(writer);
         this.setAnswers(answerList);
-        this.setProfession(profession);
-        this.setCourseList(courses);
-
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getCorrectAnsNum() {
@@ -114,6 +93,7 @@ public class Question implements Serializable {
 
     public void setProfession(Profession profession) {
         this.profession = profession;
+        profession.getQuestionList().add(this);
     }
 
     public Teacher getWriter() {
@@ -131,5 +111,8 @@ public class Question implements Serializable {
 
     public void setCourseList(List<Course> courseList) {
         this.courseList = courseList;
+        for (Course course: courseList){
+            course.getQuestionList().add(this);
+        }
     }
 }
