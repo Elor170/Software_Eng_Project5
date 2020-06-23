@@ -225,7 +225,12 @@ public class MainTeacherController {
                 selectedQuestion = question;
         }
 
-        assert selectedQuestion != null;
+        String professionCode = selectedQuestion.getCode().substring(0, 2);
+        for(Profession profession: this.professionList){
+            if(profession.getCode().equals(professionCode))
+                this.profession = profession;
+        }
+
         openQuestionWindow(selectedQuestion, selectedQuestion.isUsed(), true);
     }
 

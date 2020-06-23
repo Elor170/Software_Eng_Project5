@@ -112,8 +112,7 @@ public class QuestionControllerWindow {
                 check = false;
             else if(getCorrectAnswerNumber() == 0)
                 check = false;
-            // TODO remove first check
-            else if ((this.courseList != null) && this.courseList.isEmpty())
+            else if (this.courseList.isEmpty() && (!isEdit || isQuestionUsed))
                 check = false;
 
             return check;
@@ -156,7 +155,12 @@ public class QuestionControllerWindow {
             courseObj = course;
             courseIcon = new ImageView(courseImg);
             courseCheckBox = new CheckBox(courseObj.getCode() + " " + courseObj.getName());
-            courseCheckBox.setOnAction(this::selectCourses);
+
+            if(isEdit && !isQuestionUsed)
+                courseCheckBox.setDisable(true);
+            else
+                courseCheckBox.setOnAction(this::selectCourses);
+
             courseTreeItem = new TreeItem<>(new HBox(courseCheckBox), courseIcon);
             professionTreeItem.getChildren().add(courseTreeItem);
         }
@@ -194,9 +198,9 @@ public class QuestionControllerWindow {
         this.question = question;
         this.isQuestionUsed = isQuestionUsed;
         this.isEdit = isEdit;
-        if(!isEdit)
-            this.showCourses();
-        else
+
+        this.showCourses();
+        if(isEdit)
             this.initializedQuestion();
     }
 
@@ -221,6 +225,9 @@ public class QuestionControllerWindow {
                 chooseAnswer4.setSelected(true);
                 break;
         }
+        if(this.isQuestionUsed)
+            this.errorLabel.setText("The question is contained in a test, you can create " +
+                    "new question based on this one.");
     }
 
     @Subscribe
@@ -239,7 +246,7 @@ public class QuestionControllerWindow {
                 if (eventType.equals("Created"))
                     ((messageWindowController) fxmlLoader.getController()).setMessage("A new question was\ncreated and saved.");
                 else
-                    ((messageWindowController) fxmlLoader.getController()).setMessage("A new question\nwas edited.");
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The question\nwas edited.");
                 stage.setScene(scene);
                 try {
                     Thread.sleep(2000);

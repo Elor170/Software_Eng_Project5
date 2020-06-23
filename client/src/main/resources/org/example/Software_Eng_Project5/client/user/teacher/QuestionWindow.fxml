@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="780.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.QuestionControllerWindow">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="492.0" prefWidth="807.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.QuestionControllerWindow">
    <center>
       <VBox alignment="CENTER" prefHeight="376.0" prefWidth="551.0" BorderPane.alignment="CENTER">
          <children>
@@ -42,7 +42,7 @@
                         <Insets bottom="10.0" />
                      </VBox.margin>
                   </HBox>
-                  <Label fx:id="errorLabel" alignment="CENTER" prefHeight="20.0" prefWidth="264.0" textFill="RED">
+                  <Label fx:id="errorLabel" alignment="CENTER" prefHeight="20.0" prefWidth="558.0" textFill="RED">
                      <font>
                         <Font size="14.0" />
                      </font>
