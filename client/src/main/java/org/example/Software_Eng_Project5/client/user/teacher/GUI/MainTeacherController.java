@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
@@ -138,14 +139,14 @@ public class MainTeacherController {
         msg.setItemsType("Question");
 
         if (isCourse) {
-            this.contentTitle.setText("The questions of course " + this.course.getCode() + " " + this.course.getName()
-                    + " in profession " + this.profession.getCode() + " " + this.profession.getName());
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  "
+                    +  this.course.getCode() + "  " + this.course.getName() + ":  Questions:" );
             msg.setClassType(Course.class);
             msg.setIndexString(this.courseCode);
         }
 
         else if(isProfession) {
-            this.contentTitle.setText("The questions of profession " + this.profession.getCode() + " " + this.profession.getName());
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  Questions:" );
             msg.setClassType(Profession.class);
             msg.setIndexString(this.professionCode);
         }
@@ -160,6 +161,7 @@ public class MainTeacherController {
         questionList = null;
         do {
             try {
+
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -169,31 +171,53 @@ public class MainTeacherController {
         //Case: There are questions in the selected course/profession
         if(!questionList.isEmpty()){
             VBox questionVBox;
-            Label questionLabel;
+            HBox questionTopHBox;
+            Label questionTextLabel;
+            Label questionCodeLabel;
+            HBox answerHBox;
+            Label answerLabel;
+            Circle answerCircle;
+
             for(Question question: questionList) {
-                Label answerLabel;
                 questionVBox = new VBox();
+                questionVBox.setStyle("-fx-padding: 10");
+                List<Answer> answerList = question.getAnswers();
                 int correctAnswerNum = question.getCorrectAnsNum();
 
-                List<Answer> answerList = question.getAnswers();
-                questionLabel = new Label( question.getCode() + "  " + question.getQuestionText());
-                questionLabel.setTextFill(Color.WHITE);
+                questionCodeLabel = new Label(question.getCode());
+                questionCodeLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
+
+                questionTextLabel = new Label(question.getQuestionText());
+                questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
+                        + "-fx-font-size: 16;");
+
+
+                questionTopHBox = new HBox(questionCodeLabel, questionTextLabel);
+                questionVBox.getChildren().add(questionTopHBox);
+
+                for(Answer answer: answerList){
+                    answerLabel = new Label( answer.getAnsText());
+                    answerLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
+                            + "-fx-font-size: 16;");
+                    answerCircle = new Circle();
+                    answerCircle.setRadius(7);
+
+                    if(--correctAnswerNum == 0)
+                        answerCircle.setStyle("-fx-fill: #499C54;");
+                    else
+                        answerCircle.setStyle("-fx-fill: #FF5641;");
+
+                    answerHBox = new HBox(answerCircle, answerLabel);
+                    answerHBox.setStyle("-fx-padding: 0 0 0 100");
+                    questionVBox.getChildren().add(answerHBox);
+                }
 
                 if(isMyQuestions){
                     Button editQuestionB = new Button("Edit Question");
+                    editQuestionB.setStyle("-fx-background-color: #DADCE0;" + "-fx-padding: 10 10 5 100;" +
+                            "-fx-border-insets: 5 5 0 90;" + "-fx-background-insets: 5 5 0 90");
                     editQuestionB.setOnAction(this::onEditQuestion);
                     questionVBox.getChildren().add(editQuestionB);
-                }
-                questionVBox.getChildren().add(questionLabel);
-
-
-                for(Answer answer: answerList){
-                    answerLabel = new Label("       " + answer.getAnsText());
-                    if(--correctAnswerNum == 0)
-                        answerLabel.setTextFill(Color.GREEN);
-                    else
-                        answerLabel.setTextFill(Color.RED);
-                    questionVBox.getChildren().add(answerLabel);
                 }
                 contentVBox.getChildren().add(questionVBox);
             }
@@ -208,6 +232,7 @@ public class MainTeacherController {
         // Add create question button
         if (! isMyQuestions){
             Button addQuestion = new Button("Create Question");
+            addQuestion.setStyle("-fx-background-color: #DADCE0;");
             addQuestion.setOnAction((this::onCreateQuestion));
             HBox hBox = new HBox(addQuestion);
             hBox.setAlignment(Pos.CENTER);
@@ -218,13 +243,16 @@ public class MainTeacherController {
     private void onEditQuestion(ActionEvent event) {
         Question selectedQuestion = null;
         System.out.println("Edit the Question");
-        String selectedQuestionCode =((Label)((VBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText().substring(0, 5);
+        VBox questionVBox = (VBox)((Button)event.getSource()).getParent();
+        Label questionCodeLabel = (Label) ((HBox)questionVBox.getChildren().get(0)).getChildren().get(0);
+        String selectedQuestionCode = questionCodeLabel.getText();
         System.out.println("---" + selectedQuestionCode + "---");
         for(Question question: questionList){
             if(question.getCode().equals(selectedQuestionCode))
                 selectedQuestion = question;
         }
 
+        assert selectedQuestion != null;
         String professionCode = selectedQuestion.getCode().substring(0, 2);
         for(Profession profession: this.professionList){
             if(profession.getCode().equals(professionCode))
@@ -306,9 +334,7 @@ public class MainTeacherController {
             }
         }
         else if (eventType.equals("Created") || eventType.equals("Updated")){
-            Platform.runLater(() -> {
-                this.showQuestionsB(null);
-            });
+            Platform.runLater( () -> this.showQuestionsB(null) );
         }
 
 
