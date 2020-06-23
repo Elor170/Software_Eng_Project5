@@ -300,7 +300,7 @@ public class MainTeacherController {
                 questionList = (List<Question>) message.getObjList();
             }
         }
-        else if (eventType.equals("Created")){
+        else if (eventType.equals("Created") || eventType.equals("Updated")){
             Platform.runLater(() -> {
                 this.showQuestionsB(null);
             });
