@@ -259,7 +259,7 @@ public class MainTeacherController {
     public void inTeacherEvent(TeacherEvent event){
         Message message = event.getMessage();
         String eventType = event.getEventType();
-        System.out.println("Received");
+
         if (eventType.equals("Received")){
             if(message.getItemsType().equals("Question") && message.isList()) {
                 questionList = (List<Question>) message.getObjList();

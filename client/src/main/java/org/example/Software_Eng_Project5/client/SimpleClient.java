@@ -4,9 +4,12 @@ import org.example.Software_Eng_Project5.client.ocsf.AbstractClient;
 import org.example.Software_Eng_Project5.client.user.UserEvent;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Message;
+import org.example.Software_Eng_Project5.entities.Question;
+import org.example.Software_Eng_Project5.entities.Teacher;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import java.io.IOException;
+import java.util.List;
 
 public class SimpleClient extends AbstractClient {
 	

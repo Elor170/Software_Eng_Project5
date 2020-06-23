@@ -13,7 +13,7 @@ public class Teacher implements Serializable {
     @ManyToMany(mappedBy = "teacherList", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Profession.class)
     private List<Profession> professionList;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "writer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "writer")
     private List<Question> questionList;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
@@ -43,9 +43,6 @@ public class Teacher implements Serializable {
 
     public void setProfessionList(List<Profession> professionList) {
         this.professionList = professionList;
-//        for (Profession profession: professionList){
-//            profession.getTeacherList().add(this);
-//        }
     }
 
     public List<Question> getQuestionList() {
@@ -54,9 +51,6 @@ public class Teacher implements Serializable {
 
     public void setQuestionList(List<Question> questionList) {
         this.questionList = questionList;
-        for (Question question: questionList){
-            question.setWriter(this);
-        }
     }
 
     public List<Test> getTestList() {
