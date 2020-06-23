@@ -35,7 +35,6 @@ public class MainTeacherController {
     private Course course;
     private List<Profession> professionList;
     private  List<Question> questionList;
-    private  CreateQuestionController createQuestionController;
 
     @FXML
     private BorderPane borderPane;
@@ -73,13 +72,13 @@ public class MainTeacherController {
         for (Profession profession : professionList) {
             professionObj = profession;
             professionIcon = new ImageView(professionImg);
-            professionTreeItem = new TreeItem<String>(professionObj.getCode() + " " + professionObj.getName(), professionIcon);
+            professionTreeItem = new TreeItem<>(professionObj.getCode() + " " + professionObj.getName(), professionIcon);
             courseList = professionObj.getCourseList();
 
             for (Course course : courseList) {
                 courseObj = course;
                 courseIcon = new ImageView(courseImg);
-                courseTreeItem = new TreeItem<String>(courseObj.getCode() + " " + courseObj.getName(), courseIcon);
+                courseTreeItem = new TreeItem<>(courseObj.getCode() + " " + courseObj.getName(), courseIcon);
                 professionTreeItem.getChildren().add(courseTreeItem);
             }
 
@@ -125,24 +124,33 @@ public class MainTeacherController {
     private void showQuestionsB(ActionEvent event){
         this.isShowQuestions = true;
         this.contentVBox.getChildren().clear();
+        boolean isCourse = false;
+        boolean isProfession = false;
+        boolean isMyQuestions = false;
+        if (this.courseCode != null)
+            isCourse = true;
+        else if(this.professionCode != null)
+            isProfession = true;
+        else
+            isMyQuestions = true;
         Message msg = new Message();
         msg.setList(true);
         msg.setItemsType("Question");
 
-        if (this.courseCode != null) {
+        if (isCourse) {
             this.contentTitle.setText("The questions of course " + this.course.getCode() + " " + this.course.getName()
                     + " in profession " + this.profession.getCode() + " " + this.profession.getName());
             msg.setClassType(Course.class);
             msg.setIndexString(this.courseCode);
         }
 
-        else if(this.professionCode != null) {
+        else if(isProfession) {
             this.contentTitle.setText("The questions of profession " + this.profession.getCode() + " " + this.profession.getName());
             msg.setClassType(Profession.class);
             msg.setIndexString(this.professionCode);
         }
 
-        else{
+        else {
             this.contentTitle.setText("My Questions");
             msg.setClassType(Teacher.class);
             msg.setIndexString(this.userNameLabel.getText());
@@ -164,15 +172,23 @@ public class MainTeacherController {
             Label questionLabel;
             for(Question question: questionList) {
                 Label answerLabel;
+                questionVBox = new VBox();
                 int correctAnswerNum = question.getCorrectAnsNum();
 
                 List<Answer> answerList = question.getAnswers();
-                questionLabel = new Label("     " + question.getCode() + "  " + question.getQuestionText());
+                questionLabel = new Label( question.getCode() + "  " + question.getQuestionText());
                 questionLabel.setTextFill(Color.WHITE);
-                questionVBox = new VBox(questionLabel);
+
+                if(isMyQuestions){
+                    Button editQuestionB = new Button("Edit Question");
+                    editQuestionB.setOnAction(this::onEditQuestion);
+                    questionVBox.getChildren().add(editQuestionB);
+                }
+                questionVBox.getChildren().add(questionLabel);
+
 
                 for(Answer answer: answerList){
-                    answerLabel = new Label("           " + answer.getAnsText());
+                    answerLabel = new Label("       " + answer.getAnsText());
                     if(--correctAnswerNum == 0)
                         answerLabel.setTextFill(Color.GREEN);
                     else
@@ -190,7 +206,7 @@ public class MainTeacherController {
         }
 
         // Add create question button
-        if (this.professionCode != null){
+        if (! isMyQuestions){
             Button addQuestion = new Button("Create Question");
             addQuestion.setOnAction((this::onCreateQuestion));
             HBox hBox = new HBox(addQuestion);
@@ -199,10 +215,23 @@ public class MainTeacherController {
         }
     }
 
-    @FXML
-    private void onCreateQuestion(ActionEvent event){
+    private void onEditQuestion(ActionEvent event) {
+        Question selectedQuestion = null;
+        System.out.println("Edit the Question");
+        String selectedQuestionCode =((Label)((VBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText().substring(0, 5);
+        System.out.println("---" + selectedQuestionCode + "---");
+        for(Question question: questionList){
+            if(question.getCode().equals(selectedQuestionCode))
+                selectedQuestion = question;
+        }
+
+        assert selectedQuestion != null;
+        openQuestionWindow(selectedQuestion, selectedQuestion.isUsed(), true);
+    }
+
+    private void openQuestionWindow(Question selectedQuestion, boolean isQuestionUsed, boolean isEditQuestion) {
         Stage stage = new Stage();
-        FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("createQuestionWindow.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("QuestionWindow.fxml"));
         Scene scene = null;
         try {
             scene = new Scene(fxmlLoader.load());
@@ -214,10 +243,16 @@ public class MainTeacherController {
         stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();
-        this.createQuestionController = fxmlLoader.getController();
-        EventBus.getDefault().register(this.createQuestionController);
-        CreateQuestionController.setStage(stage);
-        this.createQuestionController.showCourses(this.profession);
+        QuestionControllerWindow questionControllerWindow = fxmlLoader.getController();
+        //TODO check if can remove
+        EventBus.getDefault().register(questionControllerWindow);
+        //
+        questionControllerWindow.setParameters(stage, this.profession, selectedQuestion, isQuestionUsed, isEditQuestion);
+    }
+
+    @FXML
+    private void onCreateQuestion(ActionEvent event){
+        openQuestionWindow(null, false, false);
     }
 
     public String getProfessionCode() {

@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="780.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.CreateQuestionController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="386.0" prefWidth="780.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.QuestionControllerWindow">
    <center>
       <VBox alignment="CENTER" prefHeight="376.0" prefWidth="551.0" BorderPane.alignment="CENTER">
          <children>
