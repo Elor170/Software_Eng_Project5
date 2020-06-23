@@ -83,16 +83,18 @@ public class TeacherApp extends UserApp
         }
     }
 
-    private void editQuestion(Question question, List<String> textAndNewAnswers)
+    private void editQuestion(Question question, List<String> textAndNewAnswers, int newCorrectAnswerNum)
     {
         Message msg = new Message();
         List<Answer> answers = question.getAnswers();
         question.setQuestionText(textAndNewAnswers.get(0));
-        for(int i = 0; i < textAndNewAnswers.size(); i++)
+        question.setCorrectAnsNum(newCorrectAnswerNum);
+        for(int i = 0; i < answers.size(); i++)
         {
             answers.get(i).setAnsText(textAndNewAnswers.get(i + 1));
         }
         msg.setCommand("Update");
+        msg.setClassType(Question.class);
         msg.setSingleObject(question);
         try
         {
@@ -125,8 +127,9 @@ public class TeacherApp extends UserApp
                 }
                 break;
 
-            case "Update":
-                editQuestion((Question)message.getSingleObject(), (List<String>)message.getObjList());
+            case "Update Question":
+                editQuestion((Question)message.getSingleObject(), (List<String>)message.getObjList(),
+                        message.getIndexInt());
                 break;
 
             case "Create Question":

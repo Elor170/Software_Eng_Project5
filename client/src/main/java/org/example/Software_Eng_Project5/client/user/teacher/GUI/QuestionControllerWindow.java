@@ -13,22 +13,22 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
-import org.example.Software_Eng_Project5.entities.Course;
-import org.example.Software_Eng_Project5.entities.Profession;
-import org.example.Software_Eng_Project5.entities.Question;
+import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
-import org.example.Software_Eng_Project5.entities.Message;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateQuestionController {
-        static private Stage stage;
+public class QuestionControllerWindow {
+        private Stage stage;
         private Profession profession;
         private String courseCode;
         private List<Course> courseList;
+        private Question question;
+        private boolean isQuestionUsed;
+        private boolean isEdit;
 
         @FXML
         private TextArea questionTextArea;
@@ -55,7 +55,9 @@ public class CreateQuestionController {
         @FXML
         private VBox coursesVBox;
 
-        @FXML
+
+
+    @FXML
         private void clickAns(ActionEvent event) {
             String answer = ((CheckBox)event.getSource()).getId();
             chooseAnswer1.setSelected(false);
@@ -88,9 +90,16 @@ public class CreateQuestionController {
             textList.add(answer3Text.getText());
             textList.add(answer4Text.getText());
             message.setObjList(textList);
+
+            if(this.isEdit && !this.isQuestionUsed) {
+                message.setSingleObject(this.question);
+                EventBus.getDefault().post(new TeacherEvent(message, "Update Question"));
+                return;
+            }
+
+
             message.setSingleObject(this.profession);
             message.setObjList2(this.courseList);
-
             EventBus.getDefault().post(new TeacherEvent(message, "Create Question"));
         }
 
@@ -103,7 +112,7 @@ public class CreateQuestionController {
                 check = false;
             else if(getCorrectAnswerNumber() == 0)
                 check = false;
-            else if (this.courseList.isEmpty())
+            else if (this.courseList.isEmpty() && (!isEdit || isQuestionUsed))
                 check = false;
 
             return check;
@@ -123,14 +132,14 @@ public class CreateQuestionController {
             return answerNum;
         }
 
-    public void showCourses(Profession professionObj) {
-        this.profession = professionObj;
+    public void showCourses() {
+
         this.courseList = new ArrayList<>();
 
         Image professionImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\profession.png");
         ImageView professionIcon = new ImageView(professionImg);
-        TreeItem<HBox> professionTreeItem = new TreeItem<HBox>( new HBox(
-                new Label(professionObj.getCode() + " " + professionObj.getName())), professionIcon);
+        TreeItem<HBox> professionTreeItem = new TreeItem<>( new HBox(
+                new Label(this.profession.getCode() + " " + this.profession.getName())), professionIcon);
         TreeView<HBox> professionNode = new TreeView<>(professionTreeItem);
         professionNode.setStyle("-fx-background-color:  #1D1D1F");
         professionNode.setStyle("-fx-control-inner-background:  #313335");
@@ -141,22 +150,23 @@ public class CreateQuestionController {
         CheckBox courseCheckBox;
         Course courseObj;
 
-        List<Course> courseList = professionObj.getCourseList();
+        List<Course> courseList = this.profession.getCourseList();
         for (Course course : courseList) {
             courseObj = course;
             courseIcon = new ImageView(courseImg);
             courseCheckBox = new CheckBox(courseObj.getCode() + " " + courseObj.getName());
-            courseCheckBox.setOnAction(this::selectCourses);
-            courseTreeItem = new TreeItem<HBox>(new HBox(courseCheckBox), courseIcon);
+
+            if(isEdit && !isQuestionUsed)
+                courseCheckBox.setDisable(true);
+            else
+                courseCheckBox.setOnAction(this::selectCourses);
+
+            courseTreeItem = new TreeItem<>(new HBox(courseCheckBox), courseIcon);
             professionTreeItem.getChildren().add(courseTreeItem);
         }
 
         professionTreeItem.setExpanded(true);
         coursesVBox.getChildren().add(professionNode);
-    }
-
-    public static void setStage(Stage stage) {
-        CreateQuestionController.stage = stage;
     }
 
     private void selectCourses(ActionEvent event){
@@ -182,10 +192,49 @@ public class CreateQuestionController {
         }
     }
 
+    public void setParameters(Stage stage, Profession profession, Question question, boolean isQuestionUsed, boolean isEdit) {
+        this.stage = stage;
+        this.profession = profession;
+        this.question = question;
+        this.isQuestionUsed = isQuestionUsed;
+        this.isEdit = isEdit;
+
+        this.showCourses();
+        if(isEdit)
+            this.initializedQuestion();
+    }
+
+    private void initializedQuestion() {
+        this.questionTextArea.setText(this.question.getQuestionText());
+        List<Answer> answerList = this.question.getAnswers();
+        this.answer1Text.setText(answerList.get(0).getAnsText());
+        this.answer2Text.setText(answerList.get(1).getAnsText());
+        this.answer3Text.setText(answerList.get(2).getAnsText());
+        this.answer4Text.setText(answerList.get(3).getAnsText());
+        switch (this.question.getCorrectAnsNum()){
+            case 1:
+                chooseAnswer1.setSelected(true);
+                break;
+            case 2:
+                chooseAnswer2.setSelected(true);
+                break;
+            case 3:
+                chooseAnswer3.setSelected(true);
+                break;
+            case 4:
+                chooseAnswer4.setSelected(true);
+                break;
+        }
+        if(this.isQuestionUsed)
+            this.errorLabel.setText("The question is contained in a test, you can create " +
+                    "new question based on this one.");
+    }
+
     @Subscribe
-    public void inTeacherEvent(TeacherEvent event){
-        if(event.getEventType().equals("Created")){
-            if (event.getMessage().getItemsType().equals("Question"))
+    public void inTeacherEvent(TeacherEvent event) {
+        String eventType = event.getEventType();
+
+        if (eventType.equals("Created") || eventType.equals("Updated")) {
             Platform.runLater(() -> {
                 FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
                 Scene scene = null;
@@ -194,7 +243,10 @@ public class CreateQuestionController {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                ((messageWindowController)fxmlLoader.getController()).setMessage("A new question was\ncreated and saved.");
+                if (eventType.equals("Created"))
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("A new question was\ncreated and saved.");
+                else
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The question\nwas edited.");
                 stage.setScene(scene);
                 try {
                     Thread.sleep(2000);
@@ -205,5 +257,6 @@ public class CreateQuestionController {
             });
         }
     }
+
 }
 

@@ -113,7 +113,16 @@ public class SimpleServer extends AbstractServer {
 	private Message updateObject(Message message)
 	{
 		Message retMessage = new Message();
-		session.update(message.getSingleObject());
+		Object object = message.getSingleObject();
+		Class<?> classType = message.getClassType();
+
+		session.update(object);
+		if(classType == Question.class){
+			List<Answer> answerList = ((Question)object).getAnswers();
+			for (Answer answer: answerList)
+				session.update(answer);
+		}
+
 		retMessage.setCommand("Teacher Event");
 		retMessage.setType("Updated");
 		return retMessage;
