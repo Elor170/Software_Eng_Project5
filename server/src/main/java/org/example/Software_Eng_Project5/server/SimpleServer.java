@@ -76,6 +76,10 @@ public class SimpleServer extends AbstractServer {
 					returnMessage = insertObject(message);
 					break;
 
+				case "Update":
+					//TODO
+					break;
+
 			}
 
 
@@ -126,19 +130,14 @@ public class SimpleServer extends AbstractServer {
 
 			Profession profession = session.get(Profession.class, ((Profession) message.getSingleObject()).getCode());
 			List<Course> courseList = (List<Course>) message.getObjList2();
-			List<Course> courseListDB = new ArrayList<>();
-			for (Course course: courseList){
-				courseListDB.add(session.get(Course.class, course.getCode()));
-			}
 			Teacher writer = session.get(Teacher.class, textList.get(5));
 
-			Question question = new Question(textList.get(0), answerList, message.getIndexInt(),
-					writer, calculateQuestionCode(profession));
-			question.setProfession(profession);
-			question.setCourseList(courseListDB);
-			session.save(question);
-			System.out.println("Question #" + question.getCode() + " saved");
+			Question question = new Question(textList.get(0), message.getIndexInt(),
+					writer, calculateQuestionCode(profession), profession, courseList, answerList);
 
+			session.save(question);
+
+			System.out.println("Question #" + question.getCode() + " saved");
 			retMessage.setItemsType("Question");
 		}
 
@@ -160,7 +159,7 @@ public class SimpleServer extends AbstractServer {
 		else if(classType.equals(Profession.class))
 			questionList = new ArrayList<>(((Profession)object).getQuestionList());
 		else if(classType.equals(Teacher.class))
-			questionList = new ArrayList<>(((Teacher)object).getQuestionList());
+			questionList = new ArrayList<>(((Teacher) object).getQuestionList());
 
 		if (message.getItemsType().equals("Question")) {
 			retMessage.setObjList(questionList);
@@ -169,8 +168,6 @@ public class SimpleServer extends AbstractServer {
 			retMessage.setList(true);
 			retMessage.setType("Received");
 		}
-
-
 
 		return retMessage;
 	}

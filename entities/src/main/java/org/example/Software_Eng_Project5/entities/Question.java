@@ -44,12 +44,15 @@ public class Question implements Serializable {
 
     }
 
-    public Question(String questionText, List<Answer> answerList, int correctAns, Teacher writer, String code) {
+    public Question(String questionText, int correctAns, Teacher writer, String code
+            , Profession profession, List<Course> courseList, List<Answer> answerList) {
         this.questionText = questionText;
         this.code = code;
         this.correctAnsNum = correctAns;
-        this.setWriter(writer);
+        this.writer = writer;
         this.setAnswers(answerList);
+        this.profession = profession;
+        this.courseList = courseList;
     }
 
     public int getCorrectAnsNum() {
@@ -93,7 +96,6 @@ public class Question implements Serializable {
 
     public void setProfession(Profession profession) {
         this.profession = profession;
-        profession.getQuestionList().add(this);
     }
 
     public Teacher getWriter() {
@@ -111,8 +113,5 @@ public class Question implements Serializable {
 
     public void setCourseList(List<Course> courseList) {
         this.courseList = courseList;
-        for (Course course: courseList){
-            course.getQuestionList().add(this);
-        }
     }
 }

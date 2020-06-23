@@ -19,7 +19,6 @@ public class Message implements Serializable {
     public Message() {
     }
 
-
     public String getIndexString() {
         return indexString;
     }
