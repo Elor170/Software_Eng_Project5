@@ -8,10 +8,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
 import org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController;
-import org.example.Software_Eng_Project5.entities.Course;
-import org.example.Software_Eng_Project5.entities.Message;
-import org.example.Software_Eng_Project5.entities.Profession;
-import org.example.Software_Eng_Project5.entities.Question;
+import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -22,12 +19,14 @@ import java.util.List;
 /**
  * JavaFX App
  */
-public class TeacherApp extends UserApp {
+public class TeacherApp extends UserApp
+{
 
-    private  MainTeacherController mainTeacherController;
+    private MainTeacherController mainTeacherController;
 
     public TeacherApp(Stage stage, String userName, List<Profession> professionList,
-                      org.example.Software_Eng_Project5.client.SimpleClient client) throws IOException {
+                      org.example.Software_Eng_Project5.client.SimpleClient client) throws IOException
+    {
         this.stage = stage;
         this.userName = userName;
         this.client = client;
@@ -47,12 +46,14 @@ public class TeacherApp extends UserApp {
     }
 
     @Override
-    protected void setRoot(String fxml) throws IOException {
+    protected void setRoot(String fxml) throws IOException
+    {
         scene.setRoot(this.loadFXML(fxml, this));
     }
 
     @Override
-    protected Parent loadFXML(String fxml, UserApp userApp) throws IOException {
+    protected Parent loadFXML(String fxml, UserApp userApp) throws IOException
+    {
         FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource(fxml + ".fxml"));
         Parent parent = fxmlLoader.load();
         if (mainTeacherController == null)
@@ -72,14 +73,35 @@ public class TeacherApp extends UserApp {
     {
         msg.setClassType(Question.class);
         msg.setCommand("Insert");
-        ((List<String>)msg.getObjList()).add(userName);
-        try {
+        ((List<String>) msg.getObjList()).add(userName);
+        try
+        {
             client.sendToServer(msg);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
 
+    private void editQuestion(Question question, List<String> textAndNewAnswers)
+    {
+        Message msg = new Message();
+        List<Answer> answers = question.getAnswers();
+        question.setQuestionText(textAndNewAnswers.get(0));
+        for(int i = 0; i < textAndNewAnswers.size(); i++)
+        {
+            answers.get(i).setAnsText(textAndNewAnswers.get(i + 1));
+        }
+        msg.setCommand("Update");
+        msg.setSingleObject(question);
+        try
+        {
+            client.sendToServer(msg);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void stop() throws Exception {
@@ -104,7 +126,7 @@ public class TeacherApp extends UserApp {
                 break;
 
             case "Update":
-                //TODO
+                editQuestion((Question)message.getSingleObject(), (List<String>)message.getObjList());
                 break;
 
             case "Create Question":

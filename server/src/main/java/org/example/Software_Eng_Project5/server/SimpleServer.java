@@ -77,7 +77,7 @@ public class SimpleServer extends AbstractServer {
 					break;
 
 				case "Update":
-					//TODO
+					returnMessage = updateObject(message);
 					break;
 
 			}
@@ -110,10 +110,20 @@ public class SimpleServer extends AbstractServer {
 
 	}
 
+	private Message updateObject(Message message)
+	{
+		Message retMessage = new Message();
+		session.update(message.getSingleObject());
+		retMessage.setCommand("Teacher Event");
+		retMessage.setType("Updated");
+		return retMessage;
+
+	}
+
 	@SuppressWarnings("unchecked")
 	private Message insertObject(Message message) {
 		Message retMessage = new Message();
-		Class classType = message.getClassType();
+		Class<?> classType = message.getClassType();
 		Object object = message.getSingleObject();
 
 		// create Question
@@ -146,10 +156,9 @@ public class SimpleServer extends AbstractServer {
 		return retMessage;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Message bringList(Message message) {
 		Message retMessage = new Message();
-		Class classType = message.getClassType();
+		Class<?> classType = message.getClassType();
 		String indexString = message.getIndexString();
 		List<Question> questionList = null;
 

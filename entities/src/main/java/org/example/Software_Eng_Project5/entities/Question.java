@@ -11,6 +11,7 @@ public class Question implements Serializable {
     @Id
     private String code; // 5 digits
     private int correctAnsNum;
+    private boolean isUsed;
 
     private String questionText;
 
@@ -53,6 +54,7 @@ public class Question implements Serializable {
         this.setAnswers(answerList);
         this.profession = profession;
         this.courseList = courseList;
+        isUsed = false;
     }
 
     public int getCorrectAnsNum() {
@@ -113,5 +115,25 @@ public class Question implements Serializable {
 
     public void setCourseList(List<Course> courseList) {
         this.courseList = courseList;
+    }
+
+    public boolean isUsed()
+    {
+        return isUsed;
+    }
+
+    public void setUsed(boolean used)
+    {
+        isUsed = used;
+    }
+
+    public List<Test> getTestList()
+    {
+        return testList;
+    }
+
+    public void setTestList(List<Test> testList)
+    {
+        this.testList = testList;
     }
 }

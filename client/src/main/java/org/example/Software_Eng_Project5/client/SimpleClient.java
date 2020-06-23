@@ -38,11 +38,18 @@ public class SimpleClient extends AbstractClient {
 					EventBus.getDefault().post(new UserEvent(message, "LogIn check"));
 					break;
 				case "Teacher Event":
-					if (eventType.equals("Received")) {
-						EventBus.getDefault().post(new TeacherEvent(message, "Received"));
+					switch (eventType)
+					{
+						case "Received":
+							EventBus.getDefault().post(new TeacherEvent(message, "Received"));
+							break;
+						case "Created":
+							EventBus.getDefault().post(new TeacherEvent(message, "Created"));
+							break;
+						case "Updated":
+							EventBus.getDefault().post(new TeacherEvent(message, "Updated"));
+							break;
 					}
-					else if(eventType.equals("Created"))
-						EventBus.getDefault().post(new TeacherEvent(message, "Created"));
 					break;
 				case "Student Event":
 					//TODO
@@ -68,7 +75,8 @@ public class SimpleClient extends AbstractClient {
 	}
 
 	@Subscribe
-	public void inTeacherEvent (TeacherEvent event) throws IOException {
+	public void inTeacherEvent (TeacherEvent event)
+	{
 
 	}
 }
