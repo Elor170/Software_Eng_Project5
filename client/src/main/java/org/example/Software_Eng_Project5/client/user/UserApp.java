@@ -55,20 +55,18 @@ public class UserApp extends Application {
         return parent;
     }
 
-
-
     @Override
     public void stop() throws Exception {
-        Message message = new Message();
-        message.setIndexString(this.userName);
-        EventBus.getDefault().post(new UserEvent(message, "LogOut"));
+        if(this.userName != null){
+            Message message = new Message();
+            message.setIndexString(this.userName);
+            EventBus.getDefault().post(new UserEvent(message, "LogOut"));
+        }
         EventBus.getDefault().unregister(this);
         EventBus.getDefault().unregister(client);
         super.stop();
         System.exit(0);
     }
-
-
 
     @Subscribe
     public void inUserEvent (UserEvent event) {

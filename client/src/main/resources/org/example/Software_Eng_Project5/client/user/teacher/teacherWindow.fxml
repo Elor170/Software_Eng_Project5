@@ -61,7 +61,7 @@
                <HBox.margin>
                   <Insets />
                </HBox.margin></VBox>
-            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+            <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <HBox.margin>
                   <Insets bottom="5.0" left="5.0" top="5.0" />
                </HBox.margin>
@@ -69,7 +69,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
                <children>
-                  <Label fx:id="contentTitle" alignment="CENTER" ellipsisString="" textFill="WHITE" underline="true">
+                  <Label fx:id="contentTitle" alignment="CENTER" ellipsisString="" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" textFill="WHITE" underline="true">
                      <font>
                         <Font name="System Bold" size="16.0" />
                      </font>

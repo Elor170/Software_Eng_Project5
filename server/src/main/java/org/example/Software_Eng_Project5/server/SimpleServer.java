@@ -106,14 +106,39 @@ public class SimpleServer extends AbstractServer {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private Message insertObject(Message message) {
 		Message retMessage = new Message();
 		Class classType = message.getClassType();
 		Object object = message.getSingleObject();
 
+		// create Question
 		if (classType.equals(Question.class)){
-			//TODO create and save the Question
-			//session.save(object);
+			List<String> textList = (List<String>) message.getObjList();
+
+			List<Answer> answerList = new ArrayList<>();
+			Answer answer;
+			for (int i = 1; i <= 4; i++){
+				answer = new Answer(textList.get(i));
+				answerList.add(answer);
+				session.save(answer);
+			}
+
+			Profession profession = session.get(Profession.class, ((Profession) message.getSingleObject()).getCode());
+			List<Course> courseList = (List<Course>) message.getObjList2();
+			List<Course> courseListDB = new ArrayList<>();
+			for (Course course: courseList){
+				courseListDB.add(session.get(Course.class, course.getCode()));
+			}
+			Teacher writer = session.get(Teacher.class, textList.get(5));
+
+			Question question = new Question(textList.get(0), answerList, message.getIndexInt(),
+					writer, calculateQuestionCode(profession));
+			question.setProfession(profession);
+			question.setCourseList(courseListDB);
+			session.save(question);
+			System.out.println("Question #" + question.getCode() + " saved");
+
 			retMessage.setItemsType("Question");
 		}
 
@@ -186,7 +211,21 @@ public class SimpleServer extends AbstractServer {
 		System.out.println("The " + user.getUserType() + ": " + user.getUserName() + " disconnected");
 	}
 
+	private String calculateQuestionCode(Profession profession){
+		List<Question> questionList = profession.getQuestionList();
+		int listSize = questionList.size();
+		if( listSize == 0)
+			return (profession.getCode() + "000");
+		else {
+			int lastCode = Integer.parseInt(questionList.get(listSize - 1).getCode());
+			String newCode = Integer.toString(lastCode + 1);
+			if (newCode.length() == 4)
+				return ("0" + newCode);
+			else
+				return newCode;
 
+		}
+	}
 
 
 	public static <T> List<T> getAll(Class<T> object) {

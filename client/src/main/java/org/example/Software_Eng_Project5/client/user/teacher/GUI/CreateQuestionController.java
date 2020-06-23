@@ -3,12 +3,15 @@ package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Course;
 import org.example.Software_Eng_Project5.entities.Profession;
@@ -17,6 +20,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,6 +151,7 @@ public class CreateQuestionController {
             professionTreeItem.getChildren().add(courseTreeItem);
         }
 
+        professionTreeItem.setExpanded(true);
         coursesVBox.getChildren().add(professionNode);
     }
 
@@ -181,10 +186,22 @@ public class CreateQuestionController {
     public void inTeacherEvent(TeacherEvent event){
         if(event.getEventType().equals("Created")){
             if (event.getMessage().getItemsType().equals("Question"))
-                System.out.println("Save");
             Platform.runLater(() -> {
+                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                Scene scene = null;
+                try {
+                    scene = new Scene(fxmlLoader.load());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ((messageWindowController)fxmlLoader.getController()).setMessage("A new question was\ncreated and saved.");
+                stage.setScene(scene);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 stage.close();
-                System.out.println("------SAVED----");
             });
         }
     }
