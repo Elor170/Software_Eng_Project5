@@ -112,6 +112,21 @@ public class TeacherApp extends UserApp
         super.stop();
     }
 
+    @SuppressWarnings("unchecked")
+    private void createExam(Message msg)
+    {
+        msg.setClassType(Exam.class);
+        msg.setCommand("Insert");
+        ((List<String>) msg.getObjList()).add(userName);
+        try
+        {
+            client.sendToServer(msg);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Subscribe
     @SuppressWarnings("unchecked")
     public void inTeacherEvent(TeacherEvent event){
@@ -127,14 +142,18 @@ public class TeacherApp extends UserApp
                 }
                 break;
 
+            case "Create Question":
+                createQuestion(message);
+                break;
+
             case "Update Question":
                 editQuestion((Question)message.getSingleObject(), (List<String>)message.getObjList(),
                         message.getIndexInt());
                 break;
 
-            case "Create Question":
-                createQuestion(message);
-                break;
+
+            case "Create Exam":
+                createExam(message);
         }
     }
 }

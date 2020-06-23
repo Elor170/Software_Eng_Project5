@@ -20,7 +20,6 @@ import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.List;
@@ -306,9 +305,7 @@ public class MainTeacherController {
             }
         }
         else if (eventType.equals("Created") || eventType.equals("Updated")){
-            Platform.runLater(() -> {
-                this.showQuestionsB(null);
-            });
+            Platform.runLater(() -> this.showQuestionsB(null));
         }
 
 

@@ -16,8 +16,8 @@ public class Teacher implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "writer")
     private List<Question> questionList;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author")
-    private List<Test> testList; // adding test
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "writer")
+    private List<Exam> examList; // adding test
 
 
 
@@ -53,11 +53,11 @@ public class Teacher implements Serializable {
         this.questionList = questionList;
     }
 
-    public List<Test> getTestList() {
-        return testList;
+    public List<Exam> getExamList() {
+        return examList;
     }
 
-    public void addTest(Test test){
-        this.testList.add(test);
+    public void addTest(Exam exam){
+        this.examList.add(exam);
     }
 }
