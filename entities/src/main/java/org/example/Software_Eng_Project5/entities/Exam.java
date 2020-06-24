@@ -7,11 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table; //wtf???
 
 @Entity
-@Table(name = "test")
+@Table(name = "exam")
 public class Exam implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
     private String code;
     private int testTime;
     private String textForTeacher;
@@ -38,6 +36,7 @@ public class Exam implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "originalExam")
     private List<PulledExam> pulledExamList;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "exam", targetEntity = Grade.class)
     private List<Integer> grades;
 
     public Exam() {
@@ -86,14 +85,6 @@ public class Exam implements Serializable {
 
     public void setQuestionList(List<Question> questionList) {
         this.questionList = questionList;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public boolean isManual() {

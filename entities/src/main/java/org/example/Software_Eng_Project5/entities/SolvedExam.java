@@ -12,12 +12,14 @@ public class SolvedExam implements Serializable{
 
     @Id
     private String id;
-
-    private PulledExam pulledExam;
-    private List<Integer> studentAns;
     private int time;
     private String teacherComments;
     private int grade;
+
+    private PulledExam pulledExam;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "solvedExam", targetEntity = StudentAns.class)
+    private List<Integer> studentAns;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student")

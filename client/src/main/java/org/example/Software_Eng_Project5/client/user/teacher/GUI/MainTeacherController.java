@@ -13,9 +13,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.teacher.ExamWindowController;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
@@ -240,7 +240,7 @@ public class MainTeacherController {
         // Add create question button
         if (! isMyQuestions){
             Button addQuestion = new Button("Create Question");
-            addQuestion.setStyle("-fx-background-color: #DADCE0;");
+            addQuestion.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16;");
             addQuestion.setOnAction((this::onCreateQuestion));
             HBox hBox = new HBox(addQuestion);
             hBox.setAlignment(Pos.CENTER);
@@ -288,19 +288,20 @@ public class MainTeacherController {
         EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
         this.examList = null;
         //TODO remove
-        Exam exam1 = new Exam();
-        exam1.setCode("010311");
-        exam1.setTestTime(90);
-        exam1.setManual(false);
-        Exam exam2 = new Exam();
-        exam2.setCode("120903");
-        exam2.setTestTime(120);
-        exam2.setManual(true);
-
-        List<Exam> examList = new ArrayList<>();
-        examList.add(exam1);
-        examList.add(exam2);
-        this.examList = examList;
+        examList = new ArrayList<>();
+//        Exam exam1 = new Exam();
+//        exam1.setCode("010311");
+//        exam1.setTestTime(90);
+//        exam1.setManual(false);
+//        Exam exam2 = new Exam();
+//        exam2.setCode("120903");
+//        exam2.setTestTime(120);
+//        exam2.setManual(true);
+//
+//        List<Exam> examList = new ArrayList<>();
+//        examList.add(exam1);
+//        examList.add(exam2);
+//        this.examList = examList;
 
 //        do {
 //            try {
@@ -313,7 +314,7 @@ public class MainTeacherController {
 
         //Case: There are exams in the selected course/profession
         if(!this.examList.isEmpty()){
-            Button showExamB;
+            Button showOrEditExamB;
             HBox examHBox;
             Label examCodeLabel;
             Label examTimeLabel;
@@ -321,9 +322,15 @@ public class MainTeacherController {
 
             for (Exam exam : this.examList){
                 examHBox = new HBox();
-                showExamB = new Button("Show");
-                showExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
-                //showExamB.setOnAction();
+                if(isMyExams){
+                    showOrEditExamB = new Button("Edit");
+                    showOrEditExamB.setOnAction(this::editExam);
+                }
+                else {
+                    showOrEditExamB = new Button("Show");
+                    showOrEditExamB.setOnAction(this::showSingleExam);
+                }
+                showOrEditExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
 
                 examCodeLabel = new Label("Code: " + exam.getCode());
                 examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
@@ -342,7 +349,7 @@ public class MainTeacherController {
                     examTypeLabel.setText("Type: Computerized");
                 examTypeLabel.setStyle("-fx-text-fill: #d6e0e5;");
 
-                examHBox.getChildren().addAll(showExamB, examCodeLabel, examTimeLabel, examTypeLabel);
+                examHBox.getChildren().addAll(showOrEditExamB, examCodeLabel, examTimeLabel, examTypeLabel);
                 examHBox.setSpacing(20);
                 examHBox.setStyle("-fx-font-size: 16;");
                 this.contentVBox.getChildren().add(examHBox);
@@ -359,23 +366,64 @@ public class MainTeacherController {
         }
 
         // Add create exam button
-        if (! isMyExams){
+        if (!isMyExams){
             Button addExam = new Button("Create Exam");
-            addExam.setStyle("-fx-background-color: #DADCE0;");
-            //addExam.setOnAction((this::onCreateExam));
+            addExam.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16;");
+            addExam.setOnAction((this::onCreateExam));
             HBox hBox = new HBox(addExam);
             hBox.setAlignment(Pos.CENTER);
             this.contentVBox.getChildren().add(hBox);
         }
     }
 
+    private void editExam(ActionEvent event) {
+        System.out.println("-----edit Single Exam----");
+        //TODO
+        this.openExamWindow(true, false, false, null);
+    }
+
+    private void showSingleExam(ActionEvent event) {
+        System.out.println("-----show Single Exam----");
+        //TODO
+        this.openExamWindow(false, false, true, null);
+    }
+
+    private void onCreateExam(ActionEvent event) {
+        System.out.println("-----Create exam-----");
+        //TODO
+        this.openExamWindow(false, true, false, null);
+    }
+
+    private void openExamWindow(boolean isEditExam, boolean isCreatExam, boolean isShowSingleExam, Exam selectedExam) {
+        Stage stage = new Stage();
+        FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("examWindow.fxml"));
+        Scene scene = null;
+        try {
+            scene = new Scene(fxmlLoader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stage.setTitle("HSTS");
+        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
+        stage.getIcons().add(appIcon);
+        stage.setScene(scene);
+        stage.show();
+        ExamWindowController examControllerWindow = fxmlLoader.getController();
+        EventBus.getDefault().register(examControllerWindow);
+        boolean isExamUsed = false;
+        if(isEditExam)
+            isExamUsed = selectedExam.isPulled();
+        examControllerWindow.setParameters(stage, this.profession, selectedExam,
+                isExamUsed, isEditExam, isCreatExam, isShowSingleExam);
+    }
+
     private void onEditQuestion(ActionEvent event) {
         Question selectedQuestion = null;
-        System.out.println("Edit the Question");
+
         VBox questionVBox = (VBox)((Button)event.getSource()).getParent();
         Label questionCodeLabel = (Label) ((HBox)questionVBox.getChildren().get(0)).getChildren().get(0);
         String selectedQuestionCode = questionCodeLabel.getText();
-        System.out.println("---" + selectedQuestionCode + "---");
+
         for(Question question: questionList){
             if(question.getCode().equals(selectedQuestionCode))
                 selectedQuestion = question;
@@ -405,11 +453,9 @@ public class MainTeacherController {
         stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();
-        QuestionControllerWindow questionControllerWindow = fxmlLoader.getController();
-        //TODO check if can remove
-        EventBus.getDefault().register(questionControllerWindow);
-        //
-        questionControllerWindow.setParameters(stage, this.profession, selectedQuestion, isQuestionUsed, isEditQuestion);
+        QuestionWindowController questionWindowController = fxmlLoader.getController();
+        EventBus.getDefault().register(questionWindowController);
+        questionWindowController.setParameters(stage, this.profession, selectedQuestion, isQuestionUsed, isEditQuestion);
     }
 
     @FXML
@@ -460,6 +506,9 @@ public class MainTeacherController {
         if (eventType.equals("Received")){
             if(message.getItemsType().equals("Question") && message.isList()) {
                 this.questionList = (List<Question>) message.getObjList();
+            }
+            else if(message.getItemsType().equals("Exam") && message.isList()) {
+                this.examList = (List<Exam>) message.getObjList();
             }
             else if(message.getItemsType().equals("Exam") && message.isList()) {
                 this.examList = (List<Exam>) message.getObjList();
