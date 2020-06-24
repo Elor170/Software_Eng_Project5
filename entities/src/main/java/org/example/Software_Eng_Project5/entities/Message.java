@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
     private int indexInt;
     private int testTime;
+    private int grade;
     private boolean isList;
     private boolean isManual;
     private String command;
@@ -14,6 +15,7 @@ public class Message implements Serializable {
     private Object objList;
     private Object SingleObject;
     private Object objList2;
+    private Object objList3;
     private Object SingleObject2;
     private Class<?> classType;
 
@@ -127,5 +129,25 @@ public class Message implements Serializable {
     public void setManual(boolean manual)
     {
         isManual = manual;
+    }
+
+    public Object getObjList3()
+    {
+        return objList3;
+    }
+
+    public void setObjList3(Object objList3)
+    {
+        this.objList3 = objList3;
+    }
+
+    public int getGrade()
+    {
+        return grade;
+    }
+
+    public void setGrade(int grade)
+    {
+        this.grade = grade;
     }
 }
