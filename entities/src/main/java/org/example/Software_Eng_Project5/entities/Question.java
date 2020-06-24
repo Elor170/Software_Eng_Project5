@@ -2,7 +2,6 @@ package org.example.Software_Eng_Project5.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,10 +34,10 @@ public class Question implements Serializable {
 
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-            targetEntity = Test.class)
+            targetEntity = Exam.class)
     @JoinTable(name="questions_tests", joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "test_id"))
-    private List<Test> testList;
+    private List<Exam> examList;
 
 
     public Question() {
@@ -127,13 +126,13 @@ public class Question implements Serializable {
         isUsed = used;
     }
 
-    public List<Test> getTestList()
+    public List<Exam> getExamList()
     {
-        return testList;
+        return examList;
     }
 
-    public void setTestList(List<Test> testList)
+    public void setExamList(List<Exam> examList)
     {
-        this.testList = testList;
+        this.examList = examList;
     }
 }

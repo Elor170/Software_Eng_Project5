@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private int indexInt;
+    private int testTime;
     private boolean isList;
+    private boolean isManual;
     private String command;
     private String indexString;
     private String type;
@@ -13,7 +15,7 @@ public class Message implements Serializable {
     private Object SingleObject;
     private Object objList2;
     private Object SingleObject2;
-    private Class classType;
+    private Class<?> classType;
 
 
     public Message() {
@@ -67,11 +69,11 @@ public class Message implements Serializable {
         this.indexInt = indexInt;
     }
 
-    public Class getClassType() {
+    public Class<?> getClassType() {
         return classType;
     }
 
-    public void setClassType(Class classType) {
+    public void setClassType(Class<?> classType) {
         this.classType = classType;
     }
 
@@ -80,7 +82,7 @@ public class Message implements Serializable {
     }
 
     public void setList(boolean list) {
-        isList = list;
+        this.isList = list;
     }
 
     public String getItemsType() {
@@ -105,5 +107,25 @@ public class Message implements Serializable {
 
     public void setSingleObject2(Object singleObject2) {
         SingleObject2 = singleObject2;
+    }
+
+    public int getTestTime()
+    {
+        return testTime;
+    }
+
+    public void setTestTime(int testTime)
+    {
+        this.testTime = testTime;
+    }
+
+    public boolean isManual()
+    {
+        return isManual;
+    }
+
+    public void setManual(boolean manual)
+    {
+        isManual = manual;
     }
 }
