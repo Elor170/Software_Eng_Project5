@@ -1,4 +1,4 @@
-package org.example.Software_Eng_Project5.client.user.teacher;
+package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -13,7 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import org.example.Software_Eng_Project5.client.user.teacher.GUI.messageWindowController;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
