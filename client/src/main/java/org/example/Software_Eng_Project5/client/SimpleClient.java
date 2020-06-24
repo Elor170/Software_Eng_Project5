@@ -49,8 +49,11 @@ public class SimpleClient extends AbstractClient {
 						case "Created Exam":
 							EventBus.getDefault().post(new TeacherEvent(message, "Created Exam"));
 							break;
-						case "Updated":
-							EventBus.getDefault().post(new TeacherEvent(message, "Updated"));
+						case "Updated Question":
+							EventBus.getDefault().post(new TeacherEvent(message, "Updated Question"));
+							break;
+						case "Updated Exam":
+							EventBus.getDefault().post(new TeacherEvent(message, "Updated Exam"));
 							break;
 					}
 					break;

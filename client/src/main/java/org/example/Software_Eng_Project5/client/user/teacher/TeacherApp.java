@@ -127,6 +127,30 @@ public class TeacherApp extends UserApp
         }
     }
 
+    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList)
+    {
+        Message msg = new Message();
+        msg.setCommand("Update");
+        msg.setObjList(questions);
+        msg.setObjList2(textList);
+        msg.setTestTime(testTime);
+        msg.setClassType(Exam.class);
+        msg.setSingleObject(exam.getProfession());
+        msg.setSingleObject2(exam.getCourse());
+        try
+        {
+            client.sendToServer(msg);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void pullExam(Exam exam)
+    {
+
+    }
+
     @Subscribe
     @SuppressWarnings("unchecked")
     public void inTeacherEvent(TeacherEvent event){
