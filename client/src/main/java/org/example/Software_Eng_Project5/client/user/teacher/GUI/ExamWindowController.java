@@ -106,6 +106,7 @@ public class ExamWindowController {
         }
         if(sum != 100){
             errorLabel.setText("The sum of the points is not 100");
+            this.questionsPoints.clear();
             return;
         }
 
@@ -117,6 +118,7 @@ public class ExamWindowController {
         textList.add(this.studentCommentsTA.getText());
         textList.add(this.teacherCommentsTA.getText());
         message.setObjList2(textList);
+        message.setObjList3(this.questionsPoints);
         message.setSingleObject(this.profession);
         message.setSingleObject2(this.course);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));

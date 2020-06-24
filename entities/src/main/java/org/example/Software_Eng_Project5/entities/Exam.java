@@ -133,5 +133,8 @@ public class Exam implements Serializable {
     public void setGrades(List<Grade> grades)
     {
         this.grades = grades;
+        for (Grade grade: grades){
+            grade.setExam(this);
+        }
     }
 }
