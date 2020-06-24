@@ -12,8 +12,10 @@ public class Grade {
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Exam.class)
     @JoinColumn(name = "exam")
     private Exam exam;
+    private int grade;
 
-    public Grade() {
+    public Grade(int grade) {
+        this.grade = grade;
     }
 
     public int getId() {
@@ -30,5 +32,15 @@ public class Grade {
 
     public void setExam(Exam exam) {
         this.exam = exam;
+    }
+
+    public int getGrade()
+    {
+        return grade;
+    }
+
+    public void setGrade(int grade)
+    {
+        this.grade = grade;
     }
 }
