@@ -128,6 +128,7 @@ public class SimpleServer extends AbstractServer {
 		return retMessage;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Message updateObject(Message message)
 	{
 		Message retMessage = new Message();
@@ -162,8 +163,16 @@ public class SimpleServer extends AbstractServer {
 			}
 			else
 			{
-				Object object = message.getSingleObject();
-				session.update(object);
+				Exam exam = (Exam)message.getSingleObject();
+				List<Grade> examGrades = exam.getGrades();
+				List<Integer> grades = (List<Integer>)message.getObjList();
+				for(int i = 0; i < grades.size(); i++)
+				{
+					Grade gradeObj = examGrades.get(i);
+					gradeObj.setGrade(grades.get(i));
+					session.update(gradeObj);
+				}
+				session.update(exam);
 			}
 			retMessage.setType("Updated Exam");
 		}
@@ -225,6 +234,7 @@ public class SimpleServer extends AbstractServer {
 			}
 			exam.setTextForStudent(textList.get(0));
 			exam.setTextForTeacher(textList.get(1));
+			exam.setManual(message.isManual());
 			List<Grade> gradeObjs = new ArrayList<>();
 			for (Integer grade : grades)
 			{
