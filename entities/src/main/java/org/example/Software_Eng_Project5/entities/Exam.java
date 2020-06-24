@@ -38,6 +38,8 @@ public class Exam implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "originalExam")
     private List<PulledExam> pulledExamList;
 
+    private List<Integer> grades;
+
     public Exam() {
     }
 
@@ -120,5 +122,25 @@ public class Exam implements Serializable {
     public void setWriter(Teacher writer)
     {
         this.writer = writer;
+    }
+
+    public List<PulledExam> getPulledExamList()
+    {
+        return pulledExamList;
+    }
+
+    public void setPulledExamList(List<PulledExam> pulledExamList)
+    {
+        this.pulledExamList = pulledExamList;
+    }
+
+    public List<Integer> getGrades()
+    {
+        return grades;
+    }
+
+    public void setGrades(List<Integer> grades)
+    {
+        this.grades = grades;
     }
 }

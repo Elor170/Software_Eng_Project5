@@ -2,6 +2,7 @@ package org.example.Software_Eng_Project5.client;
 
 import org.example.Software_Eng_Project5.client.ocsf.AbstractClient;
 import org.example.Software_Eng_Project5.client.user.UserEvent;
+import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.greenrobot.eventbus.EventBus;
@@ -52,10 +53,19 @@ public class SimpleClient extends AbstractClient {
 						case "Updated Exam":
 							EventBus.getDefault().post(new TeacherEvent(message, "Updated Exam"));
 							break;
+						case "Pulled Exam":
+							EventBus.getDefault().post(new TeacherEvent(message, "Pulled Exam"));
+							break;
 					}
 					break;
 				case "Student Event":
-					//TODO
+					if(eventType.equals("Solved Exam"))
+					{
+						EventBus.getDefault().post(new StudentEvent(message, "Solved Exam"));
+						EventBus.getDefault().post(new TeacherEvent(message, "Solved Exam"));
+					}
+					else if(eventType.equals("Start Exam"))
+						EventBus.getDefault().post(new StudentEvent(message, "Start Exam"));
 					break;
 			}
 		}

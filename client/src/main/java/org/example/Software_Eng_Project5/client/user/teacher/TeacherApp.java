@@ -117,7 +117,7 @@ public class TeacherApp extends UserApp
     {
         msg.setClassType(Exam.class);
         msg.setCommand("Insert");
-        ((List<String>) msg.getObjList()).add(userName);
+        ((List<String>) msg.getObjList2()).add(userName);
         try
         {
             client.sendToServer(msg);
@@ -146,9 +146,20 @@ public class TeacherApp extends UserApp
         }
     }
 
-    public void pullExam(Exam exam)
+    public void pullExam(Exam exam, String executionCode)
     {
-
+        Message msg = new Message();
+        msg.setClassType(PulledExam.class);
+        msg.setCommand("Insert");
+        msg.setSingleObject(exam);
+        msg.setSingleObject2(executionCode);
+        try
+        {
+            client.sendToServer(msg);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Subscribe
@@ -179,7 +190,8 @@ public class TeacherApp extends UserApp
                 createExam(message);
 
             case "Update Exam":
-                editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(), (List<String>)message.getObjList2());
+                editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(),
+                        (List<String>)message.getObjList2());
         }
     }
 }
