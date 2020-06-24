@@ -216,7 +216,13 @@ public class SimpleServer extends AbstractServer {
 
 			Exam exam = new Exam(calculateExamCode(profession, course), message.getTestTime(), message.isManual(), writer, profession, course);
 			List<Integer> grades = (List<Integer>)message.getObjList3();
-			exam.setQuestionList(questions);
+			//exam.setQuestionList(questions);
+			for (Question question: questions) {
+				question = session.get(Question.class, question.getCode());
+				question.getExamList().add(exam);
+				exam.getQuestionList().add(question);
+				session.update(question);
+			}
 			exam.setTextForStudent(textList.get(0));
 			exam.setTextForTeacher(textList.get(1));
 			List<Grade> gradeObjs = new ArrayList<>();

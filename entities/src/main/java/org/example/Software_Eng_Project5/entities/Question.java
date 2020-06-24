@@ -35,8 +35,8 @@ public class Question implements Serializable {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             targetEntity = Exam.class)
-    @JoinTable(name="questions_tests", joinColumns = @JoinColumn(name = "question_id"),
-            inverseJoinColumns = @JoinColumn(name = "test_id"))
+    @JoinTable(name="questions_exams", joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "exam_id"))
     private List<Exam> examList;
 
 

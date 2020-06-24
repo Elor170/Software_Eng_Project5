@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -33,6 +32,8 @@ public class ExamWindowController {
     private Exam exam;
     private boolean isExamUsed;
     private boolean isEdit;
+    private boolean isCreat;
+    private boolean isShow;
     private List<CheckBox> checkBoxList;
     private List<Integer> questionsPoints;
     private List<TextField> pointsTextFields;
@@ -70,16 +71,38 @@ public class ExamWindowController {
         this.exam = exam;
         this.isExamUsed = isExamUsed;
         this.isEdit = isEdit;
+        this.isCreat = isCreat;
+        this.isShow = isShow;
 
-        this.showCourses();
+
 
         if(isCreat){
+            this.showCourses();
             this.examTitle.setText("New Exam");
             this.selectedQuestionList = new ArrayList<>();
             Button saveButton = new Button("Save");
             saveButton.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16" );
             saveButton.setOnAction(this::saveExam);
             this.buttonsHBox.getChildren().add(saveButton);
+        }
+        if(isShow){
+            this.examTitle.setText(profession.getCode() + " " + profession.getName() + ": " + exam.getCode() + ":");
+            int hours = Math.floorDiv(exam.getTestTime(),60);
+            String minutes = Integer.toString(exam.getTestTime() - 60 * hours);
+            if(minutes.length() < 2)
+                minutes = "0" + minutes;
+            this.examTimeTF.setText(hours + ":" + minutes);
+            this.examTimeTF.setEditable(false);
+            this.studentCommentsTA.setText(exam.getTextForStudent());
+            this.studentCommentsTA.setEditable(false);
+            this.teacherCommentsTA.setText(exam.getTextForTeacher());
+            this.teacherCommentsTA.setEditable(false);
+            this.isManualCheckBox.setSelected(exam.isManual());
+            this.isManualCheckBox.setDisable(true);
+            this.questionList = exam.getQuestionList();
+            this.showQuestions();
+            for(TextField pointsTF: pointsTextFields)
+                pointsTF.setEditable(false);
         }
     }
 
@@ -141,6 +164,24 @@ public class ExamWindowController {
         return check;
     }
 
+    private void bringGrades() {
+        Message msg = new Message();
+        msg.setSingleObject(this.exam.getCode());
+        msg.setItemsType("Grades");
+        EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+
+        this.questionsPoints = null;
+        do {
+            try {
+
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (this.questionsPoints == null);
+        this.showQuestions();
+    }
+
     private void bringQuestions() {
         Message msg = new Message();
         msg.setList(true);
@@ -186,6 +227,10 @@ public class ExamWindowController {
                 questionCodeCheckBox = new CheckBox(question.getCode());
                 questionCodeCheckBox.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
                 questionCodeCheckBox.setOnAction(this::selectQuestion);
+                if(this.isShow){
+                    questionCodeCheckBox.setSelected(true);
+                    questionCodeCheckBox.setDisable(true);
+                }
 
                 questionTextLabel = new Label(question.getQuestionText());
                 questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
@@ -194,7 +239,7 @@ public class ExamWindowController {
                 pointsLabel = new Label("Points:");
                 pointsLabel.setStyle("-fx-font-size: 14");
                 points = new TextField();
-                points.setPrefWidth(40);
+                points.setPrefWidth(60);
                 points.setStyle("-fx-font-size: 14;");
 
                 this.pointsTextFields.add(points);

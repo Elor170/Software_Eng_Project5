@@ -35,7 +35,7 @@ public class MainTeacherController {
     private Course course;
     private List<Profession> professionList;
     private List<Exam> examList;
-    private  List<Question> questionList;
+    private List<Question> questionList;
 
     @FXML
     private BorderPane borderPane;
@@ -286,30 +286,15 @@ public class MainTeacherController {
 
         EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
         this.examList = null;
-        //TODO remove
-        examList = new ArrayList<>();
-//        Exam exam1 = new Exam();
-//        exam1.setCode("010311");
-//        exam1.setTestTime(90);
-//        exam1.setManual(false);
-//        Exam exam2 = new Exam();
-//        exam2.setCode("120903");
-//        exam2.setTestTime(120);
-//        exam2.setManual(true);
-//
-//        List<Exam> examList = new ArrayList<>();
-//        examList.add(exam1);
-//        examList.add(exam2);
-//        this.examList = examList;
 
-//        do {
-//            try {
-//
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }while (this.examList == null);
+        do {
+            try {
+
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (this.examList == null);
 
         //Case: There are exams in the selected course/profession
         if(!this.examList.isEmpty()){
@@ -384,12 +369,17 @@ public class MainTeacherController {
     private void showSingleExam(ActionEvent event) {
         System.out.println("-----show Single Exam----");
         //TODO
-        this.openExamWindow(false, false, true, null);
+        String selectedExamCode = (((Label)((HBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText());
+        selectedExamCode = selectedExamCode.substring(6);
+        Exam selectedExam = null;
+        for(Exam exam: examList){
+            if(selectedExamCode.equals(exam.getCode()))
+                selectedExam = exam;
+        }
+        this.openExamWindow(false, false, true, selectedExam);
     }
 
     private void onCreateExam(ActionEvent event) {
-        System.out.println("-----Create exam-----");
-        //TODO
         this.openExamWindow(false, true, false, null);
     }
 
@@ -502,21 +492,23 @@ public class MainTeacherController {
         Message message = event.getMessage();
         String eventType = event.getEventType();
 
-        if (eventType.equals("Received")){
-            if(message.getItemsType().equals("Question") && message.isList()) {
-                this.questionList = (List<Question>) message.getObjList();
-            }
-            else if(message.getItemsType().equals("Exam") && message.isList()) {
-                this.examList = (List<Exam>) message.getObjList();
-            }
-            else if(message.getItemsType().equals("Exam") && message.isList()) {
-                this.examList = (List<Exam>) message.getObjList();
-            }
+        switch (eventType) {
+            case "Received":
+                if (message.getItemsType().equals("Question") && message.isList()) {
+                    this.questionList = (List<Question>) message.getObjList();
+                } else if (message.getItemsType().equals("Exam") && message.isList()) {
+                    this.examList = (List<Exam>) message.getObjList();
+                }
+                break;
+            case "Created Question":
+            case "Updated Question":
+                Platform.runLater(() -> this.showQuestions(null));
+                break;
+            case "Created Exam":
+            case "Updated Exam":
+                Platform.runLater(() -> this.showExams(null));
+                break;
         }
-        else if (eventType.equals("Created Question") || eventType.equals("Updated Question")){
-            Platform.runLater( () -> this.showQuestions(null) );
-        }
-
 
     }
 }

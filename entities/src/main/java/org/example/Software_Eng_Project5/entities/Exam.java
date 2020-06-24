@@ -1,6 +1,7 @@
 package org.example.Software_Eng_Project5.entities;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -51,6 +52,7 @@ public class Exam implements Serializable {
         this.profession = profession;
         this.course = course;
         this.isPulled = false;
+        this.questionList = new ArrayList<>();
     }
 
     public String getCode() { return code; }
