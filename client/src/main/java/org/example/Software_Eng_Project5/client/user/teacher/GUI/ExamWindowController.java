@@ -17,6 +17,7 @@ import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.hibernate.sql.Update;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -110,6 +111,75 @@ public class ExamWindowController {
                 i++;
             }
         }
+        if(isEdit && !isExamUsed){
+            this.examTitle.setText(exam.getCode() + ":");
+            this.examTimeTF.setText(Integer.toString(exam.getTestTime()));
+            this.studentCommentsTA.setText(exam.getTextForStudent());
+            this.teacherCommentsTA.setText(exam.getTextForTeacher());
+            this.isManualCheckBox.setSelected(exam.isManual());
+            this.isManualCheckBox.setDisable(true);
+            this.questionList = exam.getQuestionList();
+            this.showQuestions();
+            this.bringGrades();
+            List<Integer> questionsPoints;
+            int i = 0;
+            for(TextField pointsTF: pointsTextFields){
+                pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
+                i++;
+            }
+            this.pullExamB.setText("Update");
+            this.pullExamB.setOnAction(this::updateExam);
+        }
+    }
+
+    private void updateExam(ActionEvent event) {
+        errorLabel.setText(" ");
+
+        try {
+            Integer.parseInt(examTimeTF.getText());
+        }catch (Exception e){
+            errorLabel.setText("One of the fields is empty.");
+            return;
+        }
+        if(examTimeTF.getText().equals("")){
+            errorLabel.setText("One of the fields is empty.");
+            return;
+        }
+
+        int sum = 0;
+        List<TextField> pointsTF = this.pointsTextFields;
+        for (TextField textField: pointsTF) {
+            if(!textField.getText().equals("")){
+                try {
+                    Integer.parseInt(textField.getText());
+                }catch (Exception e){
+                    errorLabel.setText("One of the fields is wrong.");
+                    return;
+                }
+                sum = sum + Integer.parseInt(textField.getText());
+                this.questionsPoints.add(Integer.parseInt(textField.getText()));
+            }
+        }
+        if(sum != 100){
+            errorLabel.setText("The sum of the points is not 100");
+            this.questionsPoints.clear();
+            return;
+        }
+
+
+
+        Message message = new Message();
+        message.setSingleObject(this.exam);
+        message.setObjList(exam.getQuestionList());
+        List<String> textList = new ArrayList<>();
+        textList.add(this.studentCommentsTA.getText());
+        textList.add(this.teacherCommentsTA.getText());
+        message.setObjList2(textList);
+        message.setObjList3(this.questionsPoints);
+        message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
+
+        System.out.println("--------Update------");
+        //EventBus.getDefault().post(new TeacherEvent(message,"Update Exam"));
     }
 
     private void saveExam(ActionEvent event) {
@@ -233,7 +303,7 @@ public class ExamWindowController {
                 questionCodeCheckBox = new CheckBox(question.getCode());
                 questionCodeCheckBox.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
                 questionCodeCheckBox.setOnAction(this::selectQuestion);
-                if(this.isShow){
+                if(this.isShow || (this.isEdit && !this.isExamUsed)){
                     questionCodeCheckBox.setSelected(true);
                     questionCodeCheckBox.setDisable(true);
                 }
