@@ -37,7 +37,7 @@ public class Exam implements Serializable {
     private List<PulledExam> pulledExamList;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "exam", targetEntity = Grade.class)
-    private List<Integer> grades;
+    private List<Grade> grades;
 
     public Exam() {
     }
@@ -125,12 +125,12 @@ public class Exam implements Serializable {
         this.pulledExamList = pulledExamList;
     }
 
-    public List<Integer> getGrades()
+    public List<Grade> getGrades()
     {
         return grades;
     }
 
-    public void setGrades(List<Integer> grades)
+    public void setGrades(List<Grade> grades)
     {
         this.grades = grades;
     }
