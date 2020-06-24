@@ -21,9 +21,9 @@
                <children>
                   <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label alignment="CENTER" text="New Question" textFill="WHITE">
+                        <Label alignment="CENTER" text="Question" textFill="WHITE">
                            <font>
-                              <Font name="System Bold" size="18.0" />
+                              <Font name="System Bold" size="24.0" />
                            </font>
                            <HBox.margin>
                               <Insets right="10.0" />

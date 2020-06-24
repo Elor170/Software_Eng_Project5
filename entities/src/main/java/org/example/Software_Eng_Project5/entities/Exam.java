@@ -23,7 +23,8 @@ public class Exam implements Serializable {
     @JoinColumn(name = "test_teacher_id")
     private Teacher writer;
 
-    @ManyToMany(mappedBy = "testList", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Question.class)
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "examList",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Question.class)
     private List<Question> questionList;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,11 +32,11 @@ public class Exam implements Serializable {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_profession_id")
+    @JoinColumn(name = "profession_id")
     private Profession profession;
 
-//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pulled_exam")
-//    private List<pulledExam> pulledExamList;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "originalExam")
+    private List<PulledExam> pulledExamList;
 
     public Exam() {
     }

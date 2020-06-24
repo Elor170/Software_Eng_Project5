@@ -39,6 +39,7 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Question.class);
 		configuration.addAnnotatedClass(Answer.class);
 		configuration.addAnnotatedClass(Exam.class);
+		configuration.addAnnotatedClass(PulledExam.class);
 
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties()).build();

@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
@@ -22,17 +23,19 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainTeacherController {
-
     private boolean isShowQuestions;
+    private boolean isShowExams;
     private String professionCode;
     private String courseCode;
     private Profession profession;
     private Course course;
     private List<Profession> professionList;
+    private List<Exam> examList;
     private  List<Question> questionList;
 
     @FXML
@@ -57,6 +60,7 @@ public class MainTeacherController {
 
     public void showProfessions(){
         isShowQuestions = false;
+        isShowExams = false;
         Image professionImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\profession.png");
         Image courseImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\course.png");
         ImageView professionIcon;
@@ -97,13 +101,15 @@ public class MainTeacherController {
                     else
                         setProfessionCode(name.substring(0, 2));
                     if (this.isShowQuestions)
-                        showQuestionsB(null);
+                        showQuestions(null);
+                    else if (this.isShowExams)
+                        showExams(null);
                 }
 
             });
             professionVBox.getChildren().add(professionNode);
         }
-        TreeItem<String> teacherQuestions = new TreeItem<>("My Questions");
+        TreeItem<String> teacherQuestions = new TreeItem<>("My Questions\\ Exams");
         TreeView<String> teacherQuestionsNode = new TreeView<>(teacherQuestions);
         teacherQuestionsNode.setStyle("-fx-background-color:  #1D1D1F");
         teacherQuestionsNode.setStyle("-fx-control-inner-background:  #313335");
@@ -114,13 +120,16 @@ public class MainTeacherController {
                 setProfessionCode(null);
             }
             if (this.isShowQuestions)
-                showQuestionsB(null);
+                showQuestions(null);
+            else if (this.isShowExams)
+                showExams(null);
         });
         professionVBox.getChildren().add(teacherQuestionsNode);
     }
 
     @FXML
-    private void showQuestionsB(ActionEvent event){
+    private void showQuestions(ActionEvent event){
+        this.isShowExams = false;
         this.isShowQuestions = true;
         this.contentVBox.getChildren().clear();
         boolean isCourse = false;
@@ -137,14 +146,14 @@ public class MainTeacherController {
         msg.setItemsType("Question");
 
         if (isCourse) {
-            this.contentTitle.setText("The questions of course " + this.course.getCode() + " " + this.course.getName()
-                    + " in profession " + this.profession.getCode() + " " + this.profession.getName());
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  "
+                    +  this.course.getCode() + "  " + this.course.getName() + ":  Questions" );
             msg.setClassType(Course.class);
             msg.setIndexString(this.courseCode);
         }
 
         else if(isProfession) {
-            this.contentTitle.setText("The questions of profession " + this.profession.getCode() + " " + this.profession.getName());
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  Questions" );
             msg.setClassType(Profession.class);
             msg.setIndexString(this.professionCode);
         }
@@ -156,43 +165,66 @@ public class MainTeacherController {
         }
 
         EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
-        questionList = null;
+        this.questionList = null;
         do {
             try {
+
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }while (questionList == null);
+        }while (this.questionList == null);
 
         //Case: There are questions in the selected course/profession
         if(!questionList.isEmpty()){
             VBox questionVBox;
-            Label questionLabel;
+            HBox questionTopHBox;
+            Label questionTextLabel;
+            Label questionCodeLabel;
+            HBox answerHBox;
+            Label answerLabel;
+            Circle answerCircle;
+
             for(Question question: questionList) {
-                Label answerLabel;
                 questionVBox = new VBox();
+                questionVBox.setStyle("-fx-padding: 10");
+                List<Answer> answerList = question.getAnswers();
                 int correctAnswerNum = question.getCorrectAnsNum();
 
-                List<Answer> answerList = question.getAnswers();
-                questionLabel = new Label( question.getCode() + "  " + question.getQuestionText());
-                questionLabel.setTextFill(Color.WHITE);
+                questionCodeLabel = new Label(question.getCode());
+                questionCodeLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
+
+                questionTextLabel = new Label(question.getQuestionText());
+                questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
+                        + "-fx-font-size: 16;");
+
+
+                questionTopHBox = new HBox(questionCodeLabel, questionTextLabel);
+                questionVBox.getChildren().add(questionTopHBox);
+
+                for(Answer answer: answerList){
+                    answerLabel = new Label( answer.getAnsText());
+                    answerLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
+                            + "-fx-font-size: 16;");
+                    answerCircle = new Circle();
+                    answerCircle.setRadius(7);
+
+                    if(--correctAnswerNum == 0)
+                        answerCircle.setStyle("-fx-fill: #499C54;");
+                    else
+                        answerCircle.setStyle("-fx-fill: #FF5641;");
+
+                    answerHBox = new HBox(answerCircle, answerLabel);
+                    answerHBox.setStyle("-fx-padding: 0 0 0 100");
+                    questionVBox.getChildren().add(answerHBox);
+                }
 
                 if(isMyQuestions){
                     Button editQuestionB = new Button("Edit Question");
+                    editQuestionB.setStyle("-fx-background-color: #DADCE0;" + "-fx-padding: 10 10 5 100;" +
+                            "-fx-border-insets: 5 5 0 90;" + "-fx-background-insets: 5 5 0 90");
                     editQuestionB.setOnAction(this::onEditQuestion);
                     questionVBox.getChildren().add(editQuestionB);
-                }
-                questionVBox.getChildren().add(questionLabel);
-
-
-                for(Answer answer: answerList){
-                    answerLabel = new Label("       " + answer.getAnsText());
-                    if(--correctAnswerNum == 0)
-                        answerLabel.setTextFill(Color.GREEN);
-                    else
-                        answerLabel.setTextFill(Color.RED);
-                    questionVBox.getChildren().add(answerLabel);
                 }
                 contentVBox.getChildren().add(questionVBox);
             }
@@ -200,15 +232,138 @@ public class MainTeacherController {
         // Case: No questions in the selected course/profession
         else {
             Label label = new Label("There are no questions yet.");
-            label.setTextFill(Color.WHITE);
+            label.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 20 20 5 5;"
+                    + "-fx-font-size: 16;");
             this.contentVBox.getChildren().add(label);
         }
 
         // Add create question button
         if (! isMyQuestions){
             Button addQuestion = new Button("Create Question");
+            addQuestion.setStyle("-fx-background-color: #DADCE0;");
             addQuestion.setOnAction((this::onCreateQuestion));
             HBox hBox = new HBox(addQuestion);
+            hBox.setAlignment(Pos.CENTER);
+            this.contentVBox.getChildren().add(hBox);
+        }
+    }
+
+    @FXML
+    void showExams(ActionEvent event) {
+        this.isShowExams = true;
+        this.isShowQuestions = false;
+        this.contentVBox.getChildren().clear();
+        boolean isCourse = false;
+        boolean isProfession = false;
+        boolean isMyExams = false;
+        if (this.courseCode != null)
+            isCourse = true;
+        else if(this.professionCode != null)
+            isProfession = true;
+        else
+            isMyExams = true;
+        Message msg = new Message();
+        msg.setList(true);
+        msg.setItemsType("Exam");
+
+        if (isCourse) {
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  "
+                    +  this.course.getCode() + "  " + this.course.getName() + ":  Exams" );
+            msg.setClassType(Course.class);
+            msg.setIndexString(this.courseCode);
+        }
+
+        else if(isProfession) {
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  Exams" );
+            msg.setClassType(Profession.class);
+            msg.setIndexString(this.professionCode);
+        }
+
+        else {
+            this.contentTitle.setText("My Exams");
+            msg.setClassType(Teacher.class);
+            msg.setIndexString(this.userNameLabel.getText());
+        }
+
+        EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+        this.examList = null;
+        //TODO remove
+        Exam exam1 = new Exam();
+        exam1.setCode("010311");
+        exam1.setTestTime(90);
+        exam1.setManual(false);
+        Exam exam2 = new Exam();
+        exam2.setCode("120903");
+        exam2.setTestTime(120);
+        exam2.setManual(true);
+
+        List<Exam> examList = new ArrayList<>();
+        examList.add(exam1);
+        examList.add(exam2);
+        this.examList = examList;
+
+//        do {
+//            try {
+//
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }while (this.examList == null);
+
+        //Case: There are exams in the selected course/profession
+        if(!this.examList.isEmpty()){
+            Button showExamB;
+            HBox examHBox;
+            Label examCodeLabel;
+            Label examTimeLabel;
+            Label examTypeLabel;
+
+            for (Exam exam : this.examList){
+                examHBox = new HBox();
+                showExamB = new Button("Show");
+                showExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
+                //showExamB.setOnAction();
+
+                examCodeLabel = new Label("Code: " + exam.getCode());
+                examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                int hours = Math.floorDiv(exam.getTestTime(),60);
+                String minutes = Integer.toString(exam.getTestTime() - 60 * hours);
+                if(minutes.length() < 2)
+                    minutes = "0" + minutes;
+                examTimeLabel = new Label(  "Time: " + hours + ":" + minutes);
+                examTimeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                examTypeLabel = new Label();
+                if (exam.isManual())
+                    examTypeLabel.setText("Type: Manual");
+                else
+                    examTypeLabel.setText("Type: Computerized");
+                examTypeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                examHBox.getChildren().addAll(showExamB, examCodeLabel, examTimeLabel, examTypeLabel);
+                examHBox.setSpacing(20);
+                examHBox.setStyle("-fx-font-size: 16;");
+                this.contentVBox.getChildren().add(examHBox);
+            }
+
+        }
+
+        // Case: No exams in the selected course/profession
+        else {
+            Label label = new Label("There are no exams yet.");
+            label.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 20 20 5 5;"
+                    + "-fx-font-size: 16;");
+            this.contentVBox.getChildren().add(label);
+        }
+
+        // Add create exam button
+        if (! isMyExams){
+            Button addExam = new Button("Create Exam");
+            addExam.setStyle("-fx-background-color: #DADCE0;");
+            //addExam.setOnAction((this::onCreateExam));
+            HBox hBox = new HBox(addExam);
             hBox.setAlignment(Pos.CENTER);
             this.contentVBox.getChildren().add(hBox);
         }
@@ -217,13 +372,16 @@ public class MainTeacherController {
     private void onEditQuestion(ActionEvent event) {
         Question selectedQuestion = null;
         System.out.println("Edit the Question");
-        String selectedQuestionCode =((Label)((VBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText().substring(0, 5);
+        VBox questionVBox = (VBox)((Button)event.getSource()).getParent();
+        Label questionCodeLabel = (Label) ((HBox)questionVBox.getChildren().get(0)).getChildren().get(0);
+        String selectedQuestionCode = questionCodeLabel.getText();
         System.out.println("---" + selectedQuestionCode + "---");
         for(Question question: questionList){
             if(question.getCode().equals(selectedQuestionCode))
                 selectedQuestion = question;
         }
 
+        assert selectedQuestion != null;
         String professionCode = selectedQuestion.getCode().substring(0, 2);
         for(Profession profession: this.professionList){
             if(profession.getCode().equals(professionCode))
@@ -301,11 +459,14 @@ public class MainTeacherController {
 
         if (eventType.equals("Received")){
             if(message.getItemsType().equals("Question") && message.isList()) {
-                questionList = (List<Question>) message.getObjList();
+                this.questionList = (List<Question>) message.getObjList();
+            }
+            else if(message.getItemsType().equals("Exam") && message.isList()) {
+                this.examList = (List<Exam>) message.getObjList();
             }
         }
-        else if (eventType.equals("Created") || eventType.equals("Updated")){
-            Platform.runLater(() -> this.showQuestionsB(null));
+        else if (eventType.equals("Created Question") || eventType.equals("Updated Question")){
+            Platform.runLater( () -> this.showQuestions(null) );
         }
 
 
