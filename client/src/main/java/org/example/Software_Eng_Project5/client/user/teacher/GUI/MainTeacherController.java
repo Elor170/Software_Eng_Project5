@@ -240,7 +240,7 @@ public class MainTeacherController {
         // Add create question button
         if (! isMyQuestions){
             Button addQuestion = new Button("Create Question");
-            addQuestion.setStyle("-fx-background-color: #DADCE0;");
+            addQuestion.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16;");
             addQuestion.setOnAction((this::onCreateQuestion));
             HBox hBox = new HBox(addQuestion);
             hBox.setAlignment(Pos.CENTER);
@@ -323,7 +323,7 @@ public class MainTeacherController {
                 examHBox = new HBox();
                 showExamB = new Button("Show");
                 showExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
-                //showExamB.setOnAction();
+                showExamB.setOnAction(this::showSingleExam);
 
                 examCodeLabel = new Label("Code: " + exam.getCode());
                 examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
@@ -361,21 +361,35 @@ public class MainTeacherController {
         // Add create exam button
         if (! isMyExams){
             Button addExam = new Button("Create Exam");
-            addExam.setStyle("-fx-background-color: #DADCE0;");
-            //addExam.setOnAction((this::onCreateExam));
+            addExam.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16;");
+            addExam.setOnAction((this::onCreateExam));
             HBox hBox = new HBox(addExam);
             hBox.setAlignment(Pos.CENTER);
             this.contentVBox.getChildren().add(hBox);
         }
     }
 
+    private void showSingleExam(ActionEvent event) {
+        System.out.println("-----show Single Exam----");
+        //TODO
+        this.openExamWindow();
+    }
+
+    private void onCreateExam(ActionEvent event) {
+        System.out.println("-----Create exam-----");
+        //TODO
+    }
+
+    private void openExamWindow() {
+    }
+
     private void onEditQuestion(ActionEvent event) {
         Question selectedQuestion = null;
-        System.out.println("Edit the Question");
+
         VBox questionVBox = (VBox)((Button)event.getSource()).getParent();
         Label questionCodeLabel = (Label) ((HBox)questionVBox.getChildren().get(0)).getChildren().get(0);
         String selectedQuestionCode = questionCodeLabel.getText();
-        System.out.println("---" + selectedQuestionCode + "---");
+
         for(Question question: questionList){
             if(question.getCode().equals(selectedQuestionCode))
                 selectedQuestion = question;
@@ -460,6 +474,9 @@ public class MainTeacherController {
         if (eventType.equals("Received")){
             if(message.getItemsType().equals("Question") && message.isList()) {
                 this.questionList = (List<Question>) message.getObjList();
+            }
+            else if(message.getItemsType().equals("Exam") && message.isList()) {
+                this.examList = (List<Exam>) message.getObjList();
             }
             else if(message.getItemsType().equals("Exam") && message.isList()) {
                 this.examList = (List<Exam>) message.getObjList();

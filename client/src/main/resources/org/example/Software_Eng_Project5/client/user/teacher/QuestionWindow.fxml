@@ -19,7 +19,7 @@
          <children>
             <VBox alignment="BOTTOM_CENTER" prefHeight="67.0" prefWidth="558.0">
                <children>
-                  <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label alignment="CENTER" text="Question" textFill="WHITE">
                            <font>
