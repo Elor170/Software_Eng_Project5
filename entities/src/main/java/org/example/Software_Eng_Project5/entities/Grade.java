@@ -1,10 +1,11 @@
 package org.example.Software_Eng_Project5.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "grade")
-public class Grade {
+public class Grade implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
@@ -13,6 +14,9 @@ public class Grade {
     @JoinColumn(name = "exam")
     private Exam exam;
     private int grade;
+
+    public Grade() {
+    }
 
     public Grade(int grade) {
         this.grade = grade;

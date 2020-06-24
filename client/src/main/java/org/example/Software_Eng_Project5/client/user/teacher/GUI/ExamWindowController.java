@@ -1,10 +1,9 @@
-package org.example.Software_Eng_Project5.client.user.teacher;
+package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -13,7 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import org.example.Software_Eng_Project5.client.user.teacher.GUI.messageWindowController;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
+import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,6 +32,8 @@ public class ExamWindowController {
     private Exam exam;
     private boolean isExamUsed;
     private boolean isEdit;
+    private boolean isCreat;
+    private boolean isShow;
     private List<CheckBox> checkBoxList;
     private List<Integer> questionsPoints;
     private List<TextField> pointsTextFields;
@@ -69,16 +71,44 @@ public class ExamWindowController {
         this.exam = exam;
         this.isExamUsed = isExamUsed;
         this.isEdit = isEdit;
+        this.isCreat = isCreat;
+        this.isShow = isShow;
 
-        this.showCourses();
+
 
         if(isCreat){
+            this.showCourses();
             this.examTitle.setText("New Exam");
             this.selectedQuestionList = new ArrayList<>();
             Button saveButton = new Button("Save");
             saveButton.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16" );
             saveButton.setOnAction(this::saveExam);
             this.buttonsHBox.getChildren().add(saveButton);
+        }
+        if(isShow){
+            this.examTitle.setText(profession.getCode() + " " + profession.getName() + ": " + exam.getCode() + ":");
+            int hours = Math.floorDiv(exam.getTestTime(),60);
+            String minutes = Integer.toString(exam.getTestTime() - 60 * hours);
+            if(minutes.length() < 2)
+                minutes = "0" + minutes;
+            this.examTimeTF.setText(hours + ":" + minutes);
+            this.examTimeTF.setEditable(false);
+            this.studentCommentsTA.setText(exam.getTextForStudent());
+            this.studentCommentsTA.setEditable(false);
+            this.teacherCommentsTA.setText(exam.getTextForTeacher());
+            this.teacherCommentsTA.setEditable(false);
+            this.isManualCheckBox.setSelected(exam.isManual());
+            this.isManualCheckBox.setDisable(true);
+            this.questionList = exam.getQuestionList();
+            this.showQuestions();
+            this.bringGrades();
+            List<Integer> questionsPoints;
+            int i = 0;
+            for(TextField pointsTF: pointsTextFields){
+                pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
+                pointsTF.setEditable(false);
+                i++;
+            }
         }
     }
 
@@ -105,6 +135,7 @@ public class ExamWindowController {
         }
         if(sum != 100){
             errorLabel.setText("The sum of the points is not 100");
+            this.questionsPoints.clear();
             return;
         }
 
@@ -116,6 +147,7 @@ public class ExamWindowController {
         textList.add(this.studentCommentsTA.getText());
         textList.add(this.teacherCommentsTA.getText());
         message.setObjList2(textList);
+        message.setObjList3(this.questionsPoints);
         message.setSingleObject(this.profession);
         message.setSingleObject2(this.course);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
@@ -136,6 +168,24 @@ public class ExamWindowController {
         }
 
         return check;
+    }
+
+    private void bringGrades() {
+        Message msg = new Message();
+        msg.setSingleObject(this.exam.getCode());
+        msg.setItemsType("Grades");
+        msg.setList(true);
+        EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+
+        this.questionsPoints = null;
+        do {
+            try {
+
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (this.questionsPoints == null);
     }
 
     private void bringQuestions() {
@@ -183,6 +233,10 @@ public class ExamWindowController {
                 questionCodeCheckBox = new CheckBox(question.getCode());
                 questionCodeCheckBox.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
                 questionCodeCheckBox.setOnAction(this::selectQuestion);
+                if(this.isShow){
+                    questionCodeCheckBox.setSelected(true);
+                    questionCodeCheckBox.setDisable(true);
+                }
 
                 questionTextLabel = new Label(question.getQuestionText());
                 questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
@@ -191,7 +245,7 @@ public class ExamWindowController {
                 pointsLabel = new Label("Points:");
                 pointsLabel.setStyle("-fx-font-size: 14");
                 points = new TextField();
-                points.setPrefWidth(40);
+                points.setPrefWidth(60);
                 points.setStyle("-fx-font-size: 14;");
 
                 this.pointsTextFields.add(points);
@@ -310,6 +364,14 @@ public class ExamWindowController {
         if (eventType.equals("Received")) {
             if (message.getItemsType().equals("Question") && message.isList()) {
                 this.questionList = (List<Question>) message.getObjList();
+            }
+            if (message.getItemsType().equals("Grades") && message.isList()) {
+                List<Grade> grades = (List<Grade>) message.getObjList();
+                List<Integer> tempInt = new ArrayList<>();
+                for (Grade grade: grades){
+                    tempInt.add(grade.getGrade());
+                }
+                this.questionsPoints = tempInt;
             }
         }
         else if (eventType.equals("Created Exam")) {

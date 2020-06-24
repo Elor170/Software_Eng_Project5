@@ -186,10 +186,6 @@ public class QuestionWindowController {
         else
             this.courseList.remove(selectedCourse);
 
-
-        for (Course course: this.courseList){
-            System.out.println(course.getCode() + " " + course.getName());
-        }
     }
 
     public void setParameters(Stage stage, Profession profession, Question question, boolean isQuestionUsed, boolean isEdit) {
