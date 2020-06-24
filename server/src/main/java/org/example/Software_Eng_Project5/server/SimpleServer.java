@@ -296,6 +296,7 @@ public class SimpleServer extends AbstractServer {
 				retMessage.setList(true);
 				retMessage.setType("Received");
 				break;
+
 			case "Exam":
 				List<Exam> examList = null;
 				if (classType.equals(Course.class))
@@ -311,11 +312,28 @@ public class SimpleServer extends AbstractServer {
 				retMessage.setList(true);
 				retMessage.setType("Received");
 				break;
+
 			case "Pulled Exam":
 				PulledExam pulledExam = (PulledExam) object;
 				retMessage.setSingleObject(pulledExam);
 				retMessage.setCommand("Student Event");
 				retMessage.setItemsType("PulledExam");
+				retMessage.setList(false);
+				retMessage.setType("Received");
+				break;
+
+			case "Grades":
+				List<Grade> allGrades = getAll(Grade.class);
+				List<Grade> grades = new ArrayList<>();
+				String examCode = (String)message.getSingleObject();
+				for(Grade grade : allGrades)
+				{
+					if(grade.getExam().getCode().equals(examCode))
+						grades.add(grade);
+				}
+				retMessage.setObjList(grades);
+				retMessage.setCommand("Teacher Event");
+				retMessage.setItemsType("Grades");
 				retMessage.setList(false);
 				retMessage.setType("Received");
 				break;

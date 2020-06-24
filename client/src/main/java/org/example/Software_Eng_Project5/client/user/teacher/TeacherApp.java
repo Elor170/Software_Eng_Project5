@@ -194,6 +194,10 @@ public class TeacherApp extends UserApp
                 editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(),
                         (List<String>)message.getObjList2());
                 break;
+
+            case "Pull Exam":
+                    pullExam((Exam)message.getSingleObject(), (String)message.getSingleObject2());
+                break;
         }
     }
 }
