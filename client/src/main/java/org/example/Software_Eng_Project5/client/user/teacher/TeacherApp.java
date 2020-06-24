@@ -130,13 +130,13 @@ public class TeacherApp extends UserApp
     public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList)
     {
         Message msg = new Message();
+        exam.setQuestionList(questions);
+        exam.setTextForStudent(textList.get(0));
+        exam.setTextForTeacher(textList.get(1));
+        exam.setTestTime(testTime);
         msg.setCommand("Update");
-        msg.setObjList(questions);
-        msg.setObjList2(textList);
-        msg.setTestTime(testTime);
         msg.setClassType(Exam.class);
-        msg.setSingleObject(exam.getProfession());
-        msg.setSingleObject2(exam.getCourse());
+        msg.setSingleObject(exam);
         try
         {
             client.sendToServer(msg);
@@ -175,9 +175,11 @@ public class TeacherApp extends UserApp
                         message.getIndexInt());
                 break;
 
-
             case "Create Exam":
                 createExam(message);
+
+            case "Update Exam":
+                editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(), (List<String>)message.getObjList2());
         }
     }
 }
