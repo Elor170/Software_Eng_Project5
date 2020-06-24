@@ -117,7 +117,7 @@ public class TeacherApp extends UserApp
     {
         msg.setClassType(Exam.class);
         msg.setCommand("Insert");
-        ((List<String>) msg.getObjList()).add(userName);
+        ((List<String>) msg.getObjList2()).add(userName);
         try
         {
             client.sendToServer(msg);
