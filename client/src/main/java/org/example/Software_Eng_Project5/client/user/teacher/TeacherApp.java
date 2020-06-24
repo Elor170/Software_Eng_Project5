@@ -190,7 +190,8 @@ public class TeacherApp extends UserApp
                 createExam(message);
 
             case "Update Exam":
-                editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(), (List<String>)message.getObjList2());
+                editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(),
+                        (List<String>)message.getObjList2());
         }
     }
 }

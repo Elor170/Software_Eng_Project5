@@ -79,6 +79,10 @@ public class SimpleServer extends AbstractServer {
 				case "Update":
 					returnMessage = updateObject(message);
 					break;
+
+				case "Validate":
+					returnMessage = validateCredentials(message);
+					break;
 			}
 				try {
 					if (returnMessage != null)
@@ -106,6 +110,21 @@ public class SimpleServer extends AbstractServer {
 		}
 	}
 
+	private Message validateCredentials(Message message)
+	{
+		Message retMessage = new Message();
+		PulledExam pulledExam = null;
+		Student student = session.get(Student.class, message.getIndexString());
+		if(student.getIdentification().equals(message.getSingleObject2()))
+			pulledExam = session.get(PulledExam.class, (String)message.getSingleObject());
+
+		System.out.println("Credentials of student #" + message.getIndexString() + " validated");
+		retMessage.setSingleObject(pulledExam);
+		retMessage.setType("Start Exam");
+		retMessage.setCommand("Student Event");
+		return retMessage;
+	}
+
 	private Message updateObject(Message message)
 	{
 		Message retMessage = new Message();
@@ -125,15 +144,16 @@ public class SimpleServer extends AbstractServer {
 			if(((Exam)message.getSingleObject()).isPulled())
 			{
 				Message msg = new Message();
-				Exam oldExam = (Exam)message.getSingleObject();
+				Exam editedExam = (Exam)message.getSingleObject();
 				List<String> textList = new ArrayList<>();
-				textList.add(oldExam.getTextForStudent());
-				textList.add(oldExam.getTextForTeacher());
-				textList.add(oldExam.getWriter().getUserName());
-				msg.setObjList(oldExam.getQuestionList());
+				textList.add(editedExam.getTextForStudent());
+				textList.add(editedExam.getTextForTeacher());
+				textList.add(editedExam.getWriter().getUserName());
+				msg.setObjList(editedExam.getQuestionList());
 				msg.setObjList2(textList);
-				msg.setSingleObject(oldExam.getProfession());
-				msg.setSingleObject2(oldExam.getCourse());
+				msg.setObjList3(editedExam.getGrades());
+				msg.setSingleObject(editedExam.getProfession());
+				msg.setSingleObject2(editedExam.getCourse());
 				msg.setClassType(Exam.class);
 				insertObject(msg);
 			}
@@ -154,8 +174,8 @@ public class SimpleServer extends AbstractServer {
 	private Message insertObject(Message message) {
 		Message retMessage = new Message();
 		Class<?> classType = message.getClassType();
-		Object object = message.getSingleObject();
-
+		//Object object = message.getSingleObject();
+		retMessage.setCommand("Teacher Event");
 		// create Question
 		if (classType.equals(Question.class)){
 			List<String> textList = (List<String>) message.getObjList();
@@ -195,6 +215,7 @@ public class SimpleServer extends AbstractServer {
 			exam.setQuestionList(questions);
 			exam.setTextForStudent(textList.get(0));
 			exam.setTextForTeacher(textList.get(1));
+			exam.setGrades((List<Integer>)message.getObjList3());
 
 			session.save(exam);
 
@@ -215,8 +236,21 @@ public class SimpleServer extends AbstractServer {
 			retMessage.setItemsType("PulledExam");
 			retMessage.setType("Pulled Exam");
 		}
+		else if(classType.equals(SolvedExam.class))
+		{
+			PulledExam pulledExam = (PulledExam) message.getSingleObject();
+			String username = (String) message.getSingleObject2();
+			String id = pulledExam.getExecutionCode() + username;
+			Student student = session.get(Student.class, username);
+			SolvedExam solvedExam = new SolvedExam(id, (PulledExam)message.getSingleObject(), (List<Integer>)message.getObjList(),
+					message.getTestTime(), student, message.getGrade());
+			session.save(solvedExam);
 
-		retMessage.setCommand("Teacher Event");
+			System.out.println("Solved Exam #" + id + " saved");
+			retMessage.setItemsType("SolvedExam");
+			retMessage.setType("Solved Exam");
+			retMessage.setCommand("Student Event");
+		}
 
 		return retMessage;
 	}
@@ -228,37 +262,46 @@ public class SimpleServer extends AbstractServer {
 
 		Object object = session.get(classType, indexString);
 
-		if (message.getItemsType().equals("Question")) {
-			List<Question> questionList = null;
-			if (classType.equals(Course.class))
-				questionList = new ArrayList<>(((Course)object).getQuestionList());
-			else if(classType.equals(Profession.class))
-				questionList = new ArrayList<>(((Profession)object).getQuestionList());
-			else if(classType.equals(Teacher.class))
-				questionList = new ArrayList<>(((Teacher) object).getQuestionList());
-
-			retMessage.setObjList(questionList);
-			retMessage.setCommand("Teacher Event");
-			retMessage.setItemsType("Question");
-			retMessage.setList(true);
-			retMessage.setType("Received");
-		}
-
-		else if (message.getItemsType().equals("Exam"))
+		switch (message.getItemsType())
 		{
-			List<Exam> examList = null;
-			if (classType.equals(Course.class))
-				examList = new ArrayList<>(((Course)object).getExamList());
-			else if(classType.equals(Profession.class))
-				examList = new ArrayList<>(((Profession)object).getExamList());
-			else if(classType.equals(Teacher.class))
-				examList = new ArrayList<>(((Teacher) object).getExamList());
+			case "Question":
+				List<Question> questionList = null;
+				if (classType.equals(Course.class))
+					questionList = new ArrayList<>(((Course) object).getQuestionList());
+				else if (classType.equals(Profession.class))
+					questionList = new ArrayList<>(((Profession) object).getQuestionList());
+				else if (classType.equals(Teacher.class))
+					questionList = new ArrayList<>(((Teacher) object).getQuestionList());
 
-			retMessage.setObjList(examList);
-			retMessage.setCommand("Teacher Event");
-			retMessage.setItemsType("Exam");
-			retMessage.setList(true);
-			retMessage.setType("Received");
+				retMessage.setObjList(questionList);
+				retMessage.setCommand("Teacher Event");
+				retMessage.setItemsType("Question");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+			case "Exam":
+				List<Exam> examList = null;
+				if (classType.equals(Course.class))
+					examList = new ArrayList<>(((Course) object).getExamList());
+				else if (classType.equals(Profession.class))
+					examList = new ArrayList<>(((Profession) object).getExamList());
+				else if (classType.equals(Teacher.class))
+					examList = new ArrayList<>(((Teacher) object).getExamList());
+
+				retMessage.setObjList(examList);
+				retMessage.setCommand("Teacher Event");
+				retMessage.setItemsType("Exam");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+			case "Pulled Exam":
+				PulledExam pulledExam = (PulledExam) object;
+				retMessage.setSingleObject(pulledExam);
+				retMessage.setCommand("Student Event");
+				retMessage.setItemsType("PulledExam");
+				retMessage.setList(false);
+				retMessage.setType("Received");
+				break;
 		}
 
 		return retMessage;
