@@ -413,7 +413,7 @@ public class MainTeacherController {
         boolean isExamUsed = false;
         if(isEditExam)
             isExamUsed = selectedExam.isPulled();
-        examControllerWindow.setParameters(stage, this.profession, this.course,selectedExam,
+        examControllerWindow.setParameters(stage, this.profession, selectedExam,
                 isExamUsed, isEditExam, isCreatExam, isShowSingleExam);
     }
 

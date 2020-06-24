@@ -170,6 +170,6 @@
       </VBox>
    </center>
    <left>
-      <VBox fx:id="coursesVBox" prefHeight="386.0" prefWidth="204.0" style="-fx-background-color: #292A2D;" BorderPane.alignment="CENTER" />
+      <VBox fx:id="coursesVBox" prefWidth="204.0" style="-fx-background-color: #292A2D;" BorderPane.alignment="CENTER" />
    </left>
 </BorderPane>

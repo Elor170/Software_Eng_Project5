@@ -3,7 +3,9 @@ package org.example.Software_Eng_Project5.client.user.teacher;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,10 +13,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.teacher.GUI.messageWindowController;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,17 +52,18 @@ public class ExamWindowController {
     private HBox buttonsHBox;
     @FXML
     private Button pullExamB;
+    @FXML
+    private Label errorLabel;
 
     @FXML
     void pullExam(ActionEvent event) {
 
     }
 
-    public void setParameters(Stage stage, Profession profession, Course course
+    public void setParameters(Stage stage, Profession profession
             ,Exam exam, boolean isExamUsed, boolean isEdit, boolean isCreat, boolean isShow) {
         this.stage = stage;
         this.profession = profession;
-        this.course = course;
         this.exam = exam;
         this.isExamUsed = isExamUsed;
         this.isEdit = isEdit;
@@ -69,16 +74,18 @@ public class ExamWindowController {
             this.examTitle.setText("New Exam");
             this.selectedQuestionList = new ArrayList<>();
             Button saveButton = new Button("Save");
-            saveButton.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 14" );
+            saveButton.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16" );
             saveButton.setOnAction(this::saveExam);
+            this.buttonsHBox.getChildren().add(saveButton);
         }
     }
 
     private void saveExam(ActionEvent event) {
-//        if(this.checkFields()){
-//
-//            return;
-//        }
+        errorLabel.setText(" ");
+        if(!this.checkFields()){
+            errorLabel.setText("One of the fields empty or wrong.");
+            return;
+        }
         Message message = new Message();
         message.setObjList(this.questionList);
         List<String> textList = new ArrayList<>();
@@ -86,14 +93,26 @@ public class ExamWindowController {
         textList.add(this.teacherCommentsTA.getText());
         message.setObjList2(textList);
         message.setSingleObject(this.profession);
-        message.setSingleObject(this.course);
+        message.setSingleObject2(this.course);
+        message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
 
         EventBus.getDefault().post(new TeacherEvent(message,"Create Exam"));
     }
 
-//    private boolean checkFields() {
-//        boolean check
-//    }
+    private boolean checkFields() {
+        boolean check = true;
+        if ((this.course == null) || (this.selectedQuestionList.isEmpty()) || (examTimeTF.getText().equals("")))
+            check = false;
+
+        try {
+            Integer.parseInt(examTimeTF.getText());
+        }catch (Exception e){
+            check = false;
+        }
+
+
+        return check;
+    }
 
     private void bringQuestions() {
         Message msg = new Message();
@@ -259,5 +278,26 @@ public class ExamWindowController {
                 this.questionList = (List<Question>) message.getObjList();
             }
         }
+        else if (eventType.equals("Created Exam")) {
+            Platform.runLater(() -> {
+                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                Scene scene = null;
+                try {
+                    scene = new Scene(fxmlLoader.load());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ((messageWindowController) fxmlLoader.getController()).setMessage("A new exam was\n" +
+                        "created and saved.");
+                stage.setScene(scene);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stage.close();
+            });
+        }
+
     }
 }

@@ -30,6 +30,11 @@
                         </Label>
                      </children>
                   </HBox>
+                  <Label fx:id="errorLabel" alignment="CENTER" prefHeight="20.0" prefWidth="558.0" textFill="RED">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
                   <VBox prefHeight="357.0" prefWidth="800.0" style="-fx-spacing: 10;">
                      <children>
                         <HBox alignment="CENTER" style="-fx-spacing: 10;">
@@ -78,7 +83,7 @@
                            </VBox.margin>
                         </TextArea>
                      </children></VBox>
-                  <VBox fx:id="contentVBox" prefHeight="200.0" prefWidth="100.0" />
+                  <VBox fx:id="contentVBox" prefHeight="200.0" prefWidth="100.0" style="-fx-spacing: 10;" />
                   <HBox fx:id="buttonsHBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-spacing: 5;">
                      <children>
                         <Button fx:id="pullExamB" mnemonicParsing="false" onAction="#pullExam" text="Pull">
