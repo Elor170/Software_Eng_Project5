@@ -33,6 +33,8 @@ public class ExamWindowController {
     private boolean isExamUsed;
     private boolean isEdit;
     private List<CheckBox> checkBoxList;
+    private List<Integer> questionsPoints;
+    private List<TextField> pointsTextFields;
 
     @FXML
     private VBox coursesVBox;
@@ -83,9 +85,31 @@ public class ExamWindowController {
     private void saveExam(ActionEvent event) {
         errorLabel.setText(" ");
         if(!this.checkFields()){
-            errorLabel.setText("One of the fields empty or wrong.");
+            errorLabel.setText("One of the fields is empty.");
             return;
         }
+
+        int sum = 0;
+        List<TextField> pointsTF = this.pointsTextFields;
+        for (TextField textField: pointsTF) {
+            if(!textField.getText().equals("")){
+                try {
+                    Integer.parseInt(textField.getText());
+                }catch (Exception e){
+                    errorLabel.setText("One of the fields is wrong.");
+                    return;
+                }
+                sum = sum + Integer.parseInt(textField.getText());
+                this.questionsPoints.add(Integer.parseInt(textField.getText()));
+            }
+        }
+        if(sum != 100){
+            errorLabel.setText("The sum of the points is not 100");
+            return;
+        }
+
+
+
         Message message = new Message();
         message.setObjList(this.questionList);
         List<String> textList = new ArrayList<>();
@@ -101,6 +125,7 @@ public class ExamWindowController {
 
     private boolean checkFields() {
         boolean check = true;
+
         if ((this.course == null) || (this.selectedQuestionList.isEmpty()) || (examTimeTF.getText().equals("")))
             check = false;
 
@@ -109,7 +134,6 @@ public class ExamWindowController {
         }catch (Exception e){
             check = false;
         }
-
 
         return check;
     }
@@ -135,6 +159,8 @@ public class ExamWindowController {
     }
 
     private void showQuestions() {
+        this.questionsPoints = new ArrayList<>();
+        this.pointsTextFields = new ArrayList<>();
         this.contentVBox.getChildren().clear();
         //Case: There are questions in the selected course/profession
         if(!questionList.isEmpty()){
@@ -145,6 +171,8 @@ public class ExamWindowController {
             HBox answerHBox;
             Label answerLabel;
             Circle answerCircle;
+            TextField points;
+            Label pointsLabel;
 
             for(Question question: questionList) {
                 questionVBox = new VBox();
@@ -160,8 +188,14 @@ public class ExamWindowController {
                 questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
                         + "-fx-font-size: 16;");
 
+                pointsLabel = new Label("Points:");
+                pointsLabel.setStyle("-fx-font-size: 14");
+                points = new TextField();
+                points.setPrefWidth(40);
+                points.setStyle("-fx-font-size: 14;");
 
-                questionTopHBox = new HBox(questionCodeCheckBox, questionTextLabel);
+                this.pointsTextFields.add(points);
+                questionTopHBox = new HBox(pointsLabel, points, questionCodeCheckBox, questionTextLabel);
                 questionVBox.getChildren().add(questionTopHBox);
 
                 for(Answer answer: answerList){
@@ -177,7 +211,7 @@ public class ExamWindowController {
                         answerCircle.setStyle("-fx-fill: #FF5641;");
 
                     answerHBox = new HBox(answerCircle, answerLabel);
-                    answerHBox.setStyle("-fx-padding: 0 0 0 100");
+                    answerHBox.setStyle("-fx-padding: 0 0 0 200");
                     questionVBox.getChildren().add(answerHBox);
                 }
 
