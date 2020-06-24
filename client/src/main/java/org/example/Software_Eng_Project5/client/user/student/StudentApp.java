@@ -100,13 +100,13 @@ public class StudentApp extends UserApp
         }
     }
 
-    private int gradeExam(List<Boolean> checkedAnswers, List<Integer> grades)
+    private int gradeExam(List<Boolean> checkedAnswers, List<Grade> grades)
     {
         int grade = 0;
         for (int i = 0; i < checkedAnswers.size(); i++)
         {
             if(checkedAnswers.get(i))
-                grade += grades.get(i);
+                grade += grades.get(i).getGrade();
         }
         return grade;
     }
