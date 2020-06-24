@@ -35,7 +35,7 @@ public class MainTeacherController {
     private Profession profession;
     private Course course;
     private List<Profession> professionList;
-    private List<Test> examList;
+    private List<Exam> examList;
     private  List<Question> questionList;
 
     @FXML
@@ -288,16 +288,16 @@ public class MainTeacherController {
         EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
         this.examList = null;
         //TODO remove
-        Test exam1 = new Test();
+        Exam exam1 = new Exam();
         exam1.setCode("010311");
         exam1.setTestTime(90);
         exam1.setManual(false);
-        Test exam2 = new Test();
+        Exam exam2 = new Exam();
         exam2.setCode("120903");
         exam2.setTestTime(120);
         exam2.setManual(true);
 
-        List<Test> examList = new ArrayList<>();
+        List<Exam> examList = new ArrayList<>();
         examList.add(exam1);
         examList.add(exam2);
         this.examList = examList;
@@ -319,7 +319,7 @@ public class MainTeacherController {
             Label examTimeLabel;
             Label examTypeLabel;
 
-            for (Test exam : this.examList){
+            for (Exam exam : this.examList){
                 examHBox = new HBox();
                 showExamB = new Button("Show");
                 showExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
@@ -462,10 +462,10 @@ public class MainTeacherController {
                 this.questionList = (List<Question>) message.getObjList();
             }
             else if(message.getItemsType().equals("Exam") && message.isList()) {
-                this.examList = (List<Test>) message.getObjList();
+                this.examList = (List<Exam>) message.getObjList();
             }
         }
-        else if (eventType.equals("Created") || eventType.equals("Updated")){
+        else if (eventType.equals("Created Question") || eventType.equals("Updated Question")){
             Platform.runLater( () -> this.showQuestions(null) );
         }
 

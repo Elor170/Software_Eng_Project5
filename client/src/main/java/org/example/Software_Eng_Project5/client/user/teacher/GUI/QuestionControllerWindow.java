@@ -234,7 +234,7 @@ public class QuestionControllerWindow {
     public void inTeacherEvent(TeacherEvent event) {
         String eventType = event.getEventType();
 
-        if (eventType.equals("Created") || eventType.equals("Updated")) {
+        if (eventType.startsWith("Created") || eventType.startsWith("Updated")) {
             Platform.runLater(() -> {
                 FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
                 Scene scene = null;
@@ -243,9 +243,9 @@ public class QuestionControllerWindow {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (eventType.equals("Created"))
+                if (eventType.equals("Created Question"))
                     ((messageWindowController) fxmlLoader.getController()).setMessage("A new question was\ncreated and saved.");
-                else
+                else if(eventType.equals("Updated Question"))
                     ((messageWindowController) fxmlLoader.getController()).setMessage("The question\nwas edited.");
                 stage.setScene(scene);
                 try {
