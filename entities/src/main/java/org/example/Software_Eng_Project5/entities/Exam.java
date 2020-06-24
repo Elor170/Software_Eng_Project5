@@ -8,7 +8,7 @@ import javax.persistence.Table; //wtf???
 
 @Entity
 @Table(name = "test")
-public class Test implements Serializable {
+public class Exam implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -17,10 +17,11 @@ public class Test implements Serializable {
     private String textForTeacher;
     private String textForStudent;
     private boolean isManual; //is the test manual
+    private boolean isPulled;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "test_teacher_id")
-    private Teacher author;
+    private Teacher writer;
 
     @ManyToMany(mappedBy = "testList", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Question.class)
     private List<Question> questionList;
@@ -33,17 +34,21 @@ public class Test implements Serializable {
     @JoinColumn(name = "test_profession_id")
     private Profession profession;
 
-    public Test() {
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "pulled_exam")
+//    private List<pulledExam> pulledExamList;
+
+    public Exam() {
     }
 
-    public Test(String code, int testTime, boolean isManual, Teacher author,
-                Course course, Profession profession) {
+    public Exam(String code, int testTime, boolean isManual, Teacher writer,
+                Profession profession, Course course) {
         this.code = code;
         this.testTime = testTime;
         this.isManual = isManual;
-        this.author = author;
-        this.course = course;
+        this.writer = writer;
         this.profession = profession;
+        this.course = course;
+        this.isPulled = false;
     }
 
     public String getCode() { return code; }
@@ -70,9 +75,9 @@ public class Test implements Serializable {
 
     public void setTextForStudent(String textForStudent) { this.textForStudent = textForStudent; }
 
-    public Teacher getAuthor() { return author; }
+    public Teacher getAuthor() { return writer; }
 
-    public void setAuthor(Teacher author) { this.author = author; }
+    public void setAuthor(Teacher author) { this.writer = author; }
 
     public List<Question> getQuestionList() { return questionList; }
 
@@ -94,5 +99,25 @@ public class Test implements Serializable {
 
     public void setManual(boolean manual) {
         isManual = manual;
+    }
+
+    public boolean isPulled()
+    {
+        return isPulled;
+    }
+
+    public void setPulled(boolean pulled)
+    {
+        isPulled = pulled;
+    }
+
+    public Teacher getWriter()
+    {
+        return writer;
+    }
+
+    public void setWriter(Teacher writer)
+    {
+        this.writer = writer;
     }
 }
