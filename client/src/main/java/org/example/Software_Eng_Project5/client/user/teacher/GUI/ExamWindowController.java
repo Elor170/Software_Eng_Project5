@@ -101,8 +101,14 @@ public class ExamWindowController {
             this.isManualCheckBox.setDisable(true);
             this.questionList = exam.getQuestionList();
             this.showQuestions();
-            for(TextField pointsTF: pointsTextFields)
+            this.bringGrades();
+            List<Integer> questionsPoints;
+            int i = 0;
+            for(TextField pointsTF: pointsTextFields){
+                pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
                 pointsTF.setEditable(false);
+                i++;
+            }
         }
     }
 
@@ -168,6 +174,7 @@ public class ExamWindowController {
         Message msg = new Message();
         msg.setSingleObject(this.exam.getCode());
         msg.setItemsType("Grades");
+        msg.setList(true);
         EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
 
         this.questionsPoints = null;
@@ -179,7 +186,6 @@ public class ExamWindowController {
                 e.printStackTrace();
             }
         }while (this.questionsPoints == null);
-        this.showQuestions();
     }
 
     private void bringQuestions() {
@@ -358,6 +364,14 @@ public class ExamWindowController {
         if (eventType.equals("Received")) {
             if (message.getItemsType().equals("Question") && message.isList()) {
                 this.questionList = (List<Question>) message.getObjList();
+            }
+            if (message.getItemsType().equals("Grades") && message.isList()) {
+                List<Grade> grades = (List<Grade>) message.getObjList();
+                List<Integer> tempInt = new ArrayList<>();
+                for (Grade grade: grades){
+                    tempInt.add(grade.getGrade());
+                }
+                this.questionsPoints = tempInt;
             }
         }
         else if (eventType.equals("Created Exam")) {

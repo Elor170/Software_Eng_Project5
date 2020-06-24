@@ -276,8 +276,10 @@ public class SimpleServer extends AbstractServer {
 		Message retMessage = new Message();
 		Class<?> classType = message.getClassType();
 		String indexString = message.getIndexString();
+		Object object = null;
 
-		Object object = session.get(classType, indexString);
+		if(!message.getItemsType().equals("Grades"))
+			object = session.get(classType, indexString);
 
 		switch (message.getItemsType())
 		{
@@ -334,7 +336,7 @@ public class SimpleServer extends AbstractServer {
 				retMessage.setObjList(grades);
 				retMessage.setCommand("Teacher Event");
 				retMessage.setItemsType("Grades");
-				retMessage.setList(false);
+				retMessage.setList(true);
 				retMessage.setType("Received");
 				break;
 		}
