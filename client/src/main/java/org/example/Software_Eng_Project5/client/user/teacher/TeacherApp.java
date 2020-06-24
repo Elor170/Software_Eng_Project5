@@ -127,7 +127,7 @@ public class TeacherApp extends UserApp
         }
     }
 
-    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList)
+    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList, List<Integer> grades)
     {
         Message msg = new Message();
         exam.setQuestionList(questions);
@@ -137,6 +137,7 @@ public class TeacherApp extends UserApp
         msg.setCommand("Update");
         msg.setClassType(Exam.class);
         msg.setSingleObject(exam);
+        msg.setObjList(grades);
         try
         {
             client.sendToServer(msg);
@@ -192,7 +193,7 @@ public class TeacherApp extends UserApp
 
             case "Update Exam":
                 editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(),
-                        (List<String>)message.getObjList2());
+                        (List<String>)message.getObjList2(), (List<Integer>)message.getObjList3());
                 break;
 
             case "Pull Exam":
