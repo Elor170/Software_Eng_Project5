@@ -146,9 +146,20 @@ public class TeacherApp extends UserApp
         }
     }
 
-    public void pullExam(Exam exam)
+    public void pullExam(Exam exam, String executionCode)
     {
-
+        Message msg = new Message();
+        msg.setClassType(PulledExam.class);
+        msg.setCommand("Insert");
+        msg.setSingleObject(exam);
+        msg.setSingleObject2(executionCode);
+        try
+        {
+            client.sendToServer(msg);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Subscribe

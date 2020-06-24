@@ -202,10 +202,19 @@ public class SimpleServer extends AbstractServer {
 			retMessage.setItemsType("Exam");
 			retMessage.setType("Created Exam");
 		}
-//		else if(classType.equals(PulledExam.class))
-//		{
-//
-//		}
+		else if(classType.equals(PulledExam.class))
+		{
+			Exam originalExam = (Exam)message.getSingleObject();
+			PulledExam pulledExam = new PulledExam(originalExam);
+			pulledExam.setExecutionCode((String)message.getSingleObject2());
+			session.save(pulledExam);
+			originalExam.setPulled(true);
+			session.update(originalExam);
+
+			System.out.println("Exam #" + pulledExam.getExecutionCode() + " pulled");
+			retMessage.setItemsType("PulledExam");
+			retMessage.setType("Pulled Exam");
+		}
 
 		retMessage.setCommand("Teacher Event");
 
