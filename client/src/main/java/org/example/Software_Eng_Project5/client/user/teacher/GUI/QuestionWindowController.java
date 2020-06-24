@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestionControllerWindow {
+public class QuestionWindowController {
         private Stage stage;
         private Profession profession;
         private String courseCode;
