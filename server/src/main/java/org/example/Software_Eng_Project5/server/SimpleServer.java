@@ -79,7 +79,6 @@ public class SimpleServer extends AbstractServer {
 				case "Update":
 					returnMessage = updateObject(message);
 					break;
-
 			}
 				try {
 					if (returnMessage != null)
@@ -123,14 +122,32 @@ public class SimpleServer extends AbstractServer {
 		}
 		else if(classType == Exam.class)
 		{
-			insertObject(message);
+			if(((Exam)message.getSingleObject()).isPulled())
+			{
+				Message msg = new Message();
+				Exam oldExam = (Exam)message.getSingleObject();
+				List<String> textList = new ArrayList<>();
+				textList.add(oldExam.getTextForStudent());
+				textList.add(oldExam.getTextForTeacher());
+				textList.add(oldExam.getWriter().getUserName());
+				msg.setObjList(oldExam.getQuestionList());
+				msg.setObjList2(textList);
+				msg.setSingleObject(oldExam.getProfession());
+				msg.setSingleObject2(oldExam.getCourse());
+				msg.setClassType(Exam.class);
+				insertObject(msg);
+			}
+			else
+			{
+				Object object = message.getSingleObject();
+				session.update(object);
+			}
 			retMessage.setType("Updated Exam");
 		}
 
 		retMessage.setCommand("Teacher Event");
 
 		return retMessage;
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -185,6 +202,10 @@ public class SimpleServer extends AbstractServer {
 			retMessage.setItemsType("Exam");
 			retMessage.setType("Created Exam");
 		}
+//		else if(classType.equals(PulledExam.class))
+//		{
+//
+//		}
 
 		retMessage.setCommand("Teacher Event");
 
@@ -195,20 +216,38 @@ public class SimpleServer extends AbstractServer {
 		Message retMessage = new Message();
 		Class<?> classType = message.getClassType();
 		String indexString = message.getIndexString();
-		List<Question> questionList = null;
 
 		Object object = session.get(classType, indexString);
-		if (classType.equals(Course.class))
-			questionList = new ArrayList<>(((Course)object).getQuestionList());
-		else if(classType.equals(Profession.class))
-			questionList = new ArrayList<>(((Profession)object).getQuestionList());
-		else if(classType.equals(Teacher.class))
-			questionList = new ArrayList<>(((Teacher) object).getQuestionList());
 
 		if (message.getItemsType().equals("Question")) {
+			List<Question> questionList = null;
+			if (classType.equals(Course.class))
+				questionList = new ArrayList<>(((Course)object).getQuestionList());
+			else if(classType.equals(Profession.class))
+				questionList = new ArrayList<>(((Profession)object).getQuestionList());
+			else if(classType.equals(Teacher.class))
+				questionList = new ArrayList<>(((Teacher) object).getQuestionList());
+
 			retMessage.setObjList(questionList);
 			retMessage.setCommand("Teacher Event");
 			retMessage.setItemsType("Question");
+			retMessage.setList(true);
+			retMessage.setType("Received");
+		}
+
+		else if (message.getItemsType().equals("Exam"))
+		{
+			List<Exam> examList = null;
+			if (classType.equals(Course.class))
+				examList = new ArrayList<>(((Course)object).getExamList());
+			else if(classType.equals(Profession.class))
+				examList = new ArrayList<>(((Profession)object).getExamList());
+			else if(classType.equals(Teacher.class))
+				examList = new ArrayList<>(((Teacher) object).getExamList());
+
+			retMessage.setObjList(examList);
+			retMessage.setCommand("Teacher Event");
+			retMessage.setItemsType("Exam");
 			retMessage.setList(true);
 			retMessage.setType("Received");
 		}
@@ -271,7 +310,7 @@ public class SimpleServer extends AbstractServer {
 		List<Exam> examList = profession.getExamList();
 		int listSize = examList.size();
 		if( listSize == 0)
-			return (profession.getCode() + "" + course.getCode() + "000");
+			return (profession.getCode() + "" + course.getCode() + "00");
 		else {
 			int lastCode = Integer.parseInt(examList.get(listSize - 1).getCode());
 			String newCode = Integer.toString(lastCode + 1);
