@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.Profession;
@@ -100,7 +101,12 @@ public class UserApp extends Application {
                     break;
 
                 case "Student":
-                    //TODO
+                    try {
+                        this.userName = userName;
+                        StudentApp studentApp = new StudentApp(this.stage, userName, this.client);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
 
                 case "Already connected":
