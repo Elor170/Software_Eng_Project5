@@ -34,7 +34,7 @@ public class ExamWindowController {
     private boolean isEdit;
     private boolean isCreat;
     private boolean isShow;
-    private List<CheckBox> checkBoxList;
+    private List<CheckBox> courseCheckBoxList;
     private List<Integer> questionsPoints;
     private List<TextField> pointsTextFields;
 
@@ -80,12 +80,10 @@ public class ExamWindowController {
             this.showCourses();
             this.examTitle.setText("New Exam");
             this.selectedQuestionList = new ArrayList<>();
-            Button saveButton = new Button("Save");
-            saveButton.setStyle("-fx-background-color: #DADCE0;" + "-fx-font-size: 16" );
-            saveButton.setOnAction(this::saveExam);
-            this.buttonsHBox.getChildren().add(saveButton);
+            pullExamB.setText("Save");
+            pullExamB.setOnAction(this::saveExam);
         }
-        if(isShow){
+        else if(isShow){
             this.examTitle.setText(profession.getCode() + " " + profession.getName() + ": " + exam.getCode() + ":");
             int hours = Math.floorDiv(exam.getTestTime(),60);
             String minutes = Integer.toString(exam.getTestTime() - 60 * hours);
@@ -110,6 +108,102 @@ public class ExamWindowController {
                 i++;
             }
         }
+        else if(isEdit && !isExamUsed){
+            this.examTitle.setText(exam.getCode() + ":");
+            this.examTimeTF.setText(Integer.toString(exam.getTestTime()));
+            this.studentCommentsTA.setText(exam.getTextForStudent());
+            this.teacherCommentsTA.setText(exam.getTextForTeacher());
+            this.isManualCheckBox.setSelected(exam.isManual());
+            this.isManualCheckBox.setDisable(true);
+            this.questionList = exam.getQuestionList();
+            this.showQuestions();
+            this.bringGrades();
+            List<Integer> questionsPoints;
+            int i = 0;
+            for(TextField pointsTF: pointsTextFields){
+                pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
+                i++;
+            }
+            this.pullExamB.setText("Update");
+            this.pullExamB.setOnAction(this::updateExam);
+        }
+        else if(isEdit && isExamUsed){
+            this.showCourses();
+            this.examTitle.setText("New Exam");
+            this.errorLabel.setText("The exam is pulled, you can create new exam based on this one.");
+            this.selectedQuestionList = new ArrayList<>();
+            this.examTimeTF.setText(Integer.toString(exam.getTestTime()));
+            this.studentCommentsTA.setText(exam.getTextForStudent());
+            this.teacherCommentsTA.setText(exam.getTextForTeacher());
+            this.isManualCheckBox.setSelected(exam.isManual());
+            this.questionList = exam.getQuestionList();
+            this.showQuestions();
+            this.bringGrades();
+            List<Integer> questionsPoints;
+            int i = 0;
+            for(TextField pointsTF: pointsTextFields){
+                pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
+                i++;
+            }
+            for (CheckBox checkBox: courseCheckBoxList){
+                String courseCode = checkBox.getText().substring(0,2);
+                String courseExamCode = this.exam.getCode().substring(2,4);
+                if(courseCode.equals(courseExamCode))
+                    checkBox.setSelected(true);
+            }
+            pullExamB.setText("Update");
+            pullExamB.setOnAction(this::updateExam);
+        }
+    }
+
+    private void updateExam(ActionEvent event) {
+        errorLabel.setText(" ");
+        this.questionsPoints = new ArrayList<>();
+        try {
+            Integer.parseInt(examTimeTF.getText());
+        }catch (Exception e){
+            errorLabel.setText("One of the fields is empty.");
+            return;
+        }
+        if(examTimeTF.getText().equals("")){
+            errorLabel.setText("One of the fields is empty.");
+            return;
+        }
+
+        int sum = 0;
+        List<TextField> pointsTF = this.pointsTextFields;
+        for (TextField textField: pointsTF) {
+            if(!textField.getText().equals("")){
+                try {
+                    Integer.parseInt(textField.getText());
+                }catch (Exception e){
+                    errorLabel.setText("One of the fields is wrong.");
+                    return;
+                }
+                sum = sum + Integer.parseInt(textField.getText());
+                this.questionsPoints.add(Integer.parseInt(textField.getText()));
+            }
+        }
+        if(sum != 100){
+            errorLabel.setText("The sum of the points is not 100");
+            this.questionsPoints.clear();
+            return;
+        }
+
+
+
+        Message message = new Message();
+        message.setSingleObject(this.exam);
+        message.setObjList(exam.getQuestionList());
+        List<String> textList = new ArrayList<>();
+        textList.add(this.studentCommentsTA.getText());
+        textList.add(this.teacherCommentsTA.getText());
+        message.setObjList2(textList);
+        message.setObjList3(this.questionsPoints);
+        message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
+
+        System.out.println("--------Update------");
+        EventBus.getDefault().post(new TeacherEvent(message,"Update Exam"));
     }
 
     private void saveExam(ActionEvent event) {
@@ -142,7 +236,7 @@ public class ExamWindowController {
 
 
         Message message = new Message();
-        message.setObjList(this.questionList);
+        message.setObjList(this.selectedQuestionList);
         List<String> textList = new ArrayList<>();
         textList.add(this.studentCommentsTA.getText());
         textList.add(this.teacherCommentsTA.getText());
@@ -151,6 +245,7 @@ public class ExamWindowController {
         message.setSingleObject(this.profession);
         message.setSingleObject2(this.course);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
+        message.setManual(isManualCheckBox.isSelected());
 
         EventBus.getDefault().post(new TeacherEvent(message,"Create Exam"));
     }
@@ -233,10 +328,11 @@ public class ExamWindowController {
                 questionCodeCheckBox = new CheckBox(question.getCode());
                 questionCodeCheckBox.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
                 questionCodeCheckBox.setOnAction(this::selectQuestion);
-                if(this.isShow){
+                if(this.isShow || (this.isEdit && !this.isExamUsed)){
                     questionCodeCheckBox.setSelected(true);
                     questionCodeCheckBox.setDisable(true);
                 }
+
 
                 questionTextLabel = new Label(question.getQuestionText());
                 questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
@@ -302,7 +398,7 @@ public class ExamWindowController {
 
     public void showCourses() {
         this.courseList = new ArrayList<>();
-        this.checkBoxList = new ArrayList<>();
+        this.courseCheckBoxList = new ArrayList<>();
 
         Image professionImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\profession.png");
         ImageView professionIcon = new ImageView(professionImg);
@@ -331,7 +427,7 @@ public class ExamWindowController {
 
             courseTreeItem = new TreeItem<>(new HBox(courseCheckBox), courseIcon);
             professionTreeItem.getChildren().add(courseTreeItem);
-            checkBoxList.add(courseCheckBox);
+            courseCheckBoxList.add(courseCheckBox);
         }
 
         professionTreeItem.setExpanded(true);
@@ -348,7 +444,7 @@ public class ExamWindowController {
                 this.course = course;
         }
 
-        for(CheckBox checkBox: this.checkBoxList)
+        for(CheckBox checkBox: this.courseCheckBoxList)
             checkBox.setSelected(false);
 
         selectedCheckBox.setSelected(true);
@@ -385,6 +481,26 @@ public class ExamWindowController {
                 }
                 ((messageWindowController) fxmlLoader.getController()).setMessage("A new exam was\n" +
                         "created and saved.");
+                stage.setScene(scene);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stage.close();
+            });
+        }
+
+        else if (eventType.equals("Updated Exam")) {
+            Platform.runLater(() -> {
+                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                Scene scene = null;
+                try {
+                    scene = new Scene(fxmlLoader.load());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ((messageWindowController) fxmlLoader.getController()).setMessage("The exam updated.");
                 stage.setScene(scene);
                 try {
                     Thread.sleep(2000);

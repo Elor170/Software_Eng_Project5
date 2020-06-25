@@ -363,12 +363,6 @@ public class MainTeacherController {
     private void editExam(ActionEvent event) {
         System.out.println("-----edit Single Exam----");
         //TODO
-        this.openExamWindow(true, false, false, null);
-    }
-
-    private void showSingleExam(ActionEvent event) {
-        System.out.println("-----show Single Exam----");
-        //TODO
         String selectedExamCode = (((Label)((HBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText());
         selectedExamCode = selectedExamCode.substring(6);
         Exam selectedExam = null;
@@ -376,7 +370,23 @@ public class MainTeacherController {
             if(selectedExamCode.equals(exam.getCode()))
                 selectedExam = exam;
         }
-        this.openExamWindow(false, false, true, selectedExam);
+        String professionCode = selectedExam.getCode().substring(0,2);
+        for (Profession profession: professionList){
+            if(profession.getCode().equals(professionCode))
+                this.profession = profession;
+        }
+        this.openExamWindow(true, false, false, selectedExam);
+    }
+
+    private void showSingleExam(ActionEvent event) {
+        String selectedExamCode = (((Label)((HBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText());
+        selectedExamCode = selectedExamCode.substring(6);
+        Exam selectedExam = null;
+        for(Exam exam: examList){
+            if(selectedExamCode.equals(exam.getCode()))
+                selectedExam = exam;
+        }
+        this.openExamWindow(true, false, true, selectedExam);
     }
 
     private void onCreateExam(ActionEvent event) {
