@@ -155,17 +155,19 @@ public class SimpleServer extends AbstractServer {
 				textList.add(editedExam.getWriter().getUserName());
 				msg.setObjList(editedExam.getQuestionList());
 				msg.setObjList2(textList);
-				msg.setObjList3(msg.getObjList3());
+				msg.setObjList3(message.getObjList3());
+				editedExam = session.get(Exam.class, editedExam.getCode());
 				msg.setSingleObject(editedExam.getProfession());
 				msg.setSingleObject2(editedExam.getCourse());
 				msg.setClassType(Exam.class);
-				insertObject(msg);
+				message.setTestTime(msg.getTestTime());
+				retMessage = insertObject(msg);
 			}
 			else
 			{
 				Exam exam = (Exam)message.getSingleObject();
 
-				List<Integer> grades = (List<Integer>)message.getObjList();
+				List<Integer> grades = (List<Integer>)message.getObjList3();
 				session.update(exam);
 				exam = session.get(Exam.class, exam.getCode());
 				List<Grade> examGrades = exam.getGrades();
@@ -176,8 +178,9 @@ public class SimpleServer extends AbstractServer {
 					session.update(gradeObj);
 				}
 				session.update(exam);
+				retMessage.setType("Updated Exam");
 			}
-			retMessage.setType("Updated Exam");
+
 		}
 
 		retMessage.setCommand("Teacher Event");

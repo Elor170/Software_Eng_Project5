@@ -137,7 +137,8 @@ public class TeacherApp extends UserApp
         msg.setCommand("Update");
         msg.setClassType(Exam.class);
         msg.setSingleObject(exam);
-        msg.setObjList3(grades);
+        List<Integer> tempGradeList = new ArrayList<>(grades);
+        msg.setObjList3(tempGradeList);
         try
         {
             client.sendToServer(msg);

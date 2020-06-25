@@ -109,6 +109,7 @@ public class ExamWindowController {
             }
         }
         else if(isEdit && !isExamUsed){
+            this.selectedQuestionList = (exam.getQuestionList());
             this.examTitle.setText(exam.getCode() + ":");
             this.examTimeTF.setText(Integer.toString(exam.getTestTime()));
             this.studentCommentsTA.setText(exam.getTextForStudent());
@@ -128,6 +129,7 @@ public class ExamWindowController {
             this.pullExamB.setOnAction(this::updateExam);
         }
         else if(isEdit && isExamUsed){
+            this.selectedQuestionList = (exam.getQuestionList());
             this.showCourses();
             this.examTitle.setText("New Exam");
             this.errorLabel.setText("The exam is pulled, you can create new exam based on this one.");
@@ -150,9 +152,12 @@ public class ExamWindowController {
                 String courseExamCode = this.exam.getCode().substring(2,4);
                 if(courseCode.equals(courseExamCode))
                     checkBox.setSelected(true);
+                checkBox.setDisable(true);
             }
-            pullExamB.setText("Update");
+            pullExamB.setText("Save");
             pullExamB.setOnAction(this::updateExam);
+            this.isManualCheckBox.setSelected(exam.isManual());
+            this.isManualCheckBox.setDisable(true);
         }
     }
 
@@ -194,12 +199,13 @@ public class ExamWindowController {
 
         Message message = new Message();
         message.setSingleObject(this.exam);
-        message.setObjList(exam.getQuestionList());
+        message.setObjList(this.selectedQuestionList);
         List<String> textList = new ArrayList<>();
         textList.add(this.studentCommentsTA.getText());
         textList.add(this.teacherCommentsTA.getText());
         message.setObjList2(textList);
-        message.setObjList3(this.questionsPoints);
+        List<Integer> tempPointsList = new ArrayList<>(this.questionsPoints);
+        message.setObjList3(tempPointsList);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
 
         System.out.println("--------Update------");
@@ -328,11 +334,13 @@ public class ExamWindowController {
                 questionCodeCheckBox = new CheckBox(question.getCode());
                 questionCodeCheckBox.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-font-size: 16;");
                 questionCodeCheckBox.setOnAction(this::selectQuestion);
-                if(this.isShow || (this.isEdit && !this.isExamUsed)){
+                if(this.isShow){
                     questionCodeCheckBox.setSelected(true);
                     questionCodeCheckBox.setDisable(true);
                 }
-
+                if(this.isEdit) {
+                    questionCodeCheckBox.setSelected(true);
+                }
 
                 questionTextLabel = new Label(question.getQuestionText());
                 questionTextLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
