@@ -88,7 +88,9 @@ public class mainStudentController {
         stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();
-        this.contentVbox = new VBox(new Label("---------"));
+//        examCodeTF.setText(this.originalExam.getCode());
+//        this.contentVbox.getChildren().clear();
+//        this.contentVbox = new VBox();
 //        this.originalExam = this.pulledExam.getOriginalExam();
 //        this.questionList = this.originalExam.getQuestionList();
 //        VBox questionVBox;
