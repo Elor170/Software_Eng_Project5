@@ -258,9 +258,21 @@ public class SimpleServer extends AbstractServer {
 		}
 		else if(classType.equals(PulledExam.class))
 		{
+			List<PulledExam> pulledExams = getAll(PulledExam.class);
+			String execCode = (String)message.getSingleObject2();
+			for(PulledExam pulledExam : pulledExams)
+			{
+				if (pulledExam.getExecutionCode().equals(execCode))
+				{
+					System.out.println("Exam with code #" + pulledExam.getExecutionCode() + " already exists");
+					retMessage.setItemsType("Error");
+					retMessage.setType("Pulled Exam");
+					return retMessage;
+				}
+			}
 			Exam originalExam = (Exam)message.getSingleObject();
 			PulledExam pulledExam = new PulledExam(originalExam);
-			pulledExam.setExecutionCode((String)message.getSingleObject2());
+			pulledExam.setExecutionCode(execCode);
 			session.save(pulledExam);
 			originalExam.setPulled(true);
 			session.update(originalExam);

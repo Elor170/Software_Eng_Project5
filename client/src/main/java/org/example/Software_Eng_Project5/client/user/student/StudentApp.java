@@ -30,7 +30,7 @@ public class StudentApp extends UserApp
 
         scene = new Scene(loadFXML("studentWindow", this));
         stage.setTitle("HSTS");
-        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
+        Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
         stage.setScene(scene);
         stage.show();
 
