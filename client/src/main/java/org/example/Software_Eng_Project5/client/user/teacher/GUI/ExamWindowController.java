@@ -515,7 +515,6 @@ public class ExamWindowController {
                 stage.close();
             });
         }
-
         else if (eventType.equals("Updated Exam")) {
             Platform.runLater(() -> {
                 FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
@@ -545,6 +544,25 @@ public class ExamWindowController {
                     e.printStackTrace();
                 }
                 ((messageWindowController) fxmlLoader.getController()).setMessage("The exam pulled.");
+                stage.setScene(scene);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stage.close();
+            });
+        }
+        else if (eventType.equals("Error")){
+            Platform.runLater(() -> {
+                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                Scene scene = null;
+                try {
+                    scene = new Scene(fxmlLoader.load());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ((messageWindowController) fxmlLoader.getController()).setMessage("The execution code is already use.");
                 stage.setScene(scene);
                 try {
                     Thread.sleep(2000);
