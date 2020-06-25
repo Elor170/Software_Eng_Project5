@@ -29,19 +29,19 @@ public class UserApp extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        this.stage = stage;
-        client = org.example.Software_Eng_Project5.client.SimpleClient.getClient();
-        client.openConnection();
+            this.stage = stage;
+            client = org.example.Software_Eng_Project5.client.SimpleClient.getClient();
+            client.openConnection();
 
-        EventBus.getDefault().register(this);
-        EventBus.getDefault().register(client);
+            EventBus.getDefault().register(this);
+            EventBus.getDefault().register(client);
 
-        scene = new Scene(loadFXML("userWindow", this));
-        stage.setTitle("HSTS");
-        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
-        stage.getIcons().add(appIcon);
-        stage.setScene(scene);
-        stage.show();
+            scene = new Scene(loadFXML("userWindow", this));
+            stage.setTitle("HSTS");
+            Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
+            stage.getIcons().add(appIcon);
+            stage.setScene(scene);
+            stage.show();
     }
 
     protected void setRoot(String fxml) throws IOException {
@@ -115,8 +115,6 @@ public class UserApp extends Application {
 
     }
 
-    public static void main(String[] args) {
-        launch();
-    }
+    public static void main(String[] args) { launch(); }
 
 }
