@@ -370,6 +370,11 @@ public class MainTeacherController {
             if(selectedExamCode.equals(exam.getCode()))
                 selectedExam = exam;
         }
+        String professionCode = selectedExam.getCode().substring(0,2);
+        for (Profession profession: professionList){
+            if(profession.getCode().equals(professionCode))
+                this.profession = profession;
+        }
         this.openExamWindow(true, false, false, selectedExam);
     }
 

@@ -155,7 +155,7 @@ public class SimpleServer extends AbstractServer {
 				textList.add(editedExam.getWriter().getUserName());
 				msg.setObjList(editedExam.getQuestionList());
 				msg.setObjList2(textList);
-				msg.setObjList3(editedExam.getGrades());
+				msg.setObjList3(msg.getObjList3());
 				msg.setSingleObject(editedExam.getProfession());
 				msg.setSingleObject2(editedExam.getCourse());
 				msg.setClassType(Exam.class);
@@ -164,8 +164,11 @@ public class SimpleServer extends AbstractServer {
 			else
 			{
 				Exam exam = (Exam)message.getSingleObject();
-				List<Grade> examGrades = exam.getGrades();
+
 				List<Integer> grades = (List<Integer>)message.getObjList();
+				session.update(exam);
+				exam = session.get(Exam.class, exam.getCode());
+				List<Grade> examGrades = exam.getGrades();
 				for(int i = 0; i < grades.size(); i++)
 				{
 					Grade gradeObj = examGrades.get(i);
