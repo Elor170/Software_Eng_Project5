@@ -12,7 +12,7 @@ public class PulledExam implements Serializable {
     @Id
     private String executionCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "original_exam")
     private Exam originalExam;
 

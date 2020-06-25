@@ -61,7 +61,22 @@ public class ExamWindowController {
 
     @FXML
     void pullExam(ActionEvent event) {
+        System.out.println("---------");
+        Label execCodeL = new Label("Execution Code:");
+        TextField execCodeTF = new TextField();
+        buttonsHBox.getChildren().add(execCodeL);
+        buttonsHBox.getChildren().add(execCodeTF);
+        pullExamB.setText("Pull now");
+        pullExamB.setOnAction(this::pullNow);
 
+    }
+
+    private void pullNow(ActionEvent event) {
+        String execCode = ((TextField)buttonsHBox.getChildren().get(2)).getText();
+        Message message = new Message();
+        message.setSingleObject(this.exam);
+        message.setSingleObject2(execCode);
+        EventBus.getDefault().post(new TeacherEvent(message, "Pull Exam"));
     }
 
     public void setParameters(Stage stage, Profession profession
@@ -107,9 +122,11 @@ public class ExamWindowController {
                 pointsTF.setEditable(false);
                 i++;
             }
+            pullExamB.setOnAction(this::pullExam);
         }
         else if(isEdit && !isExamUsed){
             this.selectedQuestionList = (exam.getQuestionList());
+            this.questionList = (exam.getQuestionList());
             this.examTitle.setText(exam.getCode() + ":");
             this.examTimeTF.setText(Integer.toString(exam.getTestTime()));
             this.studentCommentsTA.setText(exam.getTextForStudent());
@@ -130,6 +147,7 @@ public class ExamWindowController {
         }
         else if(isEdit && isExamUsed){
             this.selectedQuestionList = (exam.getQuestionList());
+            this.questionList = (exam.getQuestionList());
             this.showCourses();
             this.examTitle.setText("New Exam");
             this.errorLabel.setText("The exam is pulled, you can create new exam based on this one.");
@@ -208,7 +226,6 @@ public class ExamWindowController {
         message.setObjList3(tempPointsList);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
 
-        System.out.println("--------Update------");
         EventBus.getDefault().post(new TeacherEvent(message,"Update Exam"));
     }
 
@@ -498,7 +515,6 @@ public class ExamWindowController {
                 stage.close();
             });
         }
-
         else if (eventType.equals("Updated Exam")) {
             Platform.runLater(() -> {
                 FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
@@ -518,6 +534,28 @@ public class ExamWindowController {
                 stage.close();
             });
         }
-
+        else if (eventType.equals("Pulled Exam")){
+            Platform.runLater(() -> {
+                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                Scene scene = null;
+                try {
+                    scene = new Scene(fxmlLoader.load());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if(message.getItemsType().equals("PulledExam"))
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The exam was pulled.");
+                else if(message.getItemsType().equals("Error"))
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The execution code \n" +
+                            "is already in use.");
+                    stage.setScene(scene);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                stage.close();
+            });
+        }
     }
 }

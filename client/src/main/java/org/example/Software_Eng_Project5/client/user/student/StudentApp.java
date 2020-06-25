@@ -6,10 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
-import org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,16 +16,15 @@ import java.util.List;
 
 public class StudentApp extends UserApp
 {
-    private MainTeacherController mainStudentController;
+    private org.example.Software_Eng_Project5.client.user.student.GUI.mainStudentController mainStudentController;
 
-    public StudentApp(Stage stage, String userName, List<Profession> professionList,
+    public StudentApp(Stage stage, String userName,
                       org.example.Software_Eng_Project5.client.SimpleClient client) throws IOException
     {
         this.stage = stage;
         this.userName = userName;
         this.client = client;
         EventBus.getDefault().register(this);
-
 
         scene = new Scene(loadFXML("studentWindow", this));
         stage.setTitle("HSTS");
@@ -35,9 +33,7 @@ public class StudentApp extends UserApp
         stage.show();
 
         EventBus.getDefault().register(mainStudentController);
-        mainStudentController.setProfessionList(professionList);
         mainStudentController.setUserName(this.userName);
-        mainStudentController.showProfessions();
     }
 
     @Override
@@ -122,6 +118,7 @@ public class StudentApp extends UserApp
         return checkedAnswers;
     }
 
+    @Subscribe
     @SuppressWarnings("unchecked")
     public void inStudentEvent(StudentEvent event)
     {
