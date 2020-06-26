@@ -26,6 +26,9 @@ public class mainWindowController {
     private TextField passwordTextField;
 
     @FXML
+    private TextField identTextField;
+
+    @FXML
     private ChoiceBox<String> userTypeChoiceBox;
 
     @FXML
@@ -43,9 +46,23 @@ public class mainWindowController {
         String userName = userNameTextField.getText();
         String password = passwordTextField.getText();
         String userType = userTypeChoiceBox.getValue();
-        App.addUser2DB(userName, password, userType, teacherProfessions);
+        String identification = identTextField.getText();
+//      showIdentificationField(userType);
+//        if(identTextField.isVisible())
+//            identification = identTextField.getText();
+        App.addUser2DB(userName, password, userType, teacherProfessions, identification);
     }
 
+//    @FXML
+//    public void showIdentificationField(String userType)
+//    {
+//        if(userType.equals("Student"))
+//        {
+//            identTextField.setVisible(true);
+//        }
+//        else
+//            identTextField.setVisible(false);
+//    }
 
     public void showProfessions(MouseEvent event) {
         if(!listCheck){

@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.mainWindowController">
+<HBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.mainWindowController">
    <children>
       <VBox alignment="CENTER" prefHeight="231.0" prefWidth="289.0" spacing="20.0">
          <children>
@@ -67,6 +67,16 @@
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
             </Label>
+            <Label text="Student Identification" translateY="60.0">
+               <VBox.margin>
+                  <Insets right="5.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="identTextField" alignment="BOTTOM_CENTER" translateY="63.0">
+               <VBox.margin>
+                  <Insets right="10.0" />
+               </VBox.margin>
+            </TextField>
          </children>
       </VBox>
    </children>

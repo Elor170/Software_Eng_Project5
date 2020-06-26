@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class UserApp extends Application {
 
-    protected Stage stage;
+    protected static Stage stage;
     protected static Scene scene;
     protected org.example.Software_Eng_Project5.client.SimpleClient client;
     private UserGUI userGUI;
@@ -118,7 +118,6 @@ public class UserApp extends Application {
                     break;
             }
         });
-
     }
 
     public static void main(String[] args) { launch(); }

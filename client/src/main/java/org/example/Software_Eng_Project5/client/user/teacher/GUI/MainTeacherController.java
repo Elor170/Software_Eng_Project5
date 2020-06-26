@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.student.GUI.ExamWindowController;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
@@ -22,7 +23,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -60,8 +60,8 @@ public class MainTeacherController {
     public void showProfessions(){
         isShowQuestions = false;
         isShowExams = false;
-        Image professionImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\profession.png");
-        Image courseImg = new Image("org\\example\\Software_Eng_Project5\\client\\user\\icons\\course.png");
+        Image professionImg = new Image("org/example/Software_Eng_Project5/client/user/icons/profession.png");
+        Image courseImg = new Image("org/example/Software_Eng_Project5/client/user/icons/course.png");
         ImageView professionIcon;
         ImageView courseIcon;
         TreeView<String> professionNode;
@@ -403,7 +403,7 @@ public class MainTeacherController {
             e.printStackTrace();
         }
         stage.setTitle("HSTS");
-        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\app_icon.png");
+        Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
         stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();
@@ -448,7 +448,7 @@ public class MainTeacherController {
             e.printStackTrace();
         }
         stage.setTitle("HSTS");
-        Image appIcon = new Image("\\org\\example\\Software_Eng_Project5\\client\\user\\icons\\question_black.png");
+        Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/question_black.png");
         stage.getIcons().add(appIcon);
         stage.setScene(scene);
         stage.show();

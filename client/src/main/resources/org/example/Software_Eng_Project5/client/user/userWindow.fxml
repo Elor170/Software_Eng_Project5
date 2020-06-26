@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="300.0" prefWidth="400.0" style="-fx-background-color: #292A2D;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.UserGUI">
+<VBox alignment="CENTER" prefHeight="300.0" prefWidth="400.0" style="-fx-background-color: #292A2D;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.Software_Eng_Project5.client.user.UserGUI">
    <children>
       <Label alignment="CENTER" prefHeight="27.0" prefWidth="87.0" text="Welcome" textFill="WHITE">
          <opaqueInsets>
