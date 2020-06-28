@@ -17,6 +17,7 @@ public class mainStudentController {
     private String userName;
     private PulledExam pulledExam;
     private StudentExamController examController = new StudentExamController();
+    private studentSolvedExamController solvedExamController = new studentSolvedExamController();
 
     @FXML
     private TextField executionCodeTF;
@@ -45,7 +46,6 @@ public class mainStudentController {
     }
 
     @Subscribe
-    @SuppressWarnings("unchecked")
     public void inStudentEvent(StudentEvent event)
     {
         Message message = event.getMessage();
@@ -58,6 +58,18 @@ public class mainStudentController {
                 try
                 {
                     examController.startExam(pulledExam);
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            });
+        }
+        else if(eventType.equals("Solved Exam"))
+        {
+            Platform.runLater(()->{
+                try
+                {
+                    solvedExamController.showGradeWindow(message);
                 } catch (IOException e)
                 {
                     e.printStackTrace();

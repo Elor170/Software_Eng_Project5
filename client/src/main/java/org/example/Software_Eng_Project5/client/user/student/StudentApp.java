@@ -77,13 +77,11 @@ public class StudentApp extends UserApp
     private void createSolvedExam(PulledExam pulledExam, List<Integer> studentAnswers, int time)
     {
         Message msg = new Message();
-        int grade;
         List<Boolean> checkedAnswers = checkExam(pulledExam, studentAnswers);
-        grade = gradeExam(checkedAnswers, pulledExam.getOriginalExam().getGrades());
+        msg.setObjList2(checkedAnswers);
         msg.setSingleObject(pulledExam);
         msg.setObjList(studentAnswers);
         msg.setSingleObject2(this.userName);
-        msg.setGrade(grade);
         msg.setTestTime(time);
         msg.setCommand("Insert");
         msg.setClassType(SolvedExam.class);
@@ -96,27 +94,30 @@ public class StudentApp extends UserApp
         }
     }
 
-    private int gradeExam(List<Boolean> checkedAnswers, List<Grade> grades)
-    {
-        int grade = 0;
-        for (int i = 0; i < checkedAnswers.size(); i++)
-        {
-            if(checkedAnswers.get(i))
-                grade += grades.get(i).getGrade();
-        }
-        return grade;
-    }
-
     private List<Boolean> checkExam(PulledExam pulledExam, List<Integer> studentAnswers)
     {
         List<Boolean> checkedAnswers = new ArrayList<>();
         List<Question> questions = pulledExam.getOriginalExam().getQuestionList();
+        int questionNum = 0;
         for(int i = 0; i < studentAnswers.size(); i++)
         {
-            checkedAnswers.add(questions.get(i).getCorrectAnsNum() == studentAnswers.get(i));
+            if(i % 4  == 0 && i != 0)
+                questionNum++;
+            checkedAnswers.add(questions.get(questionNum).getCorrectAnsNum() == studentAnswers.get(i));
         }
         return checkedAnswers;
     }
+
+//    private int gradeExam(List<Boolean> checkedAnswers, List<Grade> grades)
+//    {
+//        int grade = 0;
+//        for (int i = 0; i < checkedAnswers.size(); i++)
+//        {
+//            if(checkedAnswers.get(i))
+//                grade += grades.get(i).getGrade();
+//        }
+//        return grade;
+//    }
 
     @Subscribe
     @SuppressWarnings("unchecked")

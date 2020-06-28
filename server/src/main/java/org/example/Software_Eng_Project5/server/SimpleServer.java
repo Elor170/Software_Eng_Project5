@@ -95,7 +95,6 @@ public class SimpleServer extends AbstractServer {
 					e.printStackTrace();
 				}
 
-
 			session.flush();
 			session.getTransaction().commit();
 
@@ -284,20 +283,48 @@ public class SimpleServer extends AbstractServer {
 		else if(classType.equals(SolvedExam.class))
 		{
 			PulledExam pulledExam = (PulledExam) message.getSingleObject();
+			//List<Grade> grades = pulledExam.getOriginalExam().getGrades();
+			List<Boolean> checkedAnswers = (List<Boolean>) message.getObjList2();
+			int grade = gradeExam(checkedAnswers, pulledExam.getOriginalExam());
 			String username = (String) message.getSingleObject2();
 			String id = pulledExam.getExecutionCode() + username;
 			Student student = session.get(Student.class, username);
 			SolvedExam solvedExam = new SolvedExam(id, (PulledExam)message.getSingleObject(), (List<Integer>)message.getObjList(),
-					message.getTestTime(), student, message.getGrade());
+					message.getTestTime(), student, grade);
 			session.save(solvedExam);
 
 			System.out.println("Solved Exam #" + id + " saved");
+			retMessage.setGrade(grade);
 			retMessage.setItemsType("SolvedExam");
 			retMessage.setType("Solved Exam");
 			retMessage.setCommand("Student Event");
 		}
 
 		return retMessage;
+	}
+
+	private int gradeExam(List<Boolean> checkedAnswers, Exam exam)
+	{
+		List<Grade> allGrades = getAll(Grade.class);
+		List<Grade> examGrades = new ArrayList<>();
+		String examCode = exam.getCode();
+		for(Grade grade : allGrades)
+		{
+			if(grade.getExam().getCode().equals(examCode))
+				examGrades.add(grade);
+		}
+		int grade = 0;
+		int questionGrade = 0;
+		for (int i = 0; i < checkedAnswers.size(); i++)
+		{
+			if(i % 4  == 0 && i != 0)
+				questionGrade++;
+			if(checkedAnswers.get(i))
+			{
+				grade += examGrades.get(questionGrade).getGrade();
+			}
+		}
+		return grade;
 	}
 
 	private Message bringList(Message message) {

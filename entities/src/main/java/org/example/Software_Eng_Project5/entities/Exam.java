@@ -1,4 +1,7 @@
 package org.example.Software_Eng_Project5.entities;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ public class Exam implements Serializable {
     @JoinColumn(name = "test_teacher_id")
     private Teacher writer;
 
+    @Fetch(FetchMode.SELECT)
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "examList",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = Question.class)
     private List<Question> questionList;

@@ -62,7 +62,7 @@ public class SimpleClient extends AbstractClient {
 					if(eventType.equals("Solved Exam"))
 					{
 						EventBus.getDefault().post(new StudentEvent(message, "Solved Exam"));
-						EventBus.getDefault().post(new TeacherEvent(message, "Solved Exam"));
+						//EventBus.getDefault().post(new TeacherEvent(message, "Solved Exam"));
 					}
 					else if(eventType.equals("Start Exam"))
 						EventBus.getDefault().post(new StudentEvent(message, "Start Exam"));

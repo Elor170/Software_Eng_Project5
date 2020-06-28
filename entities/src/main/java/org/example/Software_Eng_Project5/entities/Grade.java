@@ -1,5 +1,8 @@
 package org.example.Software_Eng_Project5.entities;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -10,7 +13,7 @@ public class Grade implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Exam.class)
+    @ManyToOne(fetch = FetchType.EAGER, targetEntity = Exam.class)
     @JoinColumn(name = "exam")
     private Exam exam;
     private int grade;
