@@ -18,6 +18,9 @@ public class Message implements Serializable {
     private Object objList3;
     private Object SingleObject2;
     private Class<?> classType;
+    private Profession profession;
+    private String courseName;
+    private Course course;
 
 
     public Message() {
@@ -149,5 +152,35 @@ public class Message implements Serializable {
     public void setGrade(int grade)
     {
         this.grade = grade;
+    }
+
+    public Profession getProfession()
+    {
+        return profession;
+    }
+
+    public void setProfession(Profession profession)
+    {
+        this.profession = profession;
+    }
+
+    public String getCourseName()
+    {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName)
+    {
+        this.courseName = courseName;
+    }
+
+    public Course getCourse()
+    {
+        return course;
+    }
+
+    public void setCourse(Course course)
+    {
+        this.course = course;
     }
 }

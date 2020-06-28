@@ -127,13 +127,16 @@ public class TeacherApp extends UserApp
         }
     }
 
-    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList, List<Integer> grades)
+    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList,
+                         List<Integer> grades, Profession profession, String course)
     {
         Message msg = new Message();
         exam.setQuestionList(questions);
         exam.setTextForStudent(textList.get(0));
         exam.setTextForTeacher(textList.get(1));
         exam.setTestTime(testTime);
+        exam.setProfession(profession);
+        msg.setCourseName(course);
         msg.setCommand("Update");
         msg.setClassType(Exam.class);
         msg.setSingleObject(exam);
@@ -194,7 +197,8 @@ public class TeacherApp extends UserApp
 
             case "Update Exam":
                 editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(),
-                        (List<String>)message.getObjList2(), (List<Integer>)message.getObjList3());
+                        (List<String>)message.getObjList2(), (List<Integer>)message.getObjList3(),
+                        message.getProfession(), message.getCourseName());
                 break;
 
             case "Pull Exam":

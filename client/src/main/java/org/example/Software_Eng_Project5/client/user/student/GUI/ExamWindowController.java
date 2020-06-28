@@ -30,6 +30,7 @@ public class ExamWindowController {
     private List<Course> courseList;
     private List<Question> questionList;
     private List<Question> selectedQuestionList;
+    private List<Question> originalQuestions;
     private Exam exam;
     private boolean isExamUsed;
     private boolean isEdit;
@@ -38,6 +39,7 @@ public class ExamWindowController {
     private List<CheckBox> courseCheckBoxList;
     private List<Integer> questionsPoints;
     private List<TextField> pointsTextFields;
+    private String courseExamCode;
 
     @FXML
     private VBox coursesVBox;
@@ -147,8 +149,8 @@ public class ExamWindowController {
             this.pullExamB.setOnAction(this::updateExam);
         }
         else if(isEdit && isExamUsed){
-            this.selectedQuestionList = (exam.getQuestionList());
             this.questionList = (exam.getQuestionList());
+            originalQuestions = new ArrayList<>(exam.getQuestionList());
             this.showCourses();
             this.examTitle.setText("New Exam");
             this.errorLabel.setText("The exam is pulled, you can create new exam based on this one.");
@@ -157,7 +159,6 @@ public class ExamWindowController {
             this.studentCommentsTA.setText(exam.getTextForStudent());
             this.teacherCommentsTA.setText(exam.getTextForTeacher());
             this.isManualCheckBox.setSelected(exam.isManual());
-            this.questionList = exam.getQuestionList();
             this.showQuestions();
             this.bringGrades();
             List<Integer> questionsPoints;
@@ -168,7 +169,7 @@ public class ExamWindowController {
             }
             for (CheckBox checkBox: courseCheckBoxList){
                 String courseCode = checkBox.getText().substring(0,2);
-                String courseExamCode = this.exam.getCode().substring(2,4);
+                courseExamCode = this.exam.getCode().substring(2,4);
                 if(courseCode.equals(courseExamCode))
                     checkBox.setSelected(true);
                 checkBox.setDisable(true);
@@ -214,19 +215,19 @@ public class ExamWindowController {
             return;
         }
 
-
-
         Message message = new Message();
         message.setSingleObject(this.exam);
-        message.setObjList(this.selectedQuestionList);
+        message.setObjList(exam.getQuestionList());
         List<String> textList = new ArrayList<>();
+        message.setCourseName(this.courseExamCode);
+        message.setProfession(this.profession);
         textList.add(this.studentCommentsTA.getText());
         textList.add(this.teacherCommentsTA.getText());
         message.setObjList2(textList);
         List<Integer> tempPointsList = new ArrayList<>(this.questionsPoints);
         message.setObjList3(tempPointsList);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
-
+        //exam.setQuestionList(originalQuestions);
         EventBus.getDefault().post(new TeacherEvent(message,"Update Exam"));
     }
 
@@ -256,8 +257,6 @@ public class ExamWindowController {
             this.questionsPoints.clear();
             return;
         }
-
-
 
         Message message = new Message();
         message.setObjList(this.selectedQuestionList);
@@ -416,10 +415,17 @@ public class ExamWindowController {
         }
 
         if(isSelect)
+        {
             this.selectedQuestionList.add(selectedQuestion);
+            if(!this.exam.getQuestionList().contains(selectedQuestion))
+                this.exam.getQuestionList().add(selectedQuestion);
+        }
         else
+        {
             this.selectedQuestionList.remove(selectedQuestion);
-
+            if(this.exam.getQuestionList().contains(selectedQuestion))
+                this.exam.getQuestionList().remove(selectedQuestion);
+        }
     }
 
     public void showCourses() {

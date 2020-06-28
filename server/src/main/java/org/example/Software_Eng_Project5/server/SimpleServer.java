@@ -154,12 +154,13 @@ public class SimpleServer extends AbstractServer {
 				textList.add(editedExam.getWriter().getUserName());
 				msg.setObjList(editedExam.getQuestionList());
 				msg.setObjList2(textList);
+				msg.setCourseName(message.getCourseName());
 				msg.setObjList3(message.getObjList3());
-				editedExam = session.get(Exam.class, editedExam.getCode());
+				Course course = session.get(Course.class, message.getCourseName());
 				msg.setSingleObject(editedExam.getProfession());
-				msg.setSingleObject2(editedExam.getCourse());
+				msg.setSingleObject2(course);
 				msg.setClassType(Exam.class);
-				message.setTestTime(msg.getTestTime());
+				msg.setTestTime(editedExam.getTestTime());
 				retMessage = insertObject(msg);
 			}
 			else
@@ -167,16 +168,37 @@ public class SimpleServer extends AbstractServer {
 				Exam exam = (Exam)message.getSingleObject();
 
 				List<Integer> grades = (List<Integer>)message.getObjList3();
-				session.update(exam);
-				exam = session.get(Exam.class, exam.getCode());
-				List<Grade> examGrades = exam.getGrades();
+				List<Grade> newGrades = new ArrayList<>();
+				Exam updatedExam = session.get(Exam.class, exam.getCode());
+				updatedExam.setTestTime(exam.getTestTime());
+				updatedExam.setTextForTeacher(exam.getTextForTeacher());
+				updatedExam.setTextForStudent(exam.getTextForStudent());
+				List<Question> oldQuestionList = updatedExam.getQuestionList();
+				updatedExam.setQuestionList(exam.getQuestionList());
+				List<Grade> examGrades = updatedExam.getGrades();
 				for(int i = 0; i < grades.size(); i++)
 				{
-					Grade gradeObj = examGrades.get(i);
-					gradeObj.setGrade(grades.get(i));
-					session.update(gradeObj);
+					Grade gradeObj = new Grade(grades.get(i));
+					newGrades.add(gradeObj);
+					session.save(gradeObj);
 				}
-				session.update(exam);
+				for(int i = 0; i < examGrades.size(); i++)
+				{
+					session.delete(examGrades.get(i));
+				}
+				updatedExam.setGrades(newGrades);
+				session.update(updatedExam);
+				for(Question question : oldQuestionList)
+				{
+					for(Question questionToCompare : updatedExam.getQuestionList())
+					{
+						if(question.getCode().equals(questionToCompare.getCode()))
+						{
+							question.getExamList().remove(updatedExam);
+							session.update(question);
+						}
+					}
+				}
 				retMessage.setType("Updated Exam");
 			}
 
