@@ -417,13 +417,13 @@ public class ExamWindowController {
         if(isSelect)
         {
             this.selectedQuestionList.add(selectedQuestion);
-            if(!this.exam.getQuestionList().contains(selectedQuestion))
+            if(this.exam != null && !this.exam.getQuestionList().contains(selectedQuestion))
                 this.exam.getQuestionList().add(selectedQuestion);
         }
         else
         {
             this.selectedQuestionList.remove(selectedQuestion);
-            if(this.exam.getQuestionList().contains(selectedQuestion))
+            if(this.exam != null && this.exam.getQuestionList().contains(selectedQuestion))
                 this.exam.getQuestionList().remove(selectedQuestion);
         }
     }
@@ -489,80 +489,101 @@ public class ExamWindowController {
         Message message = event.getMessage();
         String eventType = event.getEventType();
 
-        if (eventType.equals("Received")) {
-            if (message.getItemsType().equals("Question") && message.isList()) {
-                this.questionList = (List<Question>) message.getObjList();
-            }
-            if (message.getItemsType().equals("Grades") && message.isList()) {
-                List<Grade> grades = (List<Grade>) message.getObjList();
-                List<Integer> tempInt = new ArrayList<>();
-                for (Grade grade: grades){
-                    tempInt.add(grade.getGrade());
+        switch (eventType)
+        {
+            case "Received":
+                if (message.getItemsType().equals("Question") && message.isList())
+                {
+                    this.questionList = (List<Question>) message.getObjList();
                 }
-                this.questionsPoints = tempInt;
-            }
-        }
-        else if (eventType.equals("Created Exam")) {
-            Platform.runLater(() -> {
-                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
-                Scene scene = null;
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (message.getItemsType().equals("Grades") && message.isList())
+                {
+                    List<Grade> grades = (List<Grade>) message.getObjList();
+                    List<Integer> tempInt = new ArrayList<>();
+                    for (Grade grade : grades)
+                    {
+                        tempInt.add(grade.getGrade());
+                    }
+                    this.questionsPoints = tempInt;
                 }
-                ((messageWindowController) fxmlLoader.getController()).setMessage("A new exam was\n" +
-                        "created and saved.");
-                stage.setScene(scene);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                stage.close();
-            });
-        }
-        else if (eventType.equals("Updated Exam")) {
-            Platform.runLater(() -> {
-                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
-                Scene scene = null;
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                ((messageWindowController) fxmlLoader.getController()).setMessage("The exam updated.");
-                stage.setScene(scene);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                stage.close();
-            });
-        }
-        else if (eventType.equals("Pulled Exam")){
-            Platform.runLater(() -> {
-                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
-                Scene scene = null;
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(message.getItemsType().equals("PulledExam"))
-                    ((messageWindowController) fxmlLoader.getController()).setMessage("The exam was pulled.");
-                else if(message.getItemsType().equals("Error"))
-                    ((messageWindowController) fxmlLoader.getController()).setMessage("The execution code \n" +
-                            "is already in use.");
+                break;
+            case "Created Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("A new exam was\n" +
+                            "created and saved.");
                     stage.setScene(scene);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                stage.close();
-            });
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
+            case "Updated Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The exam updated.");
+                    stage.setScene(scene);
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
+            case "Pulled Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    if (message.getItemsType().equals("PulledExam"))
+                        ((messageWindowController) fxmlLoader.getController()).setMessage("The exam was pulled.");
+                    else if (message.getItemsType().equals("Error"))
+                        ((messageWindowController) fxmlLoader.getController()).setMessage("The execution code \n" +
+                                "is already in use.");
+                    stage.setScene(scene);
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
         }
     }
 }
