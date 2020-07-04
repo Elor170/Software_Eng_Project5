@@ -15,7 +15,10 @@ public class SolvedExam implements Serializable{
     private int time;
     private String teacherComments;
     private int grade;
+    private String studentAnsStr;
+    private String studentName;
 
+    @ManyToOne(fetch = FetchType.EAGER)
     private PulledExam pulledExam;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "solvedExam", targetEntity = StudentAns.class)
@@ -25,14 +28,14 @@ public class SolvedExam implements Serializable{
     @JoinColumn(name = "student")
     private Student student;
 
-
-    public SolvedExam(String id, PulledExam pulledExam, List<Integer> studentAns, int time, Student student, int grade) {
+    public SolvedExam(String id, PulledExam pulledExam, List<Integer> studentAns, int time, Student student, int grade, String name) {
         this.id = id;
         this.pulledExam = pulledExam;
         this.studentAns = studentAns;
         this.time = time;
         this.student = student;
         this.grade = grade;
+        this.studentName = name;
     }
 
     public SolvedExam(){}
@@ -91,5 +94,25 @@ public class SolvedExam implements Serializable{
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+
+    public String getStudentAnsStr()
+    {
+        return studentAnsStr;
+    }
+
+    public void setStudentAnsStr(String studentAnsStr)
+    {
+        this.studentAnsStr = studentAnsStr;
+    }
+
+    public String getStudentName()
+    {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName)
+    {
+        this.studentName = studentName;
     }
 }

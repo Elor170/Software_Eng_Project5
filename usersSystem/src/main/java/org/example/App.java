@@ -45,6 +45,7 @@ public class App extends Application {
         configuration.addAnnotatedClass(SolvedExam.class);
         configuration.addAnnotatedClass(Grade.class);
         configuration.addAnnotatedClass(StudentAns.class);
+        configuration.addAnnotatedClass(HeadMaster.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
@@ -69,7 +70,8 @@ public class App extends Application {
         return fxmlLoader.load();
     }
 
-    public static void addUser2DB(String userName, String password, String userType, List<Profession> teacherProfessions){
+    public static void addUser2DB(String userName, String password, String userType,
+                                  List<Profession> teacherProfessions, String identification){
         try {
             SessionFactory sessionFactory = getSessionFactory();
             session = sessionFactory.openSession();
@@ -88,9 +90,16 @@ public class App extends Application {
                 }
             }
 
-            if (userType.equals("Student")){
+            else if (userType.equals("Student")){
                 Student student = new Student(userName);
+                student.setIdentification(identification);
                 session.save(student);
+            }
+
+            else if (userType.equals("Headmaster"))
+            {
+                HeadMaster headmaster = new HeadMaster(userName);
+                session.save(headmaster);
             }
 
             session.flush();

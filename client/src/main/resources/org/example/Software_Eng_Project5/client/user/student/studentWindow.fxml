@@ -8,12 +8,12 @@
 
 <AnchorPane prefHeight="310.0" prefWidth="575.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.student.GUI.mainStudentController">
    <children>
-      <Button fx:id="executeExamB" layoutX="80.0" layoutY="125.0" mnemonicParsing="false" onAction="#executeExam" text="Execute Exam">
+      <Button layoutX="80.0" layoutY="125.0" mnemonicParsing="false" onAction="#executeExam" text="Execute Exam">
          <font>
             <Font size="18.0" />
          </font>
       </Button>
-      <Button layoutX="80.0" layoutY="176.0" mnemonicParsing="false" prefHeight="78.0" prefWidth="132.0" text="See my&#10; Exams" textAlignment="CENTER">
+      <Button layoutX="80.0" layoutY="176.0" mnemonicParsing="false" onAction="#seeExams" prefHeight="78.0" prefWidth="132.0" text="See my&#10; Exams" textAlignment="CENTER">
          <font>
             <Font size="18.0" />
          </font>
@@ -33,5 +33,6 @@
             <Font size="18.0" />
          </font>
       </Label>
+      <Label fx:id="errorLabel" layoutX="212.0" layoutY="84.0" prefHeight="25.0" prefWidth="172.0" text="This exam was already executed" textFill="#e10000" />
    </children>
 </AnchorPane>

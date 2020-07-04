@@ -3,19 +3,10 @@ package org.example.Software_Eng_Project5.client.user.student.GUI;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -27,11 +18,10 @@ public class mainStudentController {
 
     private String userName;
     private PulledExam pulledExam;
-    private Exam originalExam;
-    private List<Question> questionList;
-
-    @FXML
-    private Button executeExamB;
+    private List<SolvedExam> solvedExams;
+    private StudentExamController examController = new StudentExamController();
+    private studentSolvedExamController solvedExamController = new studentSolvedExamController();
+    private studentGradesWindowController gradesWindowController = new studentGradesWindowController();
 
     @FXML
     private TextField executionCodeTF;
@@ -42,18 +32,12 @@ public class mainStudentController {
     @FXML
     private TextField idTF;
 
-
     @FXML
-    private Label examCodeTF;
-
-    @FXML
-    private VBox contentVbox;
-
-    @FXML
-    private Button endExamB;
+    private Label errorLabel;
 
     @FXML
     void executeExam(ActionEvent event) {
+        errorLabel.setVisible(false);
         String execCode = executionCodeTF.getText();
         String id = idTF.getText();
         Message message = new Message();
@@ -64,73 +48,73 @@ public class mainStudentController {
         EventBus.getDefault().post(new StudentEvent(message, "Check Credentials"));
     }
 
+    @FXML
+    void seeExams(ActionEvent event) throws IOException
+    {
+        Message message = new Message();
+        message.setSingleObject(userName);
+
+        EventBus.getDefault().post(new StudentEvent(message, "Get Solved Exams"));
+    }
+
     public void setUserName(String userName){
         this.userName = userName;
         userNameL.setText(this.userName);
+        errorLabel.setVisible(false);
     }
 
-    @FXML
-    void endExam(ActionEvent event) {
-
-    }
-
-    private void startExam(){
-        Stage stage = new Stage();
-        FXMLLoader fxmlLoader = new FXMLLoader(StudentApp.class.getResource("studentExamWindow.fxml"));
-        Scene scene = null;
-        try {
-            scene = new Scene(fxmlLoader.load());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        stage.setTitle("HSTS");
-        Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
-        stage.getIcons().add(appIcon);
-        stage.setScene(scene);
-        stage.show();
-//        examCodeTF.setText(this.originalExam.getCode());
-//        this.contentVbox.getChildren().clear();
-//        this.contentVbox = new VBox();
-//        this.originalExam = this.pulledExam.getOriginalExam();
-//        this.questionList = this.originalExam.getQuestionList();
-//        VBox questionVBox;
-//        HBox topQuestionHBox;
-//        Label codeLabel;
-//        Label textLabel;
-//        VBox answersVBox;
-//        CheckBox answerCheckBox;
-//        List<Answer> answers;
-//        for (Question question: this.questionList){
-//            questionVBox = new VBox();
-//            codeLabel = new Label(question.getCode());
-//            textLabel = new Label(question.getQuestionText());
-//            topQuestionHBox = new HBox(codeLabel, textLabel);
-//            questionVBox.getChildren().add(topQuestionHBox);
-//            answers = question.getAnswers();
-//            for (Answer answer: answers){
-//                answerCheckBox = new CheckBox(answer.getAnsText());
-//                questionVBox.getChildren().add(answerCheckBox);
-//            }
-//
-//            this.contentVbox.getChildren().add(questionVBox);
-//        }
-    }
-
-    @Subscribe
     @SuppressWarnings("unchecked")
-    public void inStudentEvent(StudentEvent event)
+    @Subscribe
+    public void inStudentEvent(StudentEvent event) throws IOException
     {
         Message message = event.getMessage();
         String eventType = event.getEventType();
 
         if(eventType.equals("Start Exam")){
+            if(message.getSingleObject() != null)
+            {
+                Platform.runLater(()->{
+                    this.pulledExam = (PulledExam) message.getSingleObject();
+                    System.out.println(pulledExam.getOriginalExam().getCode());
+                    try
+                    {
+                        examController.startExam(pulledExam);
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            else
+            {
+                errorLabel.setVisible(true);
+            }
+        }
+        else if(eventType.equals("Solved Exam"))
+        {
+            solvedExams = (List<SolvedExam>)message.getObjList();
             Platform.runLater(()->{
-                this.pulledExam = (PulledExam) message.getSingleObject();
-                System.out.println(pulledExam.getOriginalExam().getCode());
-                this.startExam();
+                try
+                {
+                    solvedExamController.showGradeWindow(message);
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             });
         }
-
+        else if(eventType.equals("Solved Exams"))
+        {
+            Platform.runLater(()->{
+                try
+                {
+                    gradesWindowController.seeExams((List<SolvedExam>) message.getObjList());
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 }
 

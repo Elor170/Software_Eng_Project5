@@ -52,7 +52,12 @@
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Unchecked&#10;Exams" textAlignment="CENTER">
+                  <Button fx:id="finishedExamsB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showFinishedExams" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Finished&#10;Exams&#10;" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="TimeChangeB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#RequestTimeChange" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Change&#10;Exam Time&#10;" textAlignment="CENTER">
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>

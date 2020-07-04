@@ -7,8 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.headmaster.HeadmasterApp;
 import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
+import org.example.Software_Eng_Project5.entities.HeadMaster;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.Profession;
 import org.greenrobot.eventbus.EventBus;
@@ -22,7 +24,7 @@ import java.util.List;
  */
 public class UserApp extends Application {
 
-    protected Stage stage;
+    protected static Stage stage;
     protected static Scene scene;
     protected org.example.Software_Eng_Project5.client.SimpleClient client;
     private UserGUI userGUI;
@@ -71,30 +73,35 @@ public class UserApp extends Application {
 
     @Subscribe
     public void inUserEvent (UserEvent event) {
-        Message massage = event.getMessage();
+        Message message = event.getMessage();
         String eventType = event.getEventType();
 
         if(eventType.equals("LogIn check")){
-            logIn(massage);
+            logIn(message);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void logIn(Message massage){
+    private void logIn(Message message){
         Platform.runLater(() -> {
-            String userType = massage.getType();
-            String userName = massage.getIndexString();
+            String userType = message.getType();
+            String userName = message.getIndexString();
 
             switch (userType) {
                 case "Headmaster":
-                    //TODO
+                    try {
+                        this.userName = userName;
+                        HeadmasterApp headmasterApp = new HeadmasterApp(this.stage, userName, this.client);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
 
                 case "Teacher":
                     try {
                         this.userName = userName;
                         TeacherApp teacherApp = new TeacherApp(this.stage, userName,
-                                (List<Profession>) massage.getObjList(), this.client);
+                                (List<Profession>) message.getObjList(), this.client);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -118,7 +125,6 @@ public class UserApp extends Application {
                     break;
             }
         });
-
     }
 
     public static void main(String[] args) { launch(); }

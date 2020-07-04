@@ -223,7 +223,7 @@ public class QuestionWindowController {
         }
         if(this.isQuestionUsed)
             this.errorLabel.setText("The question is contained in a test, you can create " +
-                    "new question based on this one.");
+                    "a new question based on this one.");
     }
 
     @Subscribe

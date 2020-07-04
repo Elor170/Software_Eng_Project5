@@ -1,4 +1,4 @@
-package org.example.Software_Eng_Project5.client.user.teacher.GUI;
+package org.example.Software_Eng_Project5.client.user.student.GUI;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -12,6 +12,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import org.example.Software_Eng_Project5.client.user.headmaster.HeadmasterEvent;
+import org.example.Software_Eng_Project5.client.user.teacher.GUI.messageWindowController;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
@@ -29,14 +31,18 @@ public class ExamWindowController {
     private List<Course> courseList;
     private List<Question> questionList;
     private List<Question> selectedQuestionList;
+    private List<Question> originalQuestions;
     private Exam exam;
     private boolean isExamUsed;
     private boolean isEdit;
-    private boolean isCreat;
+    private boolean isCreate;
     private boolean isShow;
     private List<CheckBox> courseCheckBoxList;
     private List<Integer> questionsPoints;
     private List<TextField> pointsTextFields;
+    private String courseExamCode;
+    private String username;
+    private SolvedExam solvedExam;
 
     @FXML
     private VBox coursesVBox;
@@ -60,6 +66,12 @@ public class ExamWindowController {
     private Label errorLabel;
 
     @FXML
+    private Label gradeLabel;
+
+    @FXML
+    private TextField gradeTF;
+
+    @FXML
     void pullExam(ActionEvent event) {
         System.out.println("---------");
         Label execCodeL = new Label("Execution Code:");
@@ -76,22 +88,26 @@ public class ExamWindowController {
         Message message = new Message();
         message.setSingleObject(this.exam);
         message.setSingleObject2(execCode);
+        message.setObjList(username);
         EventBus.getDefault().post(new TeacherEvent(message, "Pull Exam"));
     }
 
-    public void setParameters(Stage stage, Profession profession
-            ,Exam exam, boolean isExamUsed, boolean isEdit, boolean isCreat, boolean isShow) {
+    public void setParameters(Stage stage, Profession profession,Exam exam, SolvedExam solvedExam, boolean isExamUsed,
+                              boolean isEdit, boolean isCreate, boolean isShow,
+                              boolean isShowFinished, String username, String answers, Class<?> objClass) {
         this.stage = stage;
         this.profession = profession;
         this.exam = exam;
         this.isExamUsed = isExamUsed;
         this.isEdit = isEdit;
-        this.isCreat = isCreat;
+        this.isCreate = isCreate;
         this.isShow = isShow;
+        this.username = username;
+        this.solvedExam = solvedExam;
+        this.gradeLabel.setVisible(false);
+        this.gradeTF.setVisible(false);
 
-
-
-        if(isCreat){
+        if(isCreate){
             this.showCourses();
             this.examTitle.setText("New Exam");
             this.selectedQuestionList = new ArrayList<>();
@@ -112,10 +128,12 @@ public class ExamWindowController {
             this.teacherCommentsTA.setEditable(false);
             this.isManualCheckBox.setSelected(exam.isManual());
             this.isManualCheckBox.setDisable(true);
-            this.questionList = exam.getQuestionList();
-            this.showQuestions();
-            this.bringGrades();
-            List<Integer> questionsPoints;
+            if(exam != null)
+                this.questionList = exam.getQuestionList();
+            else
+                this.questionList = solvedExam.getPulledExam().getOriginalExam().getQuestionList();
+            this.showQuestions(null, solvedExam);
+            this.bringGrades(objClass);
             int i = 0;
             for(TextField pointsTF: pointsTextFields){
                 pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
@@ -123,7 +141,42 @@ public class ExamWindowController {
                 i++;
             }
             pullExamB.setOnAction(this::pullExam);
+            if(objClass == HeadMaster.class)
+            {
+                pullExamB.setDisable(true);
+                pullExamB.setVisible(false);
+            }
         }
+        else if (isEdit && isShowFinished)
+        {
+            Exam originalExam = solvedExam.getPulledExam().getOriginalExam();
+            this.selectedQuestionList = (originalExam.getQuestionList());
+            this.questionList = (originalExam.getQuestionList());
+            this.examTitle.setText(originalExam.getCode() + ":");
+            this.examTimeTF.setText(Integer.toString(originalExam.getTestTime()));
+            this.examTimeTF.setDisable(true);
+            this.studentCommentsTA.setText(originalExam.getTextForStudent());
+            this.studentCommentsTA.setDisable(true);
+            this.teacherCommentsTA.setText(originalExam.getTextForTeacher());
+            this.teacherCommentsTA.setDisable(true);
+            this.isManualCheckBox.setSelected(originalExam.isManual());
+            this.isManualCheckBox.setDisable(true);
+            this.questionList = originalExam.getQuestionList();
+            this.gradeLabel.setVisible(true);
+            this.gradeTF.setVisible(true);
+            this.gradeTF.setText(Integer.toString(solvedExam.getGrade()));
+            this.showQuestions(answers, solvedExam);
+            this.exam = solvedExam.getPulledExam().getOriginalExam();
+            this.bringGrades(objClass);
+            int i = 0;
+            for(TextField pointsTF: pointsTextFields){
+                pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
+                i++;
+            }
+            this.pullExamB.setText("Update");
+            this.pullExamB.setOnAction(this::updateFinishedExam);
+        }
+
         else if(isEdit && !isExamUsed){
             this.selectedQuestionList = (exam.getQuestionList());
             this.questionList = (exam.getQuestionList());
@@ -134,9 +187,8 @@ public class ExamWindowController {
             this.isManualCheckBox.setSelected(exam.isManual());
             this.isManualCheckBox.setDisable(true);
             this.questionList = exam.getQuestionList();
-            this.showQuestions();
-            this.bringGrades();
-            List<Integer> questionsPoints;
+            this.showQuestions(null, null);
+            this.bringGrades(objClass);
             int i = 0;
             for(TextField pointsTF: pointsTextFields){
                 pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
@@ -146,8 +198,8 @@ public class ExamWindowController {
             this.pullExamB.setOnAction(this::updateExam);
         }
         else if(isEdit && isExamUsed){
-            this.selectedQuestionList = (exam.getQuestionList());
             this.questionList = (exam.getQuestionList());
+            originalQuestions = new ArrayList<>(exam.getQuestionList());
             this.showCourses();
             this.examTitle.setText("New Exam");
             this.errorLabel.setText("The exam is pulled, you can create new exam based on this one.");
@@ -156,10 +208,8 @@ public class ExamWindowController {
             this.studentCommentsTA.setText(exam.getTextForStudent());
             this.teacherCommentsTA.setText(exam.getTextForTeacher());
             this.isManualCheckBox.setSelected(exam.isManual());
-            this.questionList = exam.getQuestionList();
-            this.showQuestions();
-            this.bringGrades();
-            List<Integer> questionsPoints;
+            this.showQuestions(null, null);
+            this.bringGrades(objClass);
             int i = 0;
             for(TextField pointsTF: pointsTextFields){
                 pointsTF.setText(Integer.toString(this.questionsPoints.get(i)));
@@ -167,7 +217,7 @@ public class ExamWindowController {
             }
             for (CheckBox checkBox: courseCheckBoxList){
                 String courseCode = checkBox.getText().substring(0,2);
-                String courseExamCode = this.exam.getCode().substring(2,4);
+                courseExamCode = this.exam.getCode().substring(2,4);
                 if(courseCode.equals(courseExamCode))
                     checkBox.setSelected(true);
                 checkBox.setDisable(true);
@@ -179,8 +229,27 @@ public class ExamWindowController {
         }
     }
 
+    private void updateFinishedExam(ActionEvent actionEvent)
+    {
+        errorLabel.setText("");
+        if(gradeTF.getText().equals("")){
+            errorLabel.setText("Grade field is empty.");
+            return;
+        }
+        //solvedExam.setGrade(Integer.parseInt(gradeTF.getText()));
+        Message message = new Message();
+        message.setGrade(Integer.parseInt(gradeTF.getText()));
+        message.setSingleObject(solvedExam);
+        List<Integer> tempPointsList = new ArrayList<>(this.questionsPoints);
+        message.setObjList3(tempPointsList);
+        message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
+
+        EventBus.getDefault().post(new TeacherEvent(message,"Update Solved Exam"));
+
+    }
+
     private void updateExam(ActionEvent event) {
-        errorLabel.setText(" ");
+        errorLabel.setText("");
         this.questionsPoints = new ArrayList<>();
         try {
             Integer.parseInt(examTimeTF.getText());
@@ -213,19 +282,19 @@ public class ExamWindowController {
             return;
         }
 
-
-
         Message message = new Message();
         message.setSingleObject(this.exam);
-        message.setObjList(this.selectedQuestionList);
+        message.setObjList(exam.getQuestionList());
         List<String> textList = new ArrayList<>();
+        message.setCourseName(this.courseExamCode);
+        message.setProfession(this.profession);
         textList.add(this.studentCommentsTA.getText());
         textList.add(this.teacherCommentsTA.getText());
         message.setObjList2(textList);
         List<Integer> tempPointsList = new ArrayList<>(this.questionsPoints);
         message.setObjList3(tempPointsList);
         message.setTestTime(Integer.parseInt(this.examTimeTF.getText()));
-
+        //exam.setQuestionList(originalQuestions);
         EventBus.getDefault().post(new TeacherEvent(message,"Update Exam"));
     }
 
@@ -255,8 +324,6 @@ public class ExamWindowController {
             this.questionsPoints.clear();
             return;
         }
-
-
 
         Message message = new Message();
         message.setObjList(this.selectedQuestionList);
@@ -288,12 +355,15 @@ public class ExamWindowController {
         return check;
     }
 
-    private void bringGrades() {
+    private void bringGrades(Class<?> objClass) {
         Message msg = new Message();
         msg.setSingleObject(this.exam.getCode());
         msg.setItemsType("Grades");
         msg.setList(true);
-        EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+        if(objClass == Teacher.class)
+            EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+        else if(objClass == HeadMaster.class)
+            EventBus.getDefault().post(new HeadmasterEvent(msg,"Bring"));
 
         this.questionsPoints = null;
         do {
@@ -323,10 +393,10 @@ public class ExamWindowController {
                 e.printStackTrace();
             }
         }while (this.questionList == null);
-        this.showQuestions();
+        this.showQuestions(null, null);
     }
 
-    private void showQuestions() {
+    private void showQuestions(String answers, SolvedExam solvedExam) {
         this.questionsPoints = new ArrayList<>();
         this.pointsTextFields = new ArrayList<>();
         this.contentVBox.getChildren().clear();
@@ -341,7 +411,7 @@ public class ExamWindowController {
             Circle answerCircle;
             TextField points;
             Label pointsLabel;
-
+            int ansIndex = 0;
             for(Question question: questionList) {
                 questionVBox = new VBox();
                 questionVBox.setStyle("-fx-padding: 10");
@@ -357,6 +427,8 @@ public class ExamWindowController {
                 }
                 if(this.isEdit) {
                     questionCodeCheckBox.setSelected(true);
+                    if(solvedExam != null)
+                        questionCodeCheckBox.setDisable(true);
                 }
 
                 questionTextLabel = new Label(question.getQuestionText());
@@ -372,8 +444,8 @@ public class ExamWindowController {
                 this.pointsTextFields.add(points);
                 questionTopHBox = new HBox(pointsLabel, points, questionCodeCheckBox, questionTextLabel);
                 questionVBox.getChildren().add(questionTopHBox);
-
-                for(Answer answer: answerList){
+                for(int i = 0; i < answerList.size(); i++){
+                    Answer answer = answerList.get(i);
                     answerLabel = new Label( answer.getAnsText());
                     answerLabel.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 0 0 0 3;"
                             + "-fx-font-size: 16;");
@@ -381,10 +453,19 @@ public class ExamWindowController {
                     answerCircle.setRadius(7);
 
                     if(--correctAnswerNum == 0)
+                    {
+                      //  if(solvedExam != null && answers.charAt(ansIndex) == '1')
                         answerCircle.setStyle("-fx-fill: #499C54;");
-                    else
-                        answerCircle.setStyle("-fx-fill: #FF5641;");
+                    }
 
+                    else
+                    {
+                        if(solvedExam != null && solvedExam.getStudentAnsStr().charAt(ansIndex) == '1')
+                            answerCircle.setStyle("-fx-fill: #FFFF00;");
+                        else
+                            answerCircle.setStyle("-fx-fill: #FF5641;");
+                    }
+                    ansIndex++;
                     answerHBox = new HBox(answerCircle, answerLabel);
                     answerHBox.setStyle("-fx-padding: 0 0 0 200");
                     questionVBox.getChildren().add(answerHBox);
@@ -415,10 +496,17 @@ public class ExamWindowController {
         }
 
         if(isSelect)
+        {
             this.selectedQuestionList.add(selectedQuestion);
+            if(this.exam != null && !this.exam.getQuestionList().contains(selectedQuestion))
+                this.exam.getQuestionList().add(selectedQuestion);
+        }
         else
+        {
             this.selectedQuestionList.remove(selectedQuestion);
-
+            if(this.exam != null && this.exam.getQuestionList().contains(selectedQuestion))
+                this.exam.getQuestionList().remove(selectedQuestion);
+        }
     }
 
     public void showCourses() {
@@ -482,80 +570,125 @@ public class ExamWindowController {
         Message message = event.getMessage();
         String eventType = event.getEventType();
 
-        if (eventType.equals("Received")) {
-            if (message.getItemsType().equals("Question") && message.isList()) {
-                this.questionList = (List<Question>) message.getObjList();
-            }
-            if (message.getItemsType().equals("Grades") && message.isList()) {
-                List<Grade> grades = (List<Grade>) message.getObjList();
-                List<Integer> tempInt = new ArrayList<>();
-                for (Grade grade: grades){
-                    tempInt.add(grade.getGrade());
+        switch (eventType)
+        {
+            case "Received":
+                if (message.getItemsType().equals("Question") && message.isList())
+                {
+                    this.questionList = (List<Question>) message.getObjList();
                 }
-                this.questionsPoints = tempInt;
-            }
-        }
-        else if (eventType.equals("Created Exam")) {
-            Platform.runLater(() -> {
-                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
-                Scene scene = null;
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (message.getItemsType().equals("Grades") && message.isList())
+                {
+                    List<Grade> grades = (List<Grade>) message.getObjList();
+                    List<Integer> tempInt = new ArrayList<>();
+                    for (Grade grade : grades)
+                    {
+                        tempInt.add(grade.getGrade());
+                    }
+                    this.questionsPoints = tempInt;
                 }
-                ((messageWindowController) fxmlLoader.getController()).setMessage("A new exam was\n" +
-                        "created and saved.");
-                stage.setScene(scene);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                stage.close();
-            });
-        }
-        else if (eventType.equals("Updated Exam")) {
-            Platform.runLater(() -> {
-                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
-                Scene scene = null;
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                ((messageWindowController) fxmlLoader.getController()).setMessage("The exam updated.");
-                stage.setScene(scene);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                stage.close();
-            });
-        }
-        else if (eventType.equals("Pulled Exam")){
-            Platform.runLater(() -> {
-                FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
-                Scene scene = null;
-                try {
-                    scene = new Scene(fxmlLoader.load());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if(message.getItemsType().equals("PulledExam"))
-                    ((messageWindowController) fxmlLoader.getController()).setMessage("The exam was pulled.");
-                else if(message.getItemsType().equals("Error"))
-                    ((messageWindowController) fxmlLoader.getController()).setMessage("The execution code \n" +
-                            "is already in use.");
+                break;
+            case "Created Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("A new exam was\n" +
+                            "created and saved.");
                     stage.setScene(scene);
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                stage.close();
-            });
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
+            case "Updated Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The exam updated.");
+                    stage.setScene(scene);
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
+            case "Pulled Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    if (message.getItemsType().equals("PulledExam"))
+                        ((messageWindowController) fxmlLoader.getController()).setMessage("The exam was \n pulled.");
+                    else if (message.getItemsType().equals("Error"))
+                        ((messageWindowController) fxmlLoader.getController()).setMessage("The execution code \n" +
+                                "is already in use.");
+                    stage.setScene(scene);
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
+            case "Updated Solved Exam":
+                Platform.runLater(() ->
+                {
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("The exam grade \n updated.");
+                    stage.setScene(scene);
+                    try
+                    {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.close();
+                });
+                break;
         }
     }
 }

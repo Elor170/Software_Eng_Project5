@@ -127,13 +127,16 @@ public class TeacherApp extends UserApp
         }
     }
 
-    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList, List<Integer> grades)
+    public void editExam(Exam exam, List<Question> questions, int testTime, List<String> textList,
+                         List<Integer> grades, Profession profession, String course)
     {
         Message msg = new Message();
         exam.setQuestionList(questions);
         exam.setTextForStudent(textList.get(0));
         exam.setTextForTeacher(textList.get(1));
         exam.setTestTime(testTime);
+        exam.setProfession(profession);
+        msg.setCourseName(course);
         msg.setCommand("Update");
         msg.setClassType(Exam.class);
         msg.setSingleObject(exam);
@@ -148,12 +151,34 @@ public class TeacherApp extends UserApp
         }
     }
 
-    public void pullExam(Exam exam, String executionCode)
+    public void editSolvedExam(SolvedExam exam, int testTime, int grade)
+    {
+        Message msg = new Message();
+//        exam.setQuestionList(questions);
+//        exam.setTextForStudent(textList.get(0));
+//        exam.setTextForTeacher(textList.get(1));
+//        exam.setProfession(profession);
+        exam.setTime(testTime);
+        exam.setGrade(grade);
+        msg.setCommand("Update");
+        msg.setClassType(SolvedExam.class);
+        msg.setSingleObject(exam);
+        try
+        {
+            client.sendToServer(msg);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void pullExam(Exam exam, String executionCode, String teacher)
     {
         Message msg = new Message();
         msg.setClassType(PulledExam.class);
         msg.setCommand("Insert");
         msg.setSingleObject(exam);
+        msg.setObjList(teacher);
         msg.setSingleObject2(executionCode);
         try
         {
@@ -194,11 +219,17 @@ public class TeacherApp extends UserApp
 
             case "Update Exam":
                 editExam((Exam)message.getSingleObject(), (List<Question>)message.getObjList(), message.getTestTime(),
-                        (List<String>)message.getObjList2(), (List<Integer>)message.getObjList3());
+                        (List<String>)message.getObjList2(), (List<Integer>)message.getObjList3(),
+                        message.getProfession(), message.getCourseName());
+                break;
+
+            case "Update Solved Exam":
+                editSolvedExam((SolvedExam)message.getSingleObject(), message.getTestTime(),
+                        message.getGrade());
                 break;
 
             case "Pull Exam":
-                    pullExam((Exam)message.getSingleObject(), (String)message.getSingleObject2());
+                    pullExam((Exam)message.getSingleObject(), (String)message.getSingleObject2(), (String) message.getObjList());
                 break;
         }
     }

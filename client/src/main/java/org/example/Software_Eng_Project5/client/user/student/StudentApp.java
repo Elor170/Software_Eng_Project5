@@ -77,13 +77,20 @@ public class StudentApp extends UserApp
     private void createSolvedExam(PulledExam pulledExam, List<Integer> studentAnswers, int time)
     {
         Message msg = new Message();
-        int grade;
         List<Boolean> checkedAnswers = checkExam(pulledExam, studentAnswers);
-        grade = gradeExam(checkedAnswers, pulledExam.getOriginalExam().getGrades());
+        msg.setObjList2(checkedAnswers);
+        String checkedAnswersStr = "";
+        for(Integer ans : studentAnswers)
+        {
+            if(ans > 0)
+                checkedAnswersStr = checkedAnswersStr + '1';
+            else
+                checkedAnswersStr = checkedAnswersStr + '0';
+        }
+        msg.setObjList3(checkedAnswersStr);
         msg.setSingleObject(pulledExam);
         msg.setObjList(studentAnswers);
         msg.setSingleObject2(this.userName);
-        msg.setGrade(grade);
         msg.setTestTime(time);
         msg.setCommand("Insert");
         msg.setClassType(SolvedExam.class);
@@ -96,27 +103,44 @@ public class StudentApp extends UserApp
         }
     }
 
-    private int gradeExam(List<Boolean> checkedAnswers, List<Grade> grades)
-    {
-        int grade = 0;
-        for (int i = 0; i < checkedAnswers.size(); i++)
-        {
-            if(checkedAnswers.get(i))
-                grade += grades.get(i).getGrade();
-        }
-        return grade;
-    }
-
     private List<Boolean> checkExam(PulledExam pulledExam, List<Integer> studentAnswers)
     {
         List<Boolean> checkedAnswers = new ArrayList<>();
         List<Question> questions = pulledExam.getOriginalExam().getQuestionList();
+        int questionNum = 0;
         for(int i = 0; i < studentAnswers.size(); i++)
         {
-            checkedAnswers.add(questions.get(i).getCorrectAnsNum() == studentAnswers.get(i));
+            if(i % 4  == 0 && i != 0)
+                questionNum++;
+            checkedAnswers.add(questions.get(questionNum).getCorrectAnsNum() == studentAnswers.get(i));
         }
         return checkedAnswers;
     }
+
+    private void getSolvedExams(Message message)
+    {
+        message.setCommand("Bring");
+        message.setList(true);
+        message.setItemsType("SolvedExams");
+        try
+        {
+            client.sendToServer(message);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+//    private int gradeExam(List<Boolean> checkedAnswers, List<Grade> grades)
+//    {
+//        int grade = 0;
+//        for (int i = 0; i < checkedAnswers.size(); i++)
+//        {
+//            if(checkedAnswers.get(i))
+//                grade += grades.get(i).getGrade();
+//        }
+//        return grade;
+//    }
 
     @Subscribe
     @SuppressWarnings("unchecked")
@@ -140,6 +164,11 @@ public class StudentApp extends UserApp
                 break;
             case "Check Credentials":
                 checkCredentials((String)message.getSingleObject(), (String)message.getSingleObject2());
+                break;
+
+            case "Get Solved Exams":
+                getSolvedExams(message);
+                break;
 
         }
     }
