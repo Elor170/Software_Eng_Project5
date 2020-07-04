@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1000.0" style="-fx-background-color: #161719;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.headmaster.GUI.mainHeadmasterController">
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="20.0" prefWidth="802.0" style="-fx-background-color: #313335;" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets bottom="5.0" left="10.0" top="10.0" />
+               </HBox.margin>
+               <image>
+                  <Image url="@../icons/user.png" />
+               </image>
+            </ImageView>
+            <Label fx:id="userNameLabel" prefHeight="37.0" prefWidth="102.0" text="user name" textFill="WHITE">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <HBox.margin>
+                  <Insets bottom="5.0" left="10.0" top="10.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </HBox>
+   </top>
+   <left>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="525.0" prefWidth="100.0" style="-fx-background-color: #292A2D;">
+               <children>
+                  <Button fx:id="showQuestionsB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showQuestions" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #DADCE0;" text="Questions">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="20.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="showExamsB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showExams" prefHeight="50.0" prefWidth="100.0" style="-fx-background-color: #DADCE0;" text="Exams">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="finishedExamsB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showFinishedExams" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Finished&#10;Exams&#10;" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+            </VBox>
+            <VBox fx:id="professionVBox" maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-color: #1D1D1F;">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></VBox>
+         </children>
+      </HBox>
+   </left>
+   <center>
+      <ScrollPane style="-fx-background: #161719; -fx-background-color: #000000;" BorderPane.alignment="CENTER">
+         <content>
+            <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+               <children>
+                  <Label fx:id="contentTitle" alignment="CENTER" ellipsisString="" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" underline="true">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <VBox fx:id="contentVBox" />
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
