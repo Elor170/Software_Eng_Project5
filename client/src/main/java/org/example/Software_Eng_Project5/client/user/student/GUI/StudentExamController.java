@@ -18,14 +18,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,12 +32,10 @@ public class StudentExamController {
     private PulledExam pulledExam;
     private List<Question> questionList;
     private List<CheckBox> answerCheckBoxes;
+    private Stage stage;
 
     @FXML
     private Label examCodeLabel;
-
-    @FXML
-    private Button executeExamB;
 
     @FXML
     private VBox contentVbox;
@@ -54,6 +48,9 @@ public class StudentExamController {
 
     @FXML
     private Label minutesLabel;
+
+    @FXML
+    private Label studentCommentsL;
 
 
 //    @FXML
@@ -93,7 +90,7 @@ public class StudentExamController {
         FXMLLoader fxmlLoader = new FXMLLoader(StudentApp.class.getResource("studentExamWindow.fxml"));
         fxmlLoader.setController(this);
         Parent root = fxmlLoader.load();
-        Stage stage = new Stage();
+        stage = new Stage();
         stage.setScene(new Scene(root));
         stage.setTitle("HSTS");
         Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
@@ -101,6 +98,8 @@ public class StudentExamController {
         stage.show();
         Exam originalExam = pulledExam.getOriginalExam();
         examCodeLabel.setText("Exam code: " + originalExam.getCode());
+        examCodeLabel.setStyle("-fx-font-weight: bold;");
+        studentCommentsL.setText(pulledExam.getOriginalExam().getTextForStudent());
         int hours = Math.floorDiv(originalExam.getTestTime(),60);
         hoursLabel.setText(Integer.toString(hours));
         String minutes = Integer.toString(originalExam.getTestTime() - 60 * hours);
@@ -158,6 +157,7 @@ public class StudentExamController {
         }
         message.setObjList(studentAnswers);
         message.setTestTime(remainingTime);
+        stage.close();
         EventBus.getDefault().post(new StudentEvent(message, "Create Solved Exam"));
     }
 }

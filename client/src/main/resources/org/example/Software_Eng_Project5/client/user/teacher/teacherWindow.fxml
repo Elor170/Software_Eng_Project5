@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1000.0" style="-fx-background-color: #161719;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController">
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1000.0" style="-fx-background-color: #161719;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.teacher.GUI.MainTeacherController">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="20.0" prefWidth="802.0" style="-fx-background-color: #313335;" BorderPane.alignment="CENTER">
          <children>
@@ -52,7 +52,7 @@
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>
                   </Button>
-                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Unchecked&#10;Exams" textAlignment="CENTER">
+                  <Button fx:id="finishedExamsB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showFinishedExams" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Finished&#10;Exams&#10;" textAlignment="CENTER">
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>

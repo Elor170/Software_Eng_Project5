@@ -2,6 +2,7 @@ package org.example.Software_Eng_Project5.client;
 
 import org.example.Software_Eng_Project5.client.ocsf.AbstractClient;
 import org.example.Software_Eng_Project5.client.user.UserEvent;
+import org.example.Software_Eng_Project5.client.user.headmaster.HeadmasterEvent;
 import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.Message;
@@ -53,11 +54,18 @@ public class SimpleClient extends AbstractClient {
 						case "Updated Exam":
 							EventBus.getDefault().post(new TeacherEvent(message, "Updated Exam"));
 							break;
+						case "Updated Solved Exam":
+							EventBus.getDefault().post(new TeacherEvent(message, "Updated Solved Exam"));
+							break;
 						case "Pulled Exam":
 							EventBus.getDefault().post(new TeacherEvent(message, "Pulled Exam"));
 							break;
+						case "Finished Exam":
+							EventBus.getDefault().post(new TeacherEvent(message, "Finished Exam"));
+							break;
 					}
 					break;
+
 				case "Student Event":
 					if(eventType.equals("Solved Exam"))
 					{
@@ -66,7 +74,16 @@ public class SimpleClient extends AbstractClient {
 					}
 					else if(eventType.equals("Start Exam"))
 						EventBus.getDefault().post(new StudentEvent(message, "Start Exam"));
+					else if(eventType.equals("Solved Exams"))
+					{
+						EventBus.getDefault().post(new StudentEvent(message, "Solved Exams"));
+					}
+
+				case "Headmaster Event":
+					if(eventType.equals("Received"))
+						EventBus.getDefault().post(new HeadmasterEvent(message, "Received"));
 					break;
+
 			}
 		}
 

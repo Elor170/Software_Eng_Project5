@@ -44,6 +44,7 @@ public class App extends Application {
         configuration.addAnnotatedClass(SolvedExam.class);
         configuration.addAnnotatedClass(Grade.class);
         configuration.addAnnotatedClass(StudentAns.class);
+        configuration.addAnnotatedClass(HeadMaster.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();

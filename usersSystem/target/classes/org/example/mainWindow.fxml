@@ -67,12 +67,12 @@
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
             </Label>
-            <Label text="Student Identification" translateY="60.0">
+            <Label text="Student Identification" translateY="130.0">
                <VBox.margin>
                   <Insets right="5.0" />
                </VBox.margin>
             </Label>
-            <TextField fx:id="identTextField" alignment="BOTTOM_CENTER" translateY="63.0">
+            <TextField fx:id="identTextField" alignment="BOTTOM_CENTER" translateY="130.0">
                <VBox.margin>
                   <Insets right="10.0" />
                </VBox.margin>

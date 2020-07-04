@@ -45,6 +45,7 @@ public class App extends Application {
         configuration.addAnnotatedClass(SolvedExam.class);
         configuration.addAnnotatedClass(Grade.class);
         configuration.addAnnotatedClass(StudentAns.class);
+        configuration.addAnnotatedClass(HeadMaster.class);
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
@@ -89,10 +90,16 @@ public class App extends Application {
                 }
             }
 
-            if (userType.equals("Student")){
+            else if (userType.equals("Student")){
                 Student student = new Student(userName);
                 student.setIdentification(identification);
                 session.save(student);
+            }
+
+            else if (userType.equals("Headmaster"))
+            {
+                HeadMaster headmaster = new HeadMaster(userName);
+                session.save(headmaster);
             }
 
             session.flush();

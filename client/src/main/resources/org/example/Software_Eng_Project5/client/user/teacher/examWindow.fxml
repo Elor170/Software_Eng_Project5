@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.Software_Eng_Project5.client.user.student.GUI.ExamWindowController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: #1D1D1F;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Software_Eng_Project5.client.user.student.GUI.ExamWindowController">
    <left>
       <VBox fx:id="coursesVBox" prefWidth="200.0" style="-fx-background-color: #292A2D;" BorderPane.alignment="CENTER" />
    </left>
@@ -56,6 +56,16 @@
                               </CheckBox>
                            </children>
                         </HBox>
+                        <Label fx:id="gradeLabel" text="Grade:" translateY="30.0">
+                           <VBox.margin>
+                              <Insets left="50.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="gradeTF" prefHeight="25.0" prefWidth="90.0" translateX="50.0">
+                           <VBox.margin>
+                              <Insets left="50.0" right="700.0" />
+                           </VBox.margin>
+                        </TextField>
                         <Label text="  Teacher comments:">
                            <font>
                               <Font size="14.0" />

@@ -35,7 +35,14 @@ public class studentSolvedExamController {
         stage.getIcons().add(appIcon);
         stage.show();
         int grade = message.getGrade();
-        gradeLabel.setText(Integer.toString(grade));
+        String msg;
+        if(grade < 51)
+            msg = "\nBetter Luck Next Time :(";
+        else if(grade >= 51 && grade < 80)
+            msg = "\nWell Done :)";
+        else
+            msg = "\nWOW You're Amazing!!!";
+        gradeLabel.setText("Your Grade Is: " + grade + msg);
     }
 
 }

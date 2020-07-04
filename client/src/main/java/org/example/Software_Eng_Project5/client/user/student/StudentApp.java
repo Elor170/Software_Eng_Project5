@@ -79,6 +79,15 @@ public class StudentApp extends UserApp
         Message msg = new Message();
         List<Boolean> checkedAnswers = checkExam(pulledExam, studentAnswers);
         msg.setObjList2(checkedAnswers);
+        String checkedAnswersStr = "";
+        for(Integer ans : studentAnswers)
+        {
+            if(ans > 0)
+                checkedAnswersStr = checkedAnswersStr + '1';
+            else
+                checkedAnswersStr = checkedAnswersStr + '0';
+        }
+        msg.setObjList3(checkedAnswersStr);
         msg.setSingleObject(pulledExam);
         msg.setObjList(studentAnswers);
         msg.setSingleObject2(this.userName);
@@ -106,6 +115,20 @@ public class StudentApp extends UserApp
             checkedAnswers.add(questions.get(questionNum).getCorrectAnsNum() == studentAnswers.get(i));
         }
         return checkedAnswers;
+    }
+
+    private void getSolvedExams(Message message)
+    {
+        message.setCommand("Bring");
+        message.setList(true);
+        message.setItemsType("SolvedExams");
+        try
+        {
+            client.sendToServer(message);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 //    private int gradeExam(List<Boolean> checkedAnswers, List<Grade> grades)
@@ -141,6 +164,11 @@ public class StudentApp extends UserApp
                 break;
             case "Check Credentials":
                 checkCredentials((String)message.getSingleObject(), (String)message.getSingleObject2());
+                break;
+
+            case "Get Solved Exams":
+                getSolvedExams(message);
+                break;
 
         }
     }

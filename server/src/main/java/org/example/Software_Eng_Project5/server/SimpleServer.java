@@ -43,6 +43,7 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(SolvedExam.class);
 		configuration.addAnnotatedClass(Grade.class);
 		configuration.addAnnotatedClass(StudentAns.class);
+		configuration.addAnnotatedClass(HeadMaster.class);
 
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties()).build();
@@ -116,12 +117,22 @@ public class SimpleServer extends AbstractServer {
 	{
 		Message retMessage = new Message();
 		PulledExam pulledExam = null;
-		Student student = session.get(Student.class, message.getIndexString());
+		String username = message.getIndexString();
+		Student student = session.get(Student.class, username);
 		if(student.getIdentification().equals(message.getSingleObject2()))
 			pulledExam = session.get(PulledExam.class, (String)message.getSingleObject());
-
-		System.out.println("Credentials of student #" + message.getIndexString() + " validated");
+		List<SolvedExam> solvedExams = getAll(SolvedExam.class);
 		retMessage.setSingleObject(pulledExam);
+		for(SolvedExam solvedExam : solvedExams)
+		{
+			if(solvedExam.getId().substring(0, 4).equals(pulledExam.getExecutionCode()) &&
+					solvedExam.getId().substring(4).equals(username))
+			{
+				retMessage.setSingleObject(null);
+				break;
+			}
+		}
+		System.out.println("Credentials of student #" + message.getIndexString() + " validated");
 		retMessage.setType("Start Exam");
 		retMessage.setCommand("Student Event");
 		return retMessage;
@@ -203,6 +214,13 @@ public class SimpleServer extends AbstractServer {
 			}
 
 		}
+		else if(classType == SolvedExam.class)
+		{
+			SolvedExam solvedExam = (SolvedExam)message.getSingleObject();
+			session.update(solvedExam);
+
+			retMessage.setType("Updated Solved Exam");
+		}
 
 		retMessage.setCommand("Teacher Event");
 
@@ -262,6 +280,7 @@ public class SimpleServer extends AbstractServer {
 			exam.setTextForStudent(textList.get(0));
 			exam.setTextForTeacher(textList.get(1));
 			exam.setManual(message.isManual());
+			exam.setCourseName(course.getName());
 			List<Grade> gradeObjs = new ArrayList<>();
 			for (Integer grade : grades)
 			{
@@ -294,6 +313,7 @@ public class SimpleServer extends AbstractServer {
 			Exam originalExam = (Exam)message.getSingleObject();
 			PulledExam pulledExam = new PulledExam(originalExam);
 			pulledExam.setExecutionCode(execCode);
+			pulledExam.setTeacher((String)message.getObjList());
 			session.save(pulledExam);
 			originalExam.setPulled(true);
 			session.update(originalExam);
@@ -312,11 +332,17 @@ public class SimpleServer extends AbstractServer {
 			String id = pulledExam.getExecutionCode() + username;
 			Student student = session.get(Student.class, username);
 			SolvedExam solvedExam = new SolvedExam(id, (PulledExam)message.getSingleObject(), (List<Integer>)message.getObjList(),
-					message.getTestTime(), student, grade);
+					message.getTestTime(), student, grade, username);
+			solvedExam.setStudentAnsStr((String)message.getObjList3());
 			session.save(solvedExam);
-
+			student.getSolvedExamList().add(solvedExam);
+			session.update(student);
+			Teacher teacher = session.get(Teacher.class, solvedExam.getPulledExam().getTeacher());
+			teacher.getSolvedExamList().add(solvedExam);
+			session.update(teacher);
 			System.out.println("Solved Exam #" + id + " saved");
 			retMessage.setGrade(grade);
+			retMessage.setObjList(student.getSolvedExamList());
 			retMessage.setItemsType("SolvedExam");
 			retMessage.setType("Solved Exam");
 			retMessage.setCommand("Student Event");
@@ -355,8 +381,9 @@ public class SimpleServer extends AbstractServer {
 		String indexString = message.getIndexString();
 		Object object = null;
 
-		if(!message.getItemsType().equals("Grades"))
-			object = session.get(classType, indexString);
+		if(!message.getItemsType().equals("Grades") && !message.getItemsType().equals("SolvedExams"))
+			if(classType != null && indexString != null)
+				object = session.get(classType, indexString);
 
 		switch (message.getItemsType())
 		{
@@ -372,6 +399,48 @@ public class SimpleServer extends AbstractServer {
 				retMessage.setObjList(questionList);
 				retMessage.setCommand("Teacher Event");
 				retMessage.setItemsType("Question");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+
+			case "AllQuestions":
+				List<Question> allQuestionsList = getAll(Question.class);
+				retMessage.setObjList(allQuestionsList);
+				retMessage.setCommand("Headmaster Event");
+				retMessage.setItemsType("allQuestions");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+
+			case "AllExams":
+				List<Exam> allExamsList = getAll(Exam.class);
+				retMessage.setObjList(allExamsList);
+				retMessage.setCommand("Headmaster Event");
+				retMessage.setItemsType("allExams");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+
+			case "FinishedExams":
+				List<SolvedExam> allSolvedExamsList = getAll(SolvedExam.class);
+				List<String> answerList = new ArrayList<>();
+				for(SolvedExam solvedExam : allSolvedExamsList)
+				{
+					answerList.add(solvedExam.getStudentAnsStr());
+				}
+				retMessage.setObjList(allSolvedExamsList);
+				retMessage.setObjList2(answerList);
+				retMessage.setCommand("Headmaster Event");
+				retMessage.setItemsType("finishedExams");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+
+			case "ExamProfession":
+				Profession profession = session.get(Profession.class, ((Exam)message.getSingleObject()).getCode().substring(0, 2));
+				retMessage.setSingleObject(profession);
+				retMessage.setCommand("Headmaster Event");
+				retMessage.setItemsType("examProfession");
 				retMessage.setList(true);
 				retMessage.setType("Received");
 				break;
@@ -414,6 +483,43 @@ public class SimpleServer extends AbstractServer {
 				retMessage.setCommand("Teacher Event");
 				retMessage.setItemsType("Grades");
 				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+
+			case "SolvedExams":
+				List<SolvedExam> solvedExams = new ArrayList<>();
+				List<SolvedExam> allSolvedExams = getAll(SolvedExam.class);
+				String student = (String)message.getSingleObject();
+				for(SolvedExam solvedExam : allSolvedExams)
+				{
+					if(solvedExam.getId().substring(4).equals(student))
+						solvedExams.add(solvedExam);
+				}
+				retMessage.setObjList(solvedExams);
+				retMessage.setCommand("Student Event");
+				retMessage.setList(true);
+				retMessage.setType("Solved Exams");
+				break;
+
+			case "FinishedExam":
+				List<SolvedExam> allFinishedExams = getAll(SolvedExam.class);
+				List<SolvedExam> mySolvedExams = new ArrayList<>();
+				ArrayList<String> answersList = new ArrayList<>();
+				String teacher = message.getIndexString();
+				for(SolvedExam solvedExam : allFinishedExams)
+				{
+					SolvedExam finishedExam = session.get(SolvedExam.class, solvedExam.getId());
+					if(solvedExam.getPulledExam().getOriginalExam().getWriter().getUserName().equals(teacher))
+					{
+						mySolvedExams.add(solvedExam);
+						answersList.add(finishedExam.getStudentAnsStr());
+					}
+				}
+				retMessage.setObjList(mySolvedExams);
+				retMessage.setObjList2(answersList);
+				retMessage.setCommand("Teacher Event");
+				retMessage.setList(true);
+				retMessage.setItemsType("Finished Exams");
 				retMessage.setType("Received");
 				break;
 		}

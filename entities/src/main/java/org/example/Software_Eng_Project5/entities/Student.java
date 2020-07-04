@@ -13,7 +13,7 @@ public class Student implements Serializable {
 
     private String identification;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "student")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "student")
     private List<SolvedExam> solvedExamList;
 
     public Student() {
@@ -41,5 +41,15 @@ public class Student implements Serializable {
     public void setIdentification(String identification)
     {
         this.identification = identification;
+    }
+
+    public List<SolvedExam> getSolvedExamList()
+    {
+        return solvedExamList;
+    }
+
+    public void setSolvedExamList(List<SolvedExam> solvedExamList)
+    {
+        this.solvedExamList = solvedExamList;
     }
 }

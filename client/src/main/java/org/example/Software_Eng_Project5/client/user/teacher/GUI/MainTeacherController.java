@@ -23,12 +23,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainTeacherController {
     private boolean isShowQuestions;
     private boolean isShowExams;
+    private boolean isShowFinishedExams;
     private String professionCode;
     private String courseCode;
     private Profession profession;
@@ -36,6 +38,8 @@ public class MainTeacherController {
     private List<Profession> professionList;
     private List<Exam> examList;
     private List<Question> questionList;
+    private List<SolvedExam> solvedExamList;
+    private ArrayList<String> answersList;
 
     @FXML
     private BorderPane borderPane;
@@ -51,7 +55,8 @@ public class MainTeacherController {
     private Label contentTitle;
     @FXML
     private VBox VBox;
-
+    @FXML
+    private Button finishedExamsB;
 
     public void setUserName(String userName){
         userNameLabel.setText(userName);
@@ -60,6 +65,7 @@ public class MainTeacherController {
     public void showProfessions(){
         isShowQuestions = false;
         isShowExams = false;
+        isShowFinishedExams = false;
         Image professionImg = new Image("org/example/Software_Eng_Project5/client/user/icons/profession.png");
         Image courseImg = new Image("org/example/Software_Eng_Project5/client/user/icons/course.png");
         ImageView professionIcon;
@@ -130,6 +136,7 @@ public class MainTeacherController {
     private void showQuestions(ActionEvent event){
         this.isShowExams = false;
         this.isShowQuestions = true;
+        this.isShowFinishedExams = false;
         this.contentVBox.getChildren().clear();
         boolean isCourse = false;
         boolean isProfession = false;
@@ -248,9 +255,150 @@ public class MainTeacherController {
     }
 
     @FXML
+    void showFinishedExams(ActionEvent event)
+    {
+        this.isShowExams = false;
+        this.isShowQuestions = false;
+        this.isShowFinishedExams = true;
+        this.contentVBox.getChildren().clear();
+        boolean isCourse = false;
+        boolean isProfession = false;
+//        boolean isMyExams = false;
+        if (this.courseCode != null)
+            isCourse = true;
+        else if(this.professionCode != null)
+            isProfession = true;
+//        else
+//            isMyExams = true;
+        Message msg = new Message();
+        msg.setList(true);
+        msg.setItemsType("FinishedExam");
+
+        if (isCourse) {
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":  "
+                    +  this.course.getCode() + "  " + this.course.getName() + ": Finished Exams" );
+            msg.setClassType(Course.class);
+            msg.setIndexString(this.courseCode);
+        }
+
+        else if(isProfession) {
+            this.contentTitle.setText(this.profession.getCode() + "  " + this.profession.getName() + ":Finished Exams" );
+            msg.setClassType(Profession.class);
+            msg.setIndexString(this.professionCode);
+        }
+
+        else {
+            this.contentTitle.setText("Finished Exams");
+            msg.setClassType(Teacher.class);
+            msg.setIndexString(this.userNameLabel.getText());
+        }
+
+        EventBus.getDefault().post(new TeacherEvent(msg,"Bring"));
+        this.solvedExamList = null;
+
+        do {
+            try {
+
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (this.solvedExamList == null);
+
+        if(!this.solvedExamList.isEmpty()){
+            Button showOrEditExamB;
+            HBox examHBox;
+            Label examCodeLabel;
+            Label examTimeLabel;
+            Label examTypeLabel;
+
+            for (SolvedExam solvedExam : this.solvedExamList){
+                examHBox = new HBox();
+                showOrEditExamB = new Button("Show");
+                showOrEditExamB.setOnAction(this::showSingleFinishedExam); //TODO change function to showSingleFinishedExam
+
+                showOrEditExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
+                Exam exam = solvedExam.getPulledExam().getOriginalExam();
+                examCodeLabel = new Label("Code: " + exam.getCode());
+                examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                int hours = Math.floorDiv(exam.getTestTime(),60);
+                String minutes = Integer.toString(exam.getTestTime() - 60 * hours);
+                if(minutes.length() < 2)
+                    minutes = "0" + minutes;
+                examTimeLabel = new Label(  "Time: " + hours + ":" + minutes);
+                examTimeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                examTypeLabel = new Label();
+                examTypeLabel.setText("Student: " + solvedExam.getStudentName());
+                examTypeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                examHBox.getChildren().addAll(showOrEditExamB, examCodeLabel, examTimeLabel, examTypeLabel);
+                examHBox.setSpacing(20);
+                examHBox.setStyle("-fx-font-size: 16;");
+                this.contentVBox.getChildren().add(examHBox);
+            }
+        }
+
+        // Case: No exams in the selected course/profession
+        else {
+            Label label = new Label("There are no finished exams yet.");
+            label.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 20 20 5 5;"
+                    + "-fx-font-size: 16;");
+            this.contentVBox.getChildren().add(label);
+        }
+    }
+
+    private void showSingleFinishedExam(ActionEvent event)
+    {
+        System.out.println("-----edit Single Finished Exam----");
+        //TODO
+        String selectedExamCode = (((Label)((HBox)((Button)event.getSource()).getParent()).getChildren().get(1)).getText());
+        selectedExamCode = selectedExamCode.substring(6);
+        SolvedExam selectedExam = null;
+        for(SolvedExam solvedExam: solvedExamList){
+            if(selectedExamCode.equals(solvedExam.getPulledExam().getOriginalExam().getCode()))
+                selectedExam = solvedExam;
+        }
+        String professionCode = selectedExam.getPulledExam().getOriginalExam().getCode().substring(0,2);
+        for (Profession profession: professionList){
+            if(profession.getCode().equals(professionCode))
+                this.profession = profession;
+        }
+        this.openFinishedExamWindow(true, false, false, true, selectedExam);
+    }
+
+    private void openFinishedExamWindow(boolean isEditExam, boolean isCreatExam, boolean isShowSingleExam,
+                                        boolean isShowFinished, SolvedExam selectedExam)
+    {
+        Stage stage = new Stage();
+        FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("examWindow.fxml"));
+        Scene scene = null;
+        try {
+            scene = new Scene(fxmlLoader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stage.setTitle("HSTS");
+        Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
+        stage.getIcons().add(appIcon);
+        stage.setScene(scene);
+        stage.show();
+        ExamWindowController examControllerWindow = fxmlLoader.getController();
+        EventBus.getDefault().register(examControllerWindow);
+        boolean isExamUsed = false;
+        if(isEditExam)
+            isExamUsed = selectedExam.getPulledExam().getOriginalExam().isPulled();
+        String answers = answersList.get(solvedExamList.indexOf(selectedExam));
+        examControllerWindow.setParameters(stage, this.profession, null, selectedExam,
+                isExamUsed, isEditExam, isCreatExam, isShowSingleExam, isShowFinished, userNameLabel.getText(), answers, Teacher.class);
+    }
+
+    @FXML
     void showExams(ActionEvent event) {
         this.isShowExams = true;
         this.isShowQuestions = false;
+        this.isShowFinishedExams = false;
         this.contentVBox.getChildren().clear();
         boolean isCourse = false;
         boolean isProfession = false;
@@ -375,7 +523,7 @@ public class MainTeacherController {
             if(profession.getCode().equals(professionCode))
                 this.profession = profession;
         }
-        this.openExamWindow(true, false, false, selectedExam);
+        this.openExamWindow(true, false, false, false, selectedExam);
     }
 
     private void showSingleExam(ActionEvent event) {
@@ -386,14 +534,14 @@ public class MainTeacherController {
             if(selectedExamCode.equals(exam.getCode()))
                 selectedExam = exam;
         }
-        this.openExamWindow(true, false, true, selectedExam);
+        this.openExamWindow(true, false, true, false, selectedExam);
     }
 
     private void onCreateExam(ActionEvent event) {
-        this.openExamWindow(false, true, false, null);
+        this.openExamWindow(false, true, false, false,null);
     }
 
-    private void openExamWindow(boolean isEditExam, boolean isCreatExam, boolean isShowSingleExam, Exam selectedExam) {
+    private void openExamWindow(boolean isEditExam, boolean isCreatExam, boolean isShowSingleExam, boolean isShowFinished, Exam selectedExam) {
         Stage stage = new Stage();
         FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("examWindow.fxml"));
         Scene scene = null;
@@ -412,8 +560,8 @@ public class MainTeacherController {
         boolean isExamUsed = false;
         if(isEditExam)
             isExamUsed = selectedExam.isPulled();
-        examControllerWindow.setParameters(stage, this.profession, selectedExam,
-                isExamUsed, isEditExam, isCreatExam, isShowSingleExam);
+        examControllerWindow.setParameters(stage, this.profession, selectedExam, null,
+                isExamUsed, isEditExam, isCreatExam, isShowSingleExam, isShowFinished, userNameLabel.getText(), null, Teacher.class);
     }
 
     private void onEditQuestion(ActionEvent event) {
@@ -504,10 +652,16 @@ public class MainTeacherController {
 
         switch (eventType) {
             case "Received":
-                if (message.getItemsType().equals("Question") && message.isList()) {
+                String Type = message.getItemsType();
+                if (Type.equals("Question") && message.isList()) {
                     this.questionList = (List<Question>) message.getObjList();
-                } else if (message.getItemsType().equals("Exam") && message.isList()) {
+                } else if (Type.equals("Exam") && message.isList()) {
                     this.examList = (List<Exam>) message.getObjList();
+                }
+                else if (Type.equals("Finished Exams"))
+                {
+                    this.solvedExamList = (List<SolvedExam>)message.getObjList();
+                    this.answersList = (ArrayList<String>)message.getObjList2();
                 }
                 break;
             case "Created Question":
@@ -518,6 +672,9 @@ public class MainTeacherController {
             case "Updated Exam":
                 Platform.runLater(() -> this.showExams(null));
                 break;
+//            case "Updated Solved Exam":
+//                Platform.runLater(() -> this.showFinishedExams(null));
+//                break;
         }
 
     }

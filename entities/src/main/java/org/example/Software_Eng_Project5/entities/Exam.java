@@ -34,6 +34,8 @@ public class Exam implements Serializable {
     @JoinColumn(name = "course")
     private Course course;
 
+    private String courseName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profession_id")
     private Profession profession;
@@ -142,5 +144,15 @@ public class Exam implements Serializable {
         for (Grade grade: grades){
             grade.setExam(this);
         }
+    }
+
+    public String getCourseName()
+    {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName)
+    {
+        this.courseName = courseName;
     }
 }
