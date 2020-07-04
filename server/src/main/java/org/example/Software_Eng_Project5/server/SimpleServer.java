@@ -342,6 +342,7 @@ public class SimpleServer extends AbstractServer {
 			session.update(teacher);
 			System.out.println("Solved Exam #" + id + " saved");
 			retMessage.setGrade(grade);
+			retMessage.setTestTime(message.getTestTime());
 			retMessage.setObjList(student.getSolvedExamList());
 			retMessage.setItemsType("SolvedExam");
 			retMessage.setType("Solved Exam");

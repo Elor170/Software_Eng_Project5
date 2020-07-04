@@ -57,6 +57,11 @@
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>
                   </Button>
+                  <Button fx:id="TimeChangeB" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#RequestTimeChange" prefHeight="50.0" prefWidth="80.0" style="-fx-background-color: #DADCE0;" text="Change&#10;Exam Time&#10;" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
                </children>
             </VBox>
             <VBox fx:id="professionVBox" maxHeight="-Infinity" maxWidth="-Infinity" style="-fx-background-color: #1D1D1F;">

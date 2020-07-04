@@ -76,7 +76,17 @@ public class StudentExamController {
                 {
                     minutesLabel.setText(Integer.toString(Integer.parseInt(minutesLabel.getText()) - 1));
                     if(hoursLabel.getText().equals("0") && minutesLabel.getText().equals("0")){
-                        endExamB.fire();
+                        {
+//                            try
+//                            {
+//
+//                                Thread.sleep(5000);
+//                            } catch (InterruptedException e)
+//                            {
+//                                e.printStackTrace();
+//                            }
+                            endExamB.fire();
+                        }
                     }
                 }
 

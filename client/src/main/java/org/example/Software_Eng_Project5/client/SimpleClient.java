@@ -78,6 +78,7 @@ public class SimpleClient extends AbstractClient {
 					{
 						EventBus.getDefault().post(new StudentEvent(message, "Solved Exams"));
 					}
+					break;
 
 				case "Headmaster Event":
 					if(eventType.equals("Received"))

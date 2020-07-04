@@ -23,6 +23,10 @@ public class studentSolvedExamController {
     @FXML
     private Label gradeLabel;
 
+    @FXML
+    private Label timeUpLabel;
+
+
     public void showGradeWindow(Message message) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader(StudentApp.class.getResource("studentSolvedExamWindow.fxml"));
@@ -34,6 +38,9 @@ public class studentSolvedExamController {
         Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
         stage.getIcons().add(appIcon);
         stage.show();
+        timeUpLabel.setVisible(false);
+        if(message.getTestTime() == 0)
+            timeUpLabel.setVisible(true);
         int grade = message.getGrade();
         String msg;
         if(grade < 51)

@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "headmaster")
-public class HeadMaster {
+public class HeadMaster implements Serializable {
 
     @Id
     private String name;

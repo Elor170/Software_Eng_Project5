@@ -30,7 +30,7 @@
                         <Insets left="330.0" />
                      </HBox.margin>
                   </Label>
-                  <Label fx:id="minutesLabel" prefHeight="35.0" prefWidth="28.0" text="Label" />
+                  <Label fx:id="minutesLabel" prefHeight="35.0" prefWidth="33.0" text="m" translateX="10.0" />
                </children>
             </HBox>
             <Label fx:id="studentCommentsL" prefHeight="55.0" prefWidth="600.0" text="Label">

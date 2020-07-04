@@ -62,6 +62,9 @@ public class mainHeadmasterController
     private VBox VBox;
     @FXML
     private Button finishedExamsB;
+    @FXML
+    private Button timeRequestsB;
+
 
     public void setUserName(String userName){ userNameLabel.setText(userName); }
 
@@ -246,15 +249,18 @@ public class mainHeadmasterController
             for (SolvedExam solvedExam : this.solvedExamList){
                 examHBox = new HBox();
                 showOrEditExamB = new Button("Show");
-                showOrEditExamB.setOnAction(this::showSingleFinishedExam); //TODO change function to showSingleFinishedExam
+                showOrEditExamB.setOnAction(this::showSingleFinishedExam);
 
                 showOrEditExamB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
                 Exam exam = solvedExam.getPulledExam().getOriginalExam();
                 examCodeLabel = new Label("Code: " + exam.getCode());
                 examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
 
-                int hours = Math.floorDiv(exam.getTestTime(),60);
-                String minutes = Integer.toString(exam.getTestTime() - 60 * hours);
+
+                int examHours = Math.floorDiv(exam.getTestTime(),60);
+                int solvedExamHours = Math.floorDiv(solvedExam.getTime(),60);
+                int hours = examHours - solvedExamHours;
+                String minutes = Integer.toString( (exam.getTestTime() - 60 * examHours) - (solvedExam.getTime() - 60 * solvedExamHours));
                 if(minutes.length() < 2)
                     minutes = "0" + minutes;
                 examTimeLabel = new Label(  "Time: " + hours + ":" + minutes);
@@ -520,6 +526,12 @@ public class mainHeadmasterController
 //                this.course = course;
 //        }
 //    }
+
+    @FXML
+    void showTimeRequests(ActionEvent event)
+    {
+
+    }
 
     public List<Profession> getProfessionList() {
         return professionList;
