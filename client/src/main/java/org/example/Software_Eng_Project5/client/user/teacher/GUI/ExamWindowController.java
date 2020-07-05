@@ -1,4 +1,4 @@
-package org.example.Software_Eng_Project5.client.user.student.GUI;
+package org.example.Software_Eng_Project5.client.user.teacher.GUI;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;

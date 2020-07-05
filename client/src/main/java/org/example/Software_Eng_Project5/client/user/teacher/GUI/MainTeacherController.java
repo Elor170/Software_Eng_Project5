@@ -15,7 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import org.example.Software_Eng_Project5.client.user.student.GUI.ExamWindowController;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
@@ -40,6 +39,8 @@ public class MainTeacherController {
     private List<Question> questionList;
     private List<SolvedExam> solvedExamList;
     private ArrayList<String> answersList;
+    private TextField examCodeText;
+    private TextField newTimeText;
 
     @FXML
     private BorderPane borderPane;
@@ -649,9 +650,29 @@ public class MainTeacherController {
     }
 
     @FXML
-    void RequestTimeChange(ActionEvent event)
+    void requestTimeChange(ActionEvent event)
     {
+        HBox requestTimeHBox = new HBox();
+        Button sendRequestB = new Button("Send Request");
+        sendRequestB.setOnAction(this::sendRequest);
+        sendRequestB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
+        Label examCodeLabel = new Label("Execution Code: ");
+        examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+        Label newTimeLabel = new Label("New Time: ");
+        newTimeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+        examCodeText = new TextField();
+        newTimeText = new TextField();
+        requestTimeHBox.getChildren().addAll(sendRequestB, examCodeLabel, examCodeText, newTimeLabel, newTimeText);
+        this.contentVBox.getChildren().add(requestTimeHBox);
+    }
 
+    private void sendRequest(ActionEvent actionEvent)
+    {
+        Message message = new Message();
+        message.setSingleObject(examCodeText.getText());
+        message.setSingleObject2(Integer.parseInt(newTimeText.getText()));
+
+        EventBus.getDefault().post(new TeacherEvent(message, "Request Time Change"));
     }
 
     @Subscribe
@@ -685,6 +706,35 @@ public class MainTeacherController {
 //            case "Updated Solved Exam":
 //                Platform.runLater(() -> this.showFinishedExams(null));
 //                break;
+            case "Requested Time":
+                Platform.runLater(() ->
+                {
+                    Stage stage = new Stage();
+                    FXMLLoader fxmlLoader = new FXMLLoader(TeacherApp.class.getResource("messageWindow.fxml"));
+                    Scene scene = null;
+                    try
+                    {
+                        scene = new Scene(fxmlLoader.load());
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    stage.setTitle("HSTS");
+                    Image appIcon = new Image("/org/example/Software_Eng_Project5/client/user/icons/app_icon.png");
+                    stage.getIcons().add(appIcon);
+                    ((messageWindowController) fxmlLoader.getController()).setMessage("Time request was \n sent.");
+                    stage.setScene(scene);
+                    stage.show();
+//                    try
+//                    {
+//                        Thread.sleep(2000);
+//                    } catch (InterruptedException e)
+//                    {
+//                        e.printStackTrace();
+//                    }
+//                    stage.close();
+                });
+                break;
         }
 
     }

@@ -44,6 +44,7 @@ public class SimpleServer extends AbstractServer {
 		configuration.addAnnotatedClass(Grade.class);
 		configuration.addAnnotatedClass(StudentAns.class);
 		configuration.addAnnotatedClass(HeadMaster.class);
+		configuration.addAnnotatedClass(TimeRequest.class);
 
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 				.applySettings(configuration.getProperties()).build();
@@ -348,6 +349,14 @@ public class SimpleServer extends AbstractServer {
 			retMessage.setType("Solved Exam");
 			retMessage.setCommand("Student Event");
 		}
+		else if(classType.equals(TimeRequest.class))
+		{
+			TimeRequest timeRequest = new TimeRequest((String)message.getSingleObject(), (Integer)message.getSingleObject2());
+			session.save(timeRequest);
+			retMessage.setItemsType("TimeRequest");
+			retMessage.setType("Time Request");
+			retMessage.setCommand("Teacher Event");
+		}
 
 		return retMessage;
 	}
@@ -433,6 +442,15 @@ public class SimpleServer extends AbstractServer {
 				retMessage.setObjList2(answerList);
 				retMessage.setCommand("Headmaster Event");
 				retMessage.setItemsType("finishedExams");
+				retMessage.setList(true);
+				retMessage.setType("Received");
+				break;
+
+			case "TimeRequest":
+				List<TimeRequest> timeRequests = getAll(TimeRequest.class);
+				retMessage.setObjList(timeRequests);
+				retMessage.setCommand("Headmaster Event");
+				retMessage.setItemsType("timeRequests");
 				retMessage.setList(true);
 				retMessage.setType("Received");
 				break;

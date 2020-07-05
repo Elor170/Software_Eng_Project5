@@ -115,6 +115,12 @@ public class mainStudentController {
                 }
             });
         }
+        else if(eventType.equals("Change Time"))
+        {
+            Platform.runLater(()->{
+                examController.changeTime((String) message.getSingleObject(), (int)message.getSingleObject2());
+            });
+        }
     }
 }
 

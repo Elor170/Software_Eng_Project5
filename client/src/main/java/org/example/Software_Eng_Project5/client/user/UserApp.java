@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,16 @@ public class UserApp extends Application {
     protected org.example.Software_Eng_Project5.client.SimpleClient client;
     private UserGUI userGUI;
     protected String userName;
+
+    public String getUserName()
+    {
+        return userName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -89,12 +100,7 @@ public class UserApp extends Application {
 
             switch (userType) {
                 case "Headmaster":
-                    try {
-                        this.userName = userName;
-                        HeadmasterApp headmasterApp = new HeadmasterApp(this.stage, userName, this.client);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    this.userName = userName;
                     break;
 
                 case "Teacher":

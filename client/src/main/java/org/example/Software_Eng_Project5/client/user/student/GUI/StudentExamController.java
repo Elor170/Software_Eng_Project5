@@ -170,4 +170,18 @@ public class StudentExamController {
         stage.close();
         EventBus.getDefault().post(new StudentEvent(message, "Create Solved Exam"));
     }
+
+    public void changeTime(String examCode, int newTime)
+    {
+        if(examCodeLabel.getText().equals(examCode))
+        {
+            examTimer.stop();
+            int hours = Math.floorDiv(newTime,60);
+            String minutes = Integer.toString(newTime - 60 * hours);
+            hoursLabel.setText(Integer.toString(hours));
+            minutesLabel.setText(minutes);
+            examTimer.setCycleCount(newTime);
+            examTimer.play();
+        }
+    }
 }

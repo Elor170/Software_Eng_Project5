@@ -63,6 +63,8 @@ public class SimpleClient extends AbstractClient {
 						case "Finished Exam":
 							EventBus.getDefault().post(new TeacherEvent(message, "Finished Exam"));
 							break;
+						case "Time Request":
+							EventBus.getDefault().post(new TeacherEvent(message, "Requested Time"));
 					}
 					break;
 
