@@ -189,6 +189,19 @@ public class TeacherApp extends UserApp
         }
     }
 
+    private void CreateTimeRequest(Message message)
+    {
+        message.setCommand("Insert");
+        message.setClassType(TimeRequest.class);
+        try
+        {
+            client.sendToServer(message);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Subscribe
     @SuppressWarnings("unchecked")
     public void inTeacherEvent(TeacherEvent event){
@@ -230,6 +243,10 @@ public class TeacherApp extends UserApp
 
             case "Pull Exam":
                     pullExam((Exam)message.getSingleObject(), (String)message.getSingleObject2(), (String) message.getObjList());
+                break;
+
+            case "Request Time Change":
+                CreateTimeRequest(message);
                 break;
         }
     }

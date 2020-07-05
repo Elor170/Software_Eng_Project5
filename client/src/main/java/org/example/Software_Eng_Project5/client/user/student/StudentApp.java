@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
+import org.example.Software_Eng_Project5.client.user.student.GUI.mainStudentController;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

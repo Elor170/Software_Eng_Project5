@@ -4,25 +4,20 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.headmaster.HeadmasterEvent;
-import org.example.Software_Eng_Project5.client.user.student.GUI.ExamWindowController;
-import org.example.Software_Eng_Project5.client.user.teacher.GUI.QuestionWindowController;
+import org.example.Software_Eng_Project5.client.user.student.StudentApp;
+import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
+import org.example.Software_Eng_Project5.client.user.teacher.GUI.ExamWindowController;
 import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherEvent;
 import org.example.Software_Eng_Project5.entities.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -45,6 +40,8 @@ public class mainHeadmasterController
     private List<Question> questionList;
     private List<SolvedExam> solvedExamList;
     private ArrayList<String> answersList;
+    private List<TimeRequest> timeRequests;
+    private static List<StudentApp> studentAppList;
 
     @FXML
     private BorderPane borderPane;
@@ -67,6 +64,16 @@ public class mainHeadmasterController
 
 
     public void setUserName(String userName){ userNameLabel.setText(userName); }
+
+    public List<StudentApp> getStudentAppList()
+    {
+        return studentAppList;
+    }
+
+    public void setStudentAppList(List<StudentApp> studentAppList)
+    {
+        this.studentAppList = studentAppList;
+    }
 
     @FXML
     private void showQuestions(ActionEvent event){
@@ -530,7 +537,89 @@ public class mainHeadmasterController
     @FXML
     void showTimeRequests(ActionEvent event)
     {
+        Message message = new Message();
+        message.setItemsType("TimeRequest");
+        message.setList(true);
+        EventBus.getDefault().post(new HeadmasterEvent(message, "GetRequests"));
+        this.timeRequests = null;
+        do {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }while (this.timeRequests == null);
 
+        if(!this.timeRequests.isEmpty()){
+            Button ConfirmB;
+            Button DeclineB;
+            HBox examHBox;
+            Label examCodeLabel;
+            Label examTimeLabel;
+
+            for (TimeRequest timeRequest : this.timeRequests){
+                examHBox = new HBox();
+//                if(isMyExams){
+//                    showOrEditExamB = new Button("Edit");
+//                    showOrEditExamB.setOnAction(this::editExam);
+//                }
+//                else {
+                ConfirmB = new Button("Confirm");
+                ConfirmB.setOnAction(this::ConfirmRequest);
+                DeclineB = new Button("Decline");
+                DeclineB.setOnAction(this::RemoveRequest);
+                //  }
+                ConfirmB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
+                DeclineB.setStyle("-fx-background-color: #DADCE0;" + "-fx-background-insets: 5");
+
+                examCodeLabel = new Label("Execution Code: " + timeRequest.getExecCode());
+                examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                int hours = Math.floorDiv(timeRequest.getTime(),60);
+                String minutes = Integer.toString(timeRequest.getTime() - 60 * hours);
+                if(minutes.length() < 2)
+                    minutes = "0" + minutes;
+                examTimeLabel = new Label(  "New Time: " + hours + ":" + minutes);
+                examTimeLabel.setStyle("-fx-text-fill: #d6e0e5;");
+
+                examHBox.getChildren().addAll(ConfirmB, DeclineB, examCodeLabel, examTimeLabel);
+                examHBox.setSpacing(20);
+                examHBox.setStyle("-fx-font-size: 16;");
+                this.contentVBox.getChildren().add(examHBox);
+            }
+        }
+
+        // Case: No exams in the selected course/profession
+        else {
+            Label label = new Label("There are no exams yet.");
+            label.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 20 20 5 5;"
+                    + "-fx-font-size: 16;");
+            this.contentVBox.getChildren().add(label);
+        }
+    }
+
+    private void ConfirmRequest(ActionEvent actionEvent)
+    {
+        String selectedExamCode = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(2)).getText());
+        String selectedTime = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(3)).getText());
+        StudentApp studentApp;
+        Message message = new Message();
+        message.setSingleObject(selectedExamCode);
+        message.setSingleObject2(selectedTime);
+
+        EventBus.getDefault().post(new StudentEvent(message, "Change Time"));
+        //RemoveRequest(actionEvent);
+    }
+
+    private void RemoveRequest(ActionEvent actionEvent)
+    {
+        String selectedExamCode = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(2)).getText());
+        String selectedTime = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(3)).getText());
+
+        Message message = new Message();
+        message.setSingleObject(selectedExamCode);
+        message.setSingleObject2(selectedTime);
+        EventBus.getDefault().post(new HeadmasterEvent(message, "Delete Time"));
     }
 
     public List<Profession> getProfessionList() {
@@ -548,6 +637,10 @@ public class mainHeadmasterController
         String eventType = message.getItemsType();
 
         switch (eventType) {
+            case "timeRequests":
+                this.timeRequests = (List<TimeRequest>) message.getObjList();
+                break;
+
             case "allQuestions":
                 this.questionList = (List<Question>) message.getObjList();
                 break;

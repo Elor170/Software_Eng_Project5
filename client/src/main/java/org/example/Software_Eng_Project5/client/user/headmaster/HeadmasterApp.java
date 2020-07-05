@@ -6,12 +6,15 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.UserApp;
-import org.example.Software_Eng_Project5.client.user.teacher.TeacherApp;
+import org.example.Software_Eng_Project5.client.user.headmaster.GUI.mainHeadmasterController;
+import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.entities.Message;
+import org.example.Software_Eng_Project5.entities.Student;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.List;
 
 public class HeadmasterApp extends UserApp
 {

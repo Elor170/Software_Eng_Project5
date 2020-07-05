@@ -12,11 +12,13 @@ import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
 import org.example.Software_Eng_Project5.entities.Message;
 import org.example.Software_Eng_Project5.entities.PulledExam;
+import org.example.Software_Eng_Project5.entities.SolvedExam;
 import org.example.Software_Eng_Project5.entities.Student;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
+import java.util.List;
 
 public class studentSolvedExamController {
 
@@ -51,5 +53,4 @@ public class studentSolvedExamController {
             msg = "\nWOW You're Amazing!!!";
         gradeLabel.setText("Your Grade Is: " + grade + msg);
     }
-
 }
