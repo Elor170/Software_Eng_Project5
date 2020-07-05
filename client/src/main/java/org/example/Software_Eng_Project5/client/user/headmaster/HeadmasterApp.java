@@ -59,15 +59,54 @@ public class HeadmasterApp extends UserApp
         client.sendToServer(message);
     }
 
+
+    private void ChangeTime(Message message) throws IOException
+    {
+        message.setCommand("Confirm Time");
+        client.sendToServer(message);
+    }
+
+    private void DeleteTime(Message message) throws IOException
+    {
+        message.setCommand("Delete Time");
+        client.sendToServer(message);
+    }
+
     @Subscribe
     public void inHeadmasterEvent(HeadmasterEvent event)
     {
         Message message = event.getMessage();
-
-        try {
-            bring(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(event.getEventType().equals("Change Time"))
+        {
+            try
+            {
+                ChangeTime(message);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
+        else if(event.getEventType().equals("Delete Time"))
+        {
+            try
+            {
+                DeleteTime(message);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        else
+        {
+            try
+            {
+                bring(message);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
     }
 }

@@ -60,7 +60,7 @@ public class StudentExamController {
 //        assert examCodeLabel != null : "fx:id=\"examCodeLabel\" was not injected: check your FXML file 'studentExamWindow.fxml'.";
 //    }
 
-    Timeline examTimer = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+    Timeline examTimer = new Timeline(new KeyFrame(Duration.seconds(60), new EventHandler<ActionEvent>() {
 
         @Override
         public void handle(ActionEvent event) {
@@ -173,7 +173,7 @@ public class StudentExamController {
 
     public void changeTime(String examCode, int newTime)
     {
-        if(examCodeLabel.getText().equals(examCode))
+        if(pulledExam.getExecutionCode().equals(examCode))
         {
             examTimer.stop();
             int hours = Math.floorDiv(newTime,60);

@@ -652,6 +652,7 @@ public class MainTeacherController {
     @FXML
     void requestTimeChange(ActionEvent event)
     {
+        this.contentVBox.getChildren().clear();
         HBox requestTimeHBox = new HBox();
         Button sendRequestB = new Button("Send Request");
         sendRequestB.setOnAction(this::sendRequest);

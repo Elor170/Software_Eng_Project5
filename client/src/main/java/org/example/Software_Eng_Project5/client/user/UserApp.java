@@ -100,7 +100,12 @@ public class UserApp extends Application {
 
             switch (userType) {
                 case "Headmaster":
-                    this.userName = userName;
+                    try {
+                        this.userName = userName;
+                        HeadmasterApp headmasterApp = new HeadmasterApp(this.stage, userName, this.client);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
 
                 case "Teacher":

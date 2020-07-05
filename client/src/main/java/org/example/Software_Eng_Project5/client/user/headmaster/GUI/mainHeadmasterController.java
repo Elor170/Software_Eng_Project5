@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import org.example.Software_Eng_Project5.client.user.headmaster.HeadmasterEvent;
+import org.example.Software_Eng_Project5.client.user.student.GUI.mainStudentController;
 import org.example.Software_Eng_Project5.client.user.student.StudentApp;
 import org.example.Software_Eng_Project5.client.user.student.StudentEvent;
 import org.example.Software_Eng_Project5.client.user.teacher.GUI.ExamWindowController;
@@ -41,7 +42,8 @@ public class mainHeadmasterController
     private List<SolvedExam> solvedExamList;
     private ArrayList<String> answersList;
     private List<TimeRequest> timeRequests;
-    private static List<StudentApp> studentAppList;
+    private int newTime;
+    private int timeId;
 
     @FXML
     private BorderPane borderPane;
@@ -62,18 +64,7 @@ public class mainHeadmasterController
     @FXML
     private Button timeRequestsB;
 
-
     public void setUserName(String userName){ userNameLabel.setText(userName); }
-
-    public List<StudentApp> getStudentAppList()
-    {
-        return studentAppList;
-    }
-
-    public void setStudentAppList(List<StudentApp> studentAppList)
-    {
-        this.studentAppList = studentAppList;
-    }
 
     @FXML
     private void showQuestions(ActionEvent event){
@@ -537,6 +528,8 @@ public class mainHeadmasterController
     @FXML
     void showTimeRequests(ActionEvent event)
     {
+        this.contentVBox.getChildren().clear();
+        this.contentTitle.setText("Time Requests");
         Message message = new Message();
         message.setItemsType("TimeRequest");
         message.setList(true);
@@ -574,7 +567,8 @@ public class mainHeadmasterController
 
                 examCodeLabel = new Label("Execution Code: " + timeRequest.getExecCode());
                 examCodeLabel.setStyle("-fx-text-fill: #d6e0e5;");
-
+                newTime = timeRequest.getTime();
+                timeId = timeRequest.getId();
                 int hours = Math.floorDiv(timeRequest.getTime(),60);
                 String minutes = Integer.toString(timeRequest.getTime() - 60 * hours);
                 if(minutes.length() < 2)
@@ -591,7 +585,7 @@ public class mainHeadmasterController
 
         // Case: No exams in the selected course/profession
         else {
-            Label label = new Label("There are no exams yet.");
+            Label label = new Label("There are no requests yet.");
             label.setStyle("-fx-text-fill: #d6e0e5;" + "-fx-padding: 20 20 5 5;"
                     + "-fx-font-size: 16;");
             this.contentVBox.getChildren().add(label);
@@ -601,24 +595,24 @@ public class mainHeadmasterController
     private void ConfirmRequest(ActionEvent actionEvent)
     {
         String selectedExamCode = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(2)).getText());
-        String selectedTime = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(3)).getText());
+
         StudentApp studentApp;
         Message message = new Message();
-        message.setSingleObject(selectedExamCode);
-        message.setSingleObject2(selectedTime);
+        message.setSingleObject(selectedExamCode.substring(16));
+        message.setSingleObject2(newTime);
 
-        EventBus.getDefault().post(new StudentEvent(message, "Change Time"));
-        //RemoveRequest(actionEvent);
+        EventBus.getDefault().post(new HeadmasterEvent(message, "Change Time"));
+        RemoveRequest(actionEvent);
     }
 
     private void RemoveRequest(ActionEvent actionEvent)
     {
         String selectedExamCode = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(2)).getText());
-        String selectedTime = (((Label)((HBox)((Button)actionEvent.getSource()).getParent()).getChildren().get(3)).getText());
 
         Message message = new Message();
-        message.setSingleObject(selectedExamCode);
-        message.setSingleObject2(selectedTime);
+        message.setSingleObject(selectedExamCode.substring(16));
+        message.setSingleObject2(newTime);
+        message.setTestTime(timeId);
         EventBus.getDefault().post(new HeadmasterEvent(message, "Delete Time"));
     }
 

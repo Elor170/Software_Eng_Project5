@@ -80,6 +80,10 @@ public class SimpleClient extends AbstractClient {
 					{
 						EventBus.getDefault().post(new StudentEvent(message, "Solved Exams"));
 					}
+					else if(eventType.equals("Confirm Time"))
+					{
+						EventBus.getDefault().post(new StudentEvent(message, "Change Time"));
+					}
 					break;
 
 				case "Headmaster Event":

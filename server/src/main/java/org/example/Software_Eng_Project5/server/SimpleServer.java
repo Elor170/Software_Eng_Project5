@@ -88,10 +88,24 @@ public class SimpleServer extends AbstractServer {
 				case "Validate":
 					returnMessage = validateCredentials(message);
 					break;
+
+				case "Confirm Time":
+					returnMessage = confirmTime(message);
+					break;
+
+				case "Delete Time":
+					returnMessage = deleteTime(message);
+					break;
 			}
 				try {
 					if (returnMessage != null)
-						client.sendToClient(returnMessage);
+					{
+					if(returnMessage.getType().equals("Confirm Time"))
+							sendToAllClients(returnMessage);
+						else
+							client.sendToClient(returnMessage);
+					}
+
 					System.out.format("Sent message to client %s\n", Objects.requireNonNull(client.getInetAddress()).getHostAddress());
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -112,6 +126,23 @@ public class SimpleServer extends AbstractServer {
 				session.getSessionFactory().close();
 			}
 		}
+	}
+
+	private Message deleteTime(Message message)
+	{
+		TimeRequest timeRequest = session.get(TimeRequest.class, message.getTestTime());
+		session.delete(timeRequest);
+		return null;
+	}
+
+	private Message confirmTime(Message message)
+	{
+		Message retMessage = new Message();
+		retMessage.setSingleObject(message.getSingleObject());
+		retMessage.setSingleObject2(message.getSingleObject2());
+		retMessage.setType("Confirm Time");
+		retMessage.setCommand("Student Event");
+		return retMessage;
 	}
 
 	private Message validateCredentials(Message message)
